@@ -1,0 +1,2288 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>YCT Vocab — Chinois</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<meta name="theme-color" content="#0F6E56">
+<style>
+/* ══════════════════════════════════════════════
+   TOKENS — Light
+══════════════════════════════════════════════ */
+:root {
+  --c-bg:#F7F6F2; --c-surface:#FFFFFF; --c-border:#E8E4DC;
+  --c-text:#1A1814; --c-muted:#8A8070; --c-hint:#B8B0A0;
+  --c-overlay:rgba(0,0,0,.45);
+  --radius:14px; --radius-sm:9px;
+  --shadow:0 2px 12px rgba(0,0,0,.07);
+  --topbar-bg:rgba(247,246,242,.93);
+
+  --c1:#0F6E56; --c1-bg:#E1F5EE;
+  --c2:#185FA5; --c2-bg:#E6F1FB;
+  --c3:#534AB7; --c3-bg:#EEEDFE;
+  --c4:#C45E00; --c4-bg:#FEF0E1;
+  --c5:#A32D2D; --c5-bg:#FCEBEB;
+}
+/* Dark mode */
+@media(prefers-color-scheme:dark){:root{
+  --c-bg:#18171A; --c-surface:#242228; --c-border:#38353E;
+  --c-text:#EDE9E0; --c-muted:#8A8494; --c-hint:#524E5A;
+  --c-overlay:rgba(0,0,0,.6);
+  --topbar-bg:rgba(24,23,26,.93);
+  --shadow:0 2px 16px rgba(0,0,0,.35);
+  --c1:#2CC48A; --c1-bg:#0D2A20;
+  --c2:#4D9EE8; --c2-bg:#0D1E30;
+  --c3:#8E88F0; --c3-bg:#19183A;
+  --c4:#F59A3C; --c4-bg:#2E1A00;
+  --c5:#E06060; --c5-bg:#2E0F0F;
+}}
+/* Manual dark override */
+body.dark{
+  --c-bg:#18171A; --c-surface:#242228; --c-border:#38353E;
+  --c-text:#EDE9E0; --c-muted:#8A8494; --c-hint:#524E5A;
+  --c-overlay:rgba(0,0,0,.6);
+  --topbar-bg:rgba(24,23,26,.93);
+  --shadow:0 2px 16px rgba(0,0,0,.35);
+  --c1:#2CC48A; --c1-bg:#0D2A20;
+  --c2:#4D9EE8; --c2-bg:#0D1E30;
+  --c3:#8E88F0; --c3-bg:#19183A;
+  --c4:#F59A3C; --c4-bg:#2E1A00;
+  --c5:#E06060; --c5-bg:#2E0F0F;
+}
+body.light{
+  --c-bg:#F7F6F2; --c-surface:#FFFFFF; --c-border:#E8E4DC;
+  --c-text:#1A1814; --c-muted:#8A8070; --c-hint:#B8B0A0;
+  --topbar-bg:rgba(247,246,242,.93);
+  --shadow:0 2px 12px rgba(0,0,0,.07);
+  --c1:#0F6E56; --c1-bg:#E1F5EE;
+  --c2:#185FA5; --c2-bg:#E6F1FB;
+  --c3:#534AB7; --c3-bg:#EEEDFE;
+  --c4:#C45E00; --c4-bg:#FEF0E1;
+  --c5:#A32D2D; --c5-bg:#FCEBEB;
+}
+
+/* ══════════════════════════════════════════════
+   BASE
+══════════════════════════════════════════════ */
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;background:var(--c-bg);}
+body{font-family:'Georgia',serif;-webkit-tap-highlight-color:transparent;color:var(--c-text);transition:background .25s,color .25s;}
+
+.app{min-height:100vh;max-width:640px;margin:0 auto;padding:0 0 2.5rem;}
+
+/* Views */
+.view{display:none;}
+.view.active{display:block;animation:fadeUp .22s ease both;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* ══════════════════════════════════════════════
+   HOME
+══════════════════════════════════════════════ */
+.home-header{
+  padding:1.4rem 1rem .9rem;
+  display:flex;align-items:center;gap:10px;
+}
+.home-logo{font-size:28px;}
+.home-title{font-size:22px;font-weight:700;letter-spacing:-.5px;}
+.home-sub{font-size:13px;color:var(--c-muted);margin-top:2px;}
+.home-dark-btn{
+  margin-left:auto;background:none;border:1.5px solid var(--c-border);
+  border-radius:var(--radius-sm);padding:7px 10px;font-size:16px;cursor:pointer;
+  min-height:38px;min-width:38px;transition:background .12s;color:var(--c-text);
+}
+.home-dark-btn:active{background:var(--c-border);}
+.theme-seg{display:flex;gap:6px;margin-bottom:.9rem;}
+.theme-btn{
+  flex:1;padding:9px 4px;font-size:13px;font-weight:600;
+  border:1.5px solid var(--c-border);border-radius:var(--radius-sm);
+  background:var(--c-bg);color:var(--c-muted);cursor:pointer;
+  font-family:inherit;transition:background .12s,color .12s,border-color .12s;
+}
+.theme-btn.active{background:var(--c-text);color:var(--c-bg);border-color:var(--c-text);}
+
+.levels-list{padding:0 .75rem;display:flex;flex-direction:column;gap:10px;}
+
+.level-card{
+  background:var(--c-surface);border:1.5px solid var(--c-border);
+  border-radius:var(--radius);padding:.75rem 1rem .7rem;
+  box-shadow:var(--shadow);transition:transform .13s;
+}
+.level-card:active{transform:scale(.985);}
+.lc-top{display:flex;align-items:center;gap:10px;margin-bottom:.5rem;}
+.lc-icon{font-size:22px;line-height:1;}
+.lc-info{flex:1;min-width:0;}
+.lc-name{font-size:16px;font-weight:700;}
+.lc-desc{font-size:12px;color:var(--c-muted);}
+.lc-pill{font-size:11px;font-weight:600;padding:3px 10px;border-radius:20px;white-space:nowrap;}
+
+.lc-btns{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;}
+.lc-btn{
+  padding:10px 4px;font-size:12px;font-weight:600;
+  border:1.5px solid var(--c-border);border-radius:var(--radius-sm);
+  background:var(--c-bg);color:var(--c-text);cursor:pointer;
+  min-height:44px;transition:background .12s,transform .1s;
+  display:flex;align-items:center;justify-content:center;gap:4px;
+  font-family:inherit;
+}
+.lc-btn:active{transform:scale(.97);}
+.lc-btn.accent{border-color:var(--lc);color:var(--lc);background:var(--lc-bg);}
+
+/* ══════════════════════════════════════════════
+   TOPBAR
+══════════════════════════════════════════════ */
+.topbar{
+  position:sticky;top:0;z-index:10;
+  background:var(--topbar-bg);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--c-border);
+  display:flex;align-items:center;gap:8px;
+  padding:.65rem .85rem;
+  transition:background .25s;
+}
+.back-btn{
+  background:var(--c-surface);border:1.5px solid var(--c-border);
+  border-radius:var(--radius-sm);padding:7px 11px;
+  font-size:13px;color:var(--c-text);cursor:pointer;min-height:40px;
+  white-space:nowrap;transition:background .12s;font-family:inherit;
+}
+.back-btn:active{background:var(--c-border);}
+.topbar-title{font-size:15px;font-weight:700;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.topbar-badge{font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;white-space:nowrap;flex-shrink:0;}
+.topbar-actions{display:flex;gap:6px;flex-shrink:0;}
+.topbar-icon-btn{
+  background:var(--c-surface);border:1.5px solid var(--c-border);
+  border-radius:var(--radius-sm);padding:6px 9px;font-size:14px;
+  cursor:pointer;min-height:36px;transition:background .12s;color:var(--c-text);
+}
+.topbar-icon-btn:active{background:var(--c-border);}
+.topbar-icon-btn.active-toggle{background:var(--lc-bg);border-color:var(--lc);color:var(--lc);}
+
+/* ══════════════════════════════════════════════
+   VOCAB
+══════════════════════════════════════════════ */
+.vocab-body{padding:.8rem .75rem 0;}
+.search-wrap{position:relative;margin-bottom:.5rem;}
+.search-bar{
+  width:100%;padding:10px 36px 10px 12px;font-size:15px;
+  border:1.5px solid var(--c-border);border-radius:var(--radius-sm);
+  background:var(--c-surface);color:var(--c-text);font-family:inherit;
+  transition:border-color .15s;
+}
+.search-bar:focus{outline:none;border-color:var(--lc);}
+.search-clear{
+  position:absolute;right:10px;top:50%;transform:translateY(-50%);
+  background:none;border:none;font-size:16px;color:var(--c-hint);
+  cursor:pointer;padding:4px;display:none;
+}
+.search-clear.visible{display:block;}
+
+.cat-scroll{overflow-x:auto;display:flex;gap:6px;padding-bottom:.5rem;scrollbar-width:none;}
+.cat-scroll::-webkit-scrollbar{display:none;}
+.cat-pill{
+  flex-shrink:0;padding:5px 12px;font-size:12px;font-weight:600;
+  border:1.5px solid var(--c-border);border-radius:20px;
+  background:var(--c-surface);color:var(--c-muted);cursor:pointer;
+  transition:all .13s;white-space:nowrap;min-height:32px;font-family:inherit;
+}
+.cat-pill.active{background:var(--lc-bg);border-color:var(--lc);color:var(--lc);}
+
+.vocab-meta{display:flex;align-items:center;justify-content:space-between;margin-bottom:.6rem;}
+.count{font-size:12px;color:var(--c-muted);}
+.hint-speak{font-size:12px;color:var(--c-hint);}
+
+.vocab-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding-bottom:1rem;}
+@media(min-width:480px){.vocab-grid{grid-template-columns:repeat(3,1fr);}}
+
+.vocab-card{
+  border:1.5px solid var(--c-border);border-radius:var(--radius-sm);
+  padding:10px 10px 8px;background:var(--c-surface);cursor:pointer;
+  transition:background .1s,border-color .1s,transform .1s;
+  -webkit-user-select:none;user-select:none;
+}
+.vocab-card:active{transform:scale(.97);}
+.vocab-card.speaking{border-color:var(--c1);background:var(--c1-bg);}
+.vc-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:3px;}
+.v-hanzi{font-size:26px;line-height:1.25;color:var(--c-text);}
+.v-hanzi.big{font-size:32px;}
+.v-hanzi.small{font-size:20px;}
+.v-sound{font-size:15px;opacity:.55;margin-top:3px;flex-shrink:0;}
+.vocab-card.speaking .v-sound{opacity:1;}
+.v-pinyin{font-size:11px;color:var(--c-muted);transition:opacity .2s;}
+.v-pinyin.hidden{opacity:0;}
+.v-fr{font-size:12px;color:var(--c-text);font-weight:600;}
+.v-cat{font-size:10px;color:var(--c-hint);margin-top:2px;}
+
+/* ══════════════════════════════════════════════
+   FLASH CARDS
+══════════════════════════════════════════════ */
+.flash-body{padding:.8rem .75rem;}
+.flash-wrap{max-width:480px;margin:0 auto;}
+.flash-meta{display:flex;justify-content:space-between;font-size:12px;color:var(--c-muted);margin-bottom:.85rem;}
+
+.flash-scene{perspective:1000px;margin-bottom:1rem;cursor:pointer;}
+.flash-card-3d{
+  position:relative;width:100%;min-height:220px;
+  transform-style:preserve-3d;transition:transform .45s cubic-bezier(.4,0,.2,1);
+  border-radius:var(--radius);
+}
+.flash-card-3d.flipped{transform:rotateY(180deg);}
+.flash-face{
+  position:absolute;inset:0;
+  border:1.5px solid var(--c-border);border-radius:var(--radius);
+  background:var(--c-surface);box-shadow:var(--shadow);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:1.5rem 1rem;text-align:center;
+  -webkit-backface-visibility:hidden;backface-visibility:hidden;
+}
+.flash-face.back{transform:rotateY(180deg);}
+.flash-face-label{font-size:11px;color:var(--c-hint);margin-bottom:.75rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;}
+.flash-hanzi{font-size:64px;line-height:1.1;margin-bottom:.5rem;}
+.flash-pinyin{font-size:15px;color:var(--c-muted);margin-bottom:.25rem;}
+.flash-fr{font-size:20px;font-weight:700;margin-bottom:.3rem;}
+.flash-cat{font-size:12px;color:var(--c-hint);}
+.flash-tap-hint{font-size:12px;color:var(--c-hint);margin-top:.5rem;}
+
+.flash-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:.75rem;}
+.flash-btn{
+  padding:13px 8px;font-size:14px;font-weight:700;
+  border:1.5px solid var(--c-border);border-radius:var(--radius-sm);
+  cursor:pointer;min-height:50px;font-family:inherit;transition:transform .1s,background .12s;
+}
+.flash-btn:active{transform:scale(.97);}
+.flash-btn.fail{background:var(--c5-bg);color:var(--c5);border-color:var(--c5);}
+.flash-btn.pass{background:var(--c1-bg);color:var(--c1);border-color:var(--c1);}
+
+.flash-progress{display:flex;gap:4px;justify-content:center;flex-wrap:wrap;margin-bottom:.5rem;}
+.fp-dot{width:8px;height:8px;border-radius:50%;background:var(--c-border);transition:background .2s;}
+.fp-dot.ok{background:var(--c1);}
+.fp-dot.ko{background:var(--c5);}
+.fp-dot.cur{background:var(--c-muted);}
+
+/* ══════════════════════════════════════════════
+   QUIZ
+══════════════════════════════════════════════ */
+.quiz-body{padding:.8rem .75rem;}
+.quiz-wrap{max-width:480px;margin:0 auto;}
+.qpbar{height:5px;background:var(--c-border);border-radius:3px;margin-bottom:.9rem;overflow:hidden;}
+.qpfill{height:100%;border-radius:3px;background:var(--lc);transition:width .4s ease;}
+.qmeta{display:flex;justify-content:space-between;font-size:12px;color:var(--c-muted);margin-bottom:.9rem;align-items:center;}
+.streak{font-size:13px;font-weight:700;color:#F59A3C;min-width:60px;text-align:right;transition:opacity .3s;}
+.streak.hidden{opacity:0;}
+
+.qcard{
+  background:var(--c-surface);border:1.5px solid var(--c-border);
+  border-radius:var(--radius);padding:1.4rem 1rem 1.1rem;
+  text-align:center;margin-bottom:.9rem;box-shadow:var(--shadow);
+}
+.q-hanzi{font-size:54px;line-height:1.15;margin-bottom:6px;}
+.q-fr-prompt{font-size:22px;font-weight:700;line-height:1.3;margin-bottom:6px;color:var(--c-text);}
+.q-sound-btn{
+  display:inline-flex;align-items:center;gap:5px;
+  background:var(--c-bg);border:1.5px solid var(--c-border);border-radius:20px;
+  padding:5px 12px;font-size:12px;color:var(--c-muted);cursor:pointer;
+  margin-bottom:.4rem;transition:background .12s;font-family:inherit;
+}
+.q-sound-btn:active{background:var(--c-border);}
+.q-sound-btn.playing{border-color:var(--c1);color:var(--c1);}
+.q-pinyin{font-size:14px;color:var(--c-muted);}
+.q-lbl{font-size:12px;color:var(--c-hint);margin-top:4px;}
+
+.qopts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:.7rem;}
+.qopt{
+  padding:13px 10px;font-size:14px;
+  border:1.5px solid var(--c-border);border-radius:var(--radius-sm);
+  background:var(--c-surface);color:var(--c-text);cursor:pointer;
+  text-align:center;line-height:1.3;min-height:50px;
+  transition:background .1s,border-color .1s,transform .1s;font-family:inherit;
+}
+.qopt:active:not(.disabled){transform:scale(.97);}
+.qopt.correct{background:var(--c1-bg);border-color:var(--c1);color:var(--c1);font-weight:700;}
+.qopt.wrong{background:var(--c5-bg);border-color:var(--c5);color:var(--c5);}
+.qopt.disabled{cursor:default;}
+
+.qfb{font-size:14px;font-weight:600;margin-bottom:.7rem;text-align:center;min-height:20px;}
+.qnext{
+  width:100%;padding:13px;font-size:15px;font-weight:700;
+  border:none;border-radius:var(--radius-sm);
+  background:var(--c-text);color:var(--c-bg);cursor:pointer;
+  min-height:50px;font-family:inherit;transition:transform .1s,opacity .12s;
+}
+.qnext:active{transform:scale(.98);}
+
+/* ══════════════════════════════════════════════
+   SENTENCES
+══════════════════════════════════════════════ */
+.sent-sentence{font-size:26px;line-height:1.6;margin-bottom:.6rem;word-break:keep-all;}
+.sent-blank{
+  display:inline-block;min-width:2.2em;border-bottom:2.5px solid var(--lc);
+  color:var(--lc);font-weight:700;text-align:center;
+  vertical-align:bottom;margin:0 3px;transition:color .2s,background .2s,border-color .2s;
+}
+.sent-blank.filled{
+  border-bottom-color:transparent;padding:0 5px;
+  border-radius:5px;background:var(--lc-bg);
+}
+.sent-fr{font-size:13px;color:var(--c-muted);font-style:italic;line-height:1.4;margin-top:.2rem;}
+
+/* ══════════════════════════════════════════════
+   DICTÉE
+══════════════════════════════════════════════ */
+.dict-listen-btn{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+  width:112px;height:112px;border-radius:50%;
+  border:2.5px solid var(--lc);background:var(--lc-bg);color:var(--lc);
+  cursor:pointer;margin:.2rem auto .8rem;font-family:inherit;
+  transition:transform .12s,background .15s,color .15s;
+}
+.dict-listen-btn:active{transform:scale(.93);}
+.dict-listen-btn.playing{background:var(--lc);color:#fff;}
+.dict-snd-icon{font-size:38px;line-height:1;}
+.dict-snd-lbl{font-size:12px;font-weight:700;}
+
+/* ══════════════════════════════════════════════
+   ASSOCIATION
+══════════════════════════════════════════════ */
+.assoc-area{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:.75rem;}
+.assoc-col{display:flex;flex-direction:column;gap:8px;}
+.assoc-card{
+  padding:11px 6px;border:1.5px solid var(--c-border);
+  border-radius:var(--radius-sm);background:var(--c-surface);
+  cursor:pointer;text-align:center;min-height:54px;
+  display:flex;align-items:center;justify-content:center;line-height:1.3;
+  transition:background .12s,border-color .12s,color .12s,transform .1s;
+  font-family:inherit;color:var(--c-text);
+  -webkit-user-select:none;user-select:none;
+}
+.assoc-card.h-card{font-size:24px;}
+.assoc-card.fr-card{font-size:12px;font-weight:600;}
+.assoc-card:active:not(.matched):not(.wrong){transform:scale(.96);}
+.assoc-card.selected{background:var(--lc-bg);border-color:var(--lc);color:var(--lc);}
+.assoc-card.matched{background:var(--c1-bg);border-color:var(--c1);color:var(--c1);cursor:default;pointer-events:none;}
+.assoc-card.wrong{background:var(--c5-bg);border-color:var(--c5);color:var(--c5);}
+
+/* Stars result */
+.stars-row{display:flex;justify-content:center;gap:6px;margin:8px 0;}
+.star{font-size:32px;opacity:.2;transition:opacity .4s,transform .4s;}
+.star.lit{opacity:1;transform:scale(1.2);}
+
+/* ══════════════════════════════════════════════
+   RESULTS
+══════════════════════════════════════════════ */
+.rcard{
+  background:var(--c-surface);border:1.5px solid var(--c-border);
+  border-radius:var(--radius);padding:1.6rem 1rem 1.4rem;
+  text-align:center;margin-bottom:1rem;box-shadow:var(--shadow);
+}
+.remoji{font-size:38px;margin-bottom:.4rem;}
+.rscore{font-size:54px;font-weight:700;line-height:1;}
+.rscore span{font-size:22px;color:var(--c-muted);}
+.rtotal{font-size:13px;color:var(--c-muted);margin:.35rem 0 .6rem;}
+.rmsg{font-size:15px;font-weight:600;margin-bottom:1rem;}
+.ractns{display:flex;gap:8px;flex-wrap:wrap;}
+.ractns button{
+  flex:1;min-width:90px;padding:11px 6px;font-size:12px;font-weight:600;
+  border:1.5px solid var(--c-border);border-radius:var(--radius-sm);
+  background:var(--c-bg);color:var(--c-text);cursor:pointer;min-height:44px;
+  font-family:inherit;transition:background .12s;
+}
+.ractns button:active{background:var(--c-border);}
+.ractns button.cta{background:var(--c-text);color:var(--c-bg);border-color:var(--c-text);}
+.wrong-section{margin-top:1rem;}
+.wrong-title{font-size:13px;font-weight:700;margin-bottom:.5rem;color:var(--c-muted);}
+.rb-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--c-border);font-size:12px;}
+.rb-h{font-size:22px;min-width:38px;cursor:pointer;}
+.rb-pin{font-size:11px;color:var(--c-hint);min-width:70px;}
+.rb-fr{flex:1;color:var(--c-muted);}
+.rb-x{color:var(--c5);font-size:14px;}
+
+/* ══════════════════════════════════════════════
+   MODAL
+══════════════════════════════════════════════ */
+.modal-overlay{
+  position:fixed;inset:0;background:var(--c-overlay);z-index:100;
+  display:flex;align-items:flex-end;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .2s;
+}
+.modal-overlay.open{opacity:1;pointer-events:all;}
+.modal{
+  background:var(--c-surface);border-radius:var(--radius) var(--radius) 0 0;
+  padding:1.4rem 1.2rem 2rem;width:100%;max-width:480px;
+  transform:translateY(30px);transition:transform .22s;
+}
+.modal-overlay.open .modal{transform:none;}
+.modal-title{font-size:17px;font-weight:700;margin-bottom:.4rem;}
+.modal-sub{font-size:14px;color:var(--c-muted);margin-bottom:1.2rem;}
+.modal-btns{display:flex;flex-direction:column;gap:8px;}
+.modal-btns button{
+  padding:13px;font-size:15px;font-weight:600;border-radius:var(--radius-sm);
+  border:1.5px solid var(--c-border);cursor:pointer;font-family:inherit;
+  background:var(--c-bg);color:var(--c-text);
+}
+.modal-btn-stay{background:var(--c-text)!important;color:var(--c-bg)!important;border-color:var(--c-text)!important;}
+
+/* ══════════════════════════════════════════════
+   UTILS
+══════════════════════════════════════════════ */
+.empty{text-align:center;padding:2.5rem 1rem;color:var(--c-hint);}
+.empty-icon{font-size:34px;margin-bottom:.5rem;}
+@media(max-width:400px){
+  .qopts{grid-template-columns:1fr;}
+  .q-hanzi{font-size:44px;}
+  .ractns{flex-direction:column;}
+  .flash-hanzi{font-size:52px;}
+  .lc-btns{grid-template-columns:repeat(2,1fr);gap:6px;}
+}
+
+/* ══════════════════════════════════════════════
+   LEVEL COLORS  (--lc / --lc-bg per context)
+══════════════════════════════════════════════ */
+.l1{--lc:var(--c1);--lc-bg:var(--c1-bg);}
+.l2{--lc:var(--c2);--lc-bg:var(--c2-bg);}
+.l3{--lc:var(--c3);--lc-bg:var(--c3-bg);}
+.l4{--lc:var(--c4);--lc-bg:var(--c4-bg);}
+.l5{--lc:var(--c5);--lc-bg:var(--c5-bg);}
+.lc-pill,.topbar-badge,.cat-pill.active{background:var(--lc-bg);color:var(--lc);}
+.lc-btn.accent{color:var(--lc);background:var(--lc-bg);border-color:var(--lc);}
+
+/* ══════════════════════════════════════════════
+   WORD ACTION SHEET
+══════════════════════════════════════════════ */
+.word-sheet-overlay{
+  position:fixed;inset:0;background:var(--c-overlay);z-index:60;
+  display:flex;align-items:flex-end;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .2s;
+}
+.word-sheet-overlay.open{opacity:1;pointer-events:all;}
+.word-sheet{
+  background:var(--c-surface);border-radius:var(--radius) var(--radius) 0 0;
+  padding:1.4rem 1.2rem 2.2rem;width:100%;max-width:480px;
+  transform:translateY(30px);transition:transform .22s;
+  text-align:center;
+}
+.word-sheet-overlay.open .word-sheet{transform:none;}
+.ws-hanzi{font-size:72px;line-height:1.1;margin-bottom:.3rem;letter-spacing:-.02em;}
+.ws-pinyin{font-size:15px;color:var(--c-muted);margin-bottom:.2rem;}
+.ws-fr{font-size:16px;font-weight:700;margin-bottom:1.3rem;color:var(--c-text);}
+.ws-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.ws-btns button{
+  padding:15px 8px;font-size:15px;font-weight:700;
+  border:1.5px solid var(--c-border);border-radius:var(--radius-sm);
+  background:var(--c-bg);color:var(--c-text);cursor:pointer;
+  min-height:56px;font-family:inherit;transition:background .12s,transform .1s;
+}
+.ws-btns button:active{transform:scale(.97);}
+.ws-btn-write{background:var(--lc-bg)!important;color:var(--lc)!important;border-color:var(--lc)!important;}
+
+/* ══════════════════════════════════════════════
+   WRITE VIEW
+══════════════════════════════════════════════ */
+#write-view{
+  position:fixed;inset:0;z-index:50;
+  display:none;flex-direction:column;
+  background:var(--c-bg);
+}
+#write-view.wv-open{display:flex;animation:fadeUp .2s ease both;}
+.write-topbar{
+  display:flex;align-items:center;gap:8px;
+  padding:.65rem .85rem;
+  background:var(--topbar-bg);
+  backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--c-border);
+  flex-shrink:0;transition:background .25s;
+}
+.write-word-info{flex:1;text-align:center;min-width:0;overflow:hidden;}
+.write-word-hanzi{font-size:20px;font-weight:700;line-height:1.2;}
+.write-word-sub{font-size:11px;color:var(--c-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+.write-body{
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  padding:1rem .75rem 1.5rem;gap:.9rem;
+  overflow:hidden;
+}
+.write-hw-wrap{
+  position:relative;
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  overflow:hidden;
+  flex-shrink:0;
+  background:var(--c-surface);
+  border:1.5px solid var(--c-border);
+  touch-action:none;
+}
+.write-hw-wrap svg,.write-hw-wrap canvas{display:block;}
+
+/* Char nav for multi-char words */
+.write-char-nav{
+  display:flex;align-items:center;gap:12px;
+}
+.write-char-btn{
+  background:var(--c-surface);border:1.5px solid var(--c-border);
+  border-radius:var(--radius-sm);padding:6px 12px;
+  font-size:13px;color:var(--c-text);cursor:pointer;min-height:36px;
+  font-family:inherit;transition:background .12s;
+}
+.write-char-btn:active{background:var(--c-border);}
+.write-char-btn:disabled{opacity:.35;cursor:default;}
+.write-char-label{
+  font-size:13px;color:var(--c-muted);font-weight:600;white-space:nowrap;
+}
+
+/* Status bar */
+.write-status-row{
+  display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;
+}
+.write-status{
+  font-size:13px;color:var(--c-muted);text-align:center;
+  min-height:20px;transition:color .2s;
+}
+.write-status.ok{color:var(--c1);}
+.write-status.err{color:var(--c5);}
+
+/* Stroke dots */
+.write-stroke-dots{display:flex;gap:5px;flex-wrap:wrap;justify-content:center;}
+.wsd{
+  width:9px;height:9px;border-radius:50%;
+  background:var(--c-border);transition:background .25s,transform .2s;
+  flex-shrink:0;
+}
+.wsd.done{background:var(--lc);transform:scale(1.1);}
+.wsd.active{background:var(--c-muted);}
+.wsd.err{background:var(--c5);}
+
+/* Bottom actions */
+.write-actions{display:flex;gap:8px;}
+.write-action-btn{
+  padding:10px 18px;font-size:13px;font-weight:600;
+  border:1.5px solid var(--c-border);border-radius:var(--radius-sm);
+  background:var(--c-bg);color:var(--c-text);cursor:pointer;
+  min-height:42px;font-family:inherit;transition:background .12s,transform .1s;
+}
+.write-action-btn:active{transform:scale(.97);}
+.write-action-btn.accent{background:var(--lc-bg);color:var(--lc);border-color:var(--lc);}
+
+/* Error shake */
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.write-hw-wrap.shake{animation:shake .25s ease;}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
+</head>
+<body>
+<div class="app">
+
+  <!-- ── HOME ──────────────────────────────── -->
+  <div id="home" class="view active">
+    <div class="home-header">
+      <span class="home-logo">🀄</span>
+      <div>
+        <div class="home-title">YCT Vocab</div>
+        <div class="home-sub">Vocabulaire chinois — 5 niveaux</div>
+      </div>
+      <button class="home-dark-btn" id="settings-btn" title="Paramètres">⚙️</button>
+    </div>
+    <div class="levels-list" id="home-cards"></div>
+  </div>
+
+  <!-- ── VOCAB ─────────────────────────────── -->
+  <div id="vocab-view" class="view">
+    <div class="topbar" id="vocab-topbar">
+      <button class="back-btn" id="vocab-back">← Retour</button>
+      <span class="topbar-title" id="view-title"></span>
+      <div class="topbar-actions">
+        <button class="topbar-icon-btn" id="pinyin-toggle" title="Masquer pinyin">pīn</button>
+        <button class="topbar-icon-btn" id="size-toggle" title="Taille hanzi">A+</button>
+        <span class="topbar-badge" id="view-badge"></span>
+      </div>
+    </div>
+    <div class="vocab-body">
+      <div class="search-wrap">
+        <input class="search-bar" id="search" type="search" placeholder="Rechercher..." autocomplete="off"/>
+        <button class="search-clear" id="search-clear" aria-label="Effacer">✕</button>
+      </div>
+      <div class="cat-scroll" id="cat-scroll"></div>
+      <div class="vocab-meta">
+        <span class="count" id="count-label"></span>
+        <span class="hint-speak">🔊 Appuyer pour écouter</span>
+      </div>
+      <div class="vocab-grid" id="vocab-grid"></div>
+    </div>
+  </div>
+
+  <!-- ── FLASH CARDS ───────────────────────── -->
+  <div id="flash-view" class="view">
+    <div class="topbar" id="flash-topbar">
+      <button class="back-btn" id="flash-back">← Retour</button>
+      <span class="topbar-title" id="flash-title"></span>
+      <span class="topbar-badge" id="flash-badge"></span>
+    </div>
+    <div class="flash-body">
+      <div class="flash-wrap" id="flash-body"></div>
+    </div>
+  </div>
+
+  <!-- ── QUIZ ──────────────────────────────── -->
+  <div id="quiz-view" class="view">
+    <div class="topbar" id="quiz-topbar">
+      <button class="back-btn" id="quiz-back">← Retour</button>
+      <span class="topbar-title" id="quiz-title"></span>
+      <span class="topbar-badge" id="quiz-badge"></span>
+    </div>
+    <div class="quiz-body">
+      <div class="quiz-wrap" id="quiz-body"></div>
+    </div>
+  </div>
+
+  <!-- ── PHRASES ──────────────────────────── -->
+  <div id="sent-view" class="view">
+    <div class="topbar" id="sent-topbar">
+      <button class="back-btn" id="sent-back">← Retour</button>
+      <span class="topbar-title" id="sent-title"></span>
+      <span class="topbar-badge" id="sent-badge"></span>
+    </div>
+    <div class="quiz-body">
+      <div class="quiz-wrap" id="sent-body"></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── WRITE VIEW ──────────────────────────── -->
+<div id="write-view">
+  <div class="write-topbar" id="write-topbar">
+    <button class="back-btn" id="write-back">← Retour</button>
+    <div class="write-word-info">
+      <div class="write-word-hanzi" id="write-word-hanzi"></div>
+      <div class="write-word-sub" id="write-word-sub"></div>
+    </div>
+    <button class="topbar-icon-btn" id="write-replay" title="Revoir l'animation">▶</button>
+  </div>
+  <div class="write-body" id="write-body">
+    <!-- char nav (multi-char words) -->
+    <div class="write-char-nav" id="write-char-nav" style="display:none">
+      <button class="write-char-btn" id="write-prev">‹</button>
+      <span class="write-char-label" id="write-char-label"></span>
+      <button class="write-char-btn" id="write-next">›</button>
+    </div>
+    <!-- HanziWriter target -->
+    <div class="write-hw-wrap" id="write-hw-wrap">
+      <div id="hanzi-writer-target"></div>
+    </div>
+    <!-- Stroke progress dots -->
+    <div class="write-stroke-dots" id="write-stroke-dots"></div>
+    <!-- Status message -->
+    <div class="write-status" id="write-status">Chargement…</div>
+    <!-- Action buttons -->
+    <div class="write-actions">
+      <button class="write-action-btn" id="write-hint-btn">💡 Indice</button>
+      <button class="write-action-btn accent" id="write-retry-btn">↺ Recommencer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Word action sheet -->
+<div class="word-sheet-overlay" id="word-sheet-overlay">
+  <div class="word-sheet" id="word-sheet">
+    <div class="ws-hanzi" id="ws-hanzi"></div>
+    <div class="ws-pinyin" id="ws-pinyin"></div>
+    <div class="ws-fr" id="ws-fr"></div>
+    <div class="ws-btns">
+      <button id="ws-listen">🔊 Écouter</button>
+      <button class="ws-btn-write" id="ws-write">✏️ Écrire</button>
+    </div>
+  </div>
+</div>
+
+<!-- Settings sheet -->
+<div class="modal-overlay" id="settings-overlay">
+  <div class="modal">
+    <div class="modal-title">⚙️ Paramètres</div>
+    <div style="font-size:11px;font-weight:700;letter-spacing:.07em;color:var(--c-muted);margin-bottom:.5rem">THÈME</div>
+    <div class="theme-seg">
+      <button class="theme-btn" id="theme-light">☀️ Clair</button>
+      <button class="theme-btn" id="theme-auto">🔄 Auto</button>
+      <button class="theme-btn" id="theme-dark">🌙 Sombre</button>
+    </div>
+    <div style="font-size:11px;font-weight:700;letter-spacing:.07em;color:var(--c-muted);margin-bottom:.5rem">DONNÉES</div>
+    <div class="modal-sub" id="settings-info" style="margin-bottom:.8rem">Chargement…</div>
+    <div class="modal-btns">
+      <button id="settings-clear" style="background:var(--c5-bg);color:var(--c5);border-color:var(--c5)">🗑️ Effacer toutes les données</button>
+      <button class="modal-btn-stay" id="settings-close">Fermer</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal -->
+<div class="modal-overlay" id="modal-overlay">
+  <div class="modal">
+    <div class="modal-title">Quitter ?</div>
+    <div class="modal-sub">Ta progression sera perdue.</div>
+    <div class="modal-btns">
+      <button class="modal-btn-stay" id="modal-stay">Continuer</button>
+      <button id="modal-leave">Quitter quand même</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════════════
+// DATA
+// ════════════════════════════════════════════════
+var data = {
+yct1:{label:"YCT 1",lc:"l1",icon:"🟢",desc:"Débutant absolu",words:[
+["你好","nǐ hǎo","Bonjour","Salutations"],["谢谢","xiè xie","Merci","Salutations"],
+["再见","zài jiàn","Au revoir","Salutations"],["对不起","duì bu qǐ","Pardon / Désolé","Salutations"],
+["不客气","bù kè qi","De rien","Salutations"],["没关系","méi guān xi","Ce n'est pas grave","Salutations"],
+["我","wǒ","Je / Moi","Pronoms"],["你","nǐ","Tu / Toi","Pronoms"],["他","tā","Il / Lui","Pronoms"],
+["她","tā","Elle","Pronoms"],["我们","wǒ men","Nous","Pronoms"],["你们","nǐ men","Vous","Pronoms"],["他们","tā men","Ils / Eux","Pronoms"],
+["零","líng","Zéro","Chiffres"],["一","yī","Un","Chiffres"],["二","èr","Deux","Chiffres"],["三","sān","Trois","Chiffres"],
+["四","sì","Quatre","Chiffres"],["五","wǔ","Cinq","Chiffres"],["六","liù","Six","Chiffres"],["七","qī","Sept","Chiffres"],
+["八","bā","Huit","Chiffres"],["九","jiǔ","Neuf","Chiffres"],["十","shí","Dix","Chiffres"],["百","bǎi","Cent","Chiffres"],["千","qiān","Mille","Chiffres"],
+["爸爸","bà ba","Papa","Famille"],["妈妈","mā ma","Maman","Famille"],["哥哥","gē ge","Grand frère","Famille"],
+["姐姐","jiě jie","Grande sœur","Famille"],["弟弟","dì di","Petit frère","Famille"],["妹妹","mèi mei","Petite sœur","Famille"],
+["老师","lǎo shī","Professeur","Personnes"],["同学","tóng xué","Camarade de classe","Personnes"],["朋友","péng you","Ami(e)","Personnes"],
+["猫","māo","Chat","Animaux"],["狗","gǒu","Chien","Animaux"],["鸟","niǎo","Oiseau","Animaux"],["鱼","yú","Poisson","Animaux"],["马","mǎ","Cheval","Animaux"],
+["苹果","píng guǒ","Pomme","Nourriture"],["水","shuǐ","Eau","Nourriture"],["米饭","mǐ fàn","Riz","Nourriture"],["面条","miàn tiáo","Nouilles","Nourriture"],["好吃","hǎo chī","Délicieux","Nourriture"],
+["大","dà","Grand","Adjectifs"],["小","xiǎo","Petit","Adjectifs"],["好","hǎo","Bon / Bien","Adjectifs"],["多","duō","Beaucoup","Adjectifs"],
+["高兴","gāo xìng","Content / Joyeux","Adjectifs"],["漂亮","piào liang","Joli / Beau","Adjectifs"],["高","gāo","Grand / Haut","Adjectifs"],
+["今天","jīn tiān","Aujourd'hui","Temps"],["明天","míng tiān","Demain","Temps"],["昨天","zuó tiān","Hier","Temps"],
+["年","nián","An / Année","Temps"],["月","yuè","Mois","Temps"],["日","rì","Jour (date)","Temps"],["星期","xīng qī","Semaine","Temps"],
+["去","qù","Aller","Verbes"],["来","lái","Venir","Verbes"],["看","kàn","Regarder","Verbes"],
+["吃","chī","Manger","Verbes"],["喝","hē","Boire","Verbes"],["说","shuō","Parler","Verbes"],
+["叫","jiào","S'appeler","Verbes"],["有","yǒu","Avoir","Verbes"],["没有","méi yǒu","Ne pas avoir","Verbes"],
+["是","shì","Être","Verbes"],["在","zài","Être à","Verbes"],["学","xué","Apprendre","Verbes"],
+["什么","shén me","Quoi / Quel","Questions"],["谁","shéi","Qui","Questions"],["哪","nǎ","Lequel","Questions"],
+["几","jǐ","Combien (petit nb)","Questions"],["多少","duō shao","Combien","Questions"],
+["这","zhè","Ceci","Démonstratifs"],["那","nà","Cela","Démonstratifs"],
+["不","bù","Non / Ne pas","Particules"],["书","shū","Livre","École"],["中国","zhōng guó","Chine","Pays"]
+]},
+yct2:{label:"YCT 2",lc:"l2",icon:"🔵",desc:"Élémentaire",words:[
+["学校","xué xiào","École","Lieux"],["家","jiā","Maison","Lieux"],["医院","yī yuàn","Hôpital","Lieux"],
+["商店","shāng diàn","Magasin","Lieux"],["公园","gōng yuán","Parc","Lieux"],["饭馆","fàn guǎn","Restaurant","Lieux"],
+["教室","jiào shì","Salle de classe","Lieux"],["超市","chāo shì","Supermarché","Lieux"],
+["喜欢","xǐ huān","Aimer","Verbes"],["想","xiǎng","Vouloir / Penser","Verbes"],["知道","zhī dào","Savoir","Verbes"],
+["听","tīng","Écouter","Verbes"],["写","xiě","Écrire","Verbes"],["读","dú","Lire","Verbes"],
+["做","zuò","Faire","Verbes"],["玩","wán","Jouer","Verbes"],["睡觉","shuì jiào","Dormir","Verbes"],
+["起床","qǐ chuáng","Se lever","Verbes"],["坐","zuò","S'asseoir","Verbes"],["走","zǒu","Marcher","Verbes"],
+["买","mǎi","Acheter","Verbes"],["卖","mài","Vendre","Verbes"],["跑","pǎo","Courir","Verbes"],
+["站","zhàn","Se tenir debout","Verbes"],["回","huí","Rentrer","Verbes"],["唱","chàng","Chanter","Verbes"],
+["画","huà","Dessiner","Verbes"],["打电话","dǎ diàn huà","Téléphoner","Verbes"],["回答","huí dá","Répondre","Verbes"],
+["星期一","xīng qī yī","Lundi","Jours"],["星期二","xīng qī èr","Mardi","Jours"],["星期三","xīng qī sān","Mercredi","Jours"],
+["星期四","xīng qī sì","Jeudi","Jours"],["星期五","xīng qī wǔ","Vendredi","Jours"],["星期六","xīng qī liù","Samedi","Jours"],["星期天","xīng qī tiān","Dimanche","Jours"],
+["早上","zǎo shang","Matin","Temps"],["上午","shàng wǔ","Matinée","Temps"],["中午","zhōng wǔ","Midi","Temps"],
+["下午","xià wǔ","Après-midi","Temps"],["晚上","wǎn shang","Soir","Temps"],["现在","xiàn zài","Maintenant","Temps"],
+["以前","yǐ qián","Avant","Temps"],["以后","yǐ hòu","Après","Temps"],
+["鸡蛋","jī dàn","Œuf","Nourriture"],["牛奶","niú nǎi","Lait","Nourriture"],["茶","chá","Thé","Nourriture"],
+["果汁","guǒ zhī","Jus de fruit","Nourriture"],["面包","miàn bāo","Pain","Nourriture"],["饺子","jiǎo zi","Raviolis","Nourriture"],
+["肉","ròu","Viande","Nourriture"],["蔬菜","shū cài","Légumes","Nourriture"],["香蕉","xiāng jiāo","Banane","Nourriture"],
+["西瓜","xī guā","Pastèque","Nourriture"],["葡萄","pú tao","Raisin","Nourriture"],["橙子","chéng zi","Orange","Nourriture"],
+["红色","hóng sè","Rouge","Couleurs"],["黄色","huáng sè","Jaune","Couleurs"],["蓝色","lán sè","Bleu","Couleurs"],
+["绿色","lǜ sè","Vert","Couleurs"],["白色","bái sè","Blanc","Couleurs"],["黑色","hēi sè","Noir","Couleurs"],["粉色","fěn sè","Rose","Couleurs"],
+["热","rè","Chaud","Adjectifs"],["冷","lěng","Froid","Adjectifs"],["贵","guì","Cher","Adjectifs"],
+["便宜","pián yi","Bon marché","Adjectifs"],["新","xīn","Nouveau","Adjectifs"],["旧","jiù","Vieux","Adjectifs"],
+["快","kuài","Rapide","Adjectifs"],["慢","màn","Lent","Adjectifs"],["长","cháng","Long","Adjectifs"],
+["短","duǎn","Court","Adjectifs"],["难","nán","Difficile","Adjectifs"],["容易","róng yì","Facile","Adjectifs"],
+["汽车","qì chē","Voiture","Transports"],["公共汽车","gōng gòng qì chē","Bus","Transports"],["自行车","zì xíng chē","Vélo","Transports"],
+["火车","huǒ chē","Train","Transports"],["飞机","fēi jī","Avion","Transports"],
+["头","tóu","Tête","Corps"],["眼睛","yǎn jīng","Yeux","Corps"],["鼻子","bí zi","Nez","Corps"],
+["嘴","zuǐ","Bouche","Corps"],["耳朵","ěr duo","Oreille","Corps"],["手","shǒu","Main","Corps"],["脚","jiǎo","Pied","Corps"],
+["天气","tiān qì","Météo","Météo"],["晴天","qíng tiān","Ensoleillé","Météo"],
+["下雨","xià yǔ","Pleuvoir","Météo"],["下雪","xià xuě","Neiger","Météo"],["风","fēng","Vent","Météo"],
+["爷爷","yé ye","Grand-père (paternel)","Famille"],["奶奶","nǎi nai","Grand-mère (paternelle)","Famille"],
+["外公","wài gōng","Grand-père (maternel)","Famille"],["外婆","wài pó","Grand-mère (maternelle)","Famille"],["儿子","ér zi","Fils","Famille"],
+["音乐","yīn yuè","Musique","Loisirs"],["电影","diàn yǐng","Film / Cinéma","Loisirs"],
+["运动","yùn dòng","Sport","Loisirs"],["游泳","yóu yǒng","Nager","Loisirs"],["足球","zú qiú","Football","Loisirs"],
+["也","yě","Aussi","Adverbes"],["都","dōu","Tous","Adverbes"],["很","hěn","Très","Adverbes"],
+["太","tài","Trop","Adverbes"],["非常","fēi cháng","Extrêmement","Adverbes"],["一起","yī qǐ","Ensemble","Adverbes"],
+["上面","shàng miàn","Dessus","Positions"],["下面","xià miàn","Dessous","Positions"],
+["前面","qián miàn","Devant","Positions"],["后面","hòu miàn","Derrière","Positions"],
+["名字","míng zi","Prénom / Nom","Divers"],["电话","diàn huà","Téléphone","Divers"],["电脑","diàn nǎo","Ordinateur","Divers"],
+["钱","qián","Argent","Divers"],["时间","shí jiān","Temps / Heure","Divers"],["衣服","yī fu","Vêtements","Divers"],
+["桌子","zhuō zi","Table","Divers"],["椅子","yǐ zi","Chaise","Divers"],["床","chuáng","Lit","Divers"],
+["照片","zhào piàn","Photo","Divers"],["礼物","lǐ wù","Cadeau","Divers"],["节日","jié rì","Fête","Divers"]
+]},
+yct3:{label:"YCT 3",lc:"l3",icon:"🟣",desc:"Intermédiaire",words:[
+["城市","chéng shì","Ville","Lieux"],["农村","nóng cūn","Campagne","Lieux"],["机场","jī chǎng","Aéroport","Lieux"],
+["火车站","huǒ chē zhàn","Gare","Lieux"],["银行","yín háng","Banque","Lieux"],["图书馆","tú shū guǎn","Bibliothèque","Lieux"],
+["饭店","fàn diàn","Hôtel / Restaurant","Lieux"],["博物馆","bó wù guǎn","Musée","Lieux"],
+["工作","gōng zuò","Travail","Professions"],["工程师","gōng chéng shī","Ingénieur","Professions"],["经理","jīng lǐ","Directeur","Professions"],
+["律师","lǜ shī","Avocat","Professions"],["护士","hù shi","Infirmier/ière","Professions"],["警察","jǐng chá","Policier","Professions"],
+["司机","sī jī","Chauffeur","Professions"],["厨师","chú shī","Cuisinier","Professions"],["演员","yǎn yuán","Acteur","Professions"],
+["旅游","lǚ yóu","Tourisme","Voyages"],["护照","hù zhào","Passeport","Voyages"],["行李","xíng li","Bagages","Voyages"],
+["地图","dì tú","Carte / Plan","Voyages"],["签证","qiān zhèng","Visa","Voyages"],["出发","chū fā","Départ","Voyages"],
+["到达","dào dá","Arrivée","Voyages"],["旅行","lǚ xíng","Voyage","Voyages"],
+["气候","qì hòu","Climat","Nature"],["山","shān","Montagne","Nature"],["河","hé","Rivière","Nature"],
+["海","hǎi","Mer","Nature"],["森林","sēn lín","Forêt","Nature"],["花","huā","Fleur","Nature"],
+["树","shù","Arbre","Nature"],["天空","tiān kōng","Ciel","Nature"],["月亮","yuè liang","Lune","Nature"],
+["春天","chūn tiān","Printemps","Saisons"],["夏天","xià tiān","Été","Saisons"],["秋天","qiū tiān","Automne","Saisons"],["冬天","dōng tiān","Hiver","Saisons"],
+["生病","shēng bìng","Être malade","Santé"],["头疼","tóu téng","Mal de tête","Santé"],
+["发烧","fā shāo","Fièvre","Santé"],["药","yào","Médicament","Santé"],
+["休息","xiū xi","Se reposer","Santé"],["健康","jiàn kāng","Santé","Santé"],["感冒","gǎn mào","Rhume","Santé"],
+["因为","yīn wèi","Parce que","Connecteurs"],["所以","suǒ yǐ","Donc","Connecteurs"],["虽然","suī rán","Bien que","Connecteurs"],
+["但是","dàn shì","Mais","Connecteurs"],["如果","rú guǒ","Si (cond.)","Connecteurs"],["而且","ér qiě","De plus","Connecteurs"],
+["可以","kě yǐ","Pouvoir","Auxiliaires"],["应该","yīng gāi","Devoir","Auxiliaires"],
+["必须","bì xū","Devoir absolument","Auxiliaires"],["能","néng","Capable de","Auxiliaires"],["要","yào","Vouloir","Auxiliaires"],
+["了解","liǎo jiě","Comprendre","Verbes"],["介绍","jiè shào","Présenter","Verbes"],["参加","cān jiā","Participer","Verbes"],
+["准备","zhǔn bèi","Préparer","Verbes"],["解决","jiě jué","Résoudre","Verbes"],["发现","fā xiàn","Découvrir","Verbes"],
+["决定","jué dìng","Décider","Verbes"],["选择","xuǎn zé","Choisir","Verbes"],
+["危险","wēi xiǎn","Dangereux","Adjectifs"],["安全","ān quán","Sûr","Adjectifs"],["简单","jiǎn dān","Simple","Adjectifs"],
+["复杂","fù zá","Complexe","Adjectifs"],["方便","fāng biàn","Pratique","Adjectifs"],
+["有名","yǒu míng","Célèbre","Adjectifs"],["认真","rèn zhēn","Sérieux","Adjectifs"],
+["丈夫","zhàng fu","Mari","Relations"],["妻子","qī zi","Épouse","Relations"],["父母","fù mǔ","Parents","Relations"],
+["孩子","hái zi","Enfant","Relations"],["邻居","lín jū","Voisin","Relations"],["同事","tóng shì","Collègue","Relations"],
+["文化","wén huà","Culture","Société"],["历史","lì shǐ","Histoire","Société"],["经济","jīng jì","Économie","Société"],
+["社会","shè huì","Société","Société"],["教育","jiào yù","Éducation","Société"],["科技","kē jì","Technologie","Société"]
+]},
+yct4:{label:"YCT 4",lc:"l4",icon:"🟠",desc:"Intermédiaire supérieur",words:[
+["辩论","biàn lùn","Débattre","Communication"],["演讲","yǎn jiǎng","Discours","Communication"],
+["表达","biǎo dá","Exprimer","Communication"],["交流","jiāo liú","Échanger","Communication"],
+["描述","miáo shù","Décrire","Communication"],["说明","shuō míng","Expliquer","Communication"],
+["强调","qiáng diào","Souligner","Communication"],["反驳","fǎn bó","Réfuter","Communication"],
+["平等","píng děng","Égalité","Société"],["民主","mín zhǔ","Démocratie","Société"],
+["自由","zì yóu","Liberté","Société"],["责任","zé rèn","Responsabilité","Société"],
+["权利","quán lì","Droit","Société"],["义务","yì wù","Obligation","Société"],
+["公平","gōng píng","Juste","Société"],["规则","guī zé","Règle","Société"],
+["传统","chuán tǒng","Tradition","Société"],["习俗","xí sú","Coutume","Société"],
+["投资","tóu zī","Investir","Économie"],["利润","lì rùn","Bénéfice","Économie"],
+["市场","shì chǎng","Marché","Économie"],["消费","xiāo fèi","Consommer","Économie"],
+["税收","shuì shōu","Impôts","Économie"],["预算","yù suàn","Budget","Économie"],
+["通货膨胀","tōng huò péng zhàng","Inflation","Économie"],["贸易","mào yì","Commerce","Économie"],
+["环境","huán jìng","Environnement","Nature"],["污染","wū rǎn","Pollution","Nature"],
+["能源","néng yuán","Énergie","Nature"],["生态","shēng tài","Écologie","Nature"],
+["气候变化","qì hòu biàn huà","Changement climatique","Nature"],["可再生","kě zài shēng","Renouvelable","Nature"],
+["人工智能","rén gōng zhì néng","Intelligence artificielle","Science"],["机器人","jī qì rén","Robot","Science"],
+["研究","yán jiū","Recherche","Science"],["实验","shí yàn","Expérience","Science"],
+["发明","fā míng","Invention","Science"],["创新","chuàng xīn","Innovation","Science"],
+["技术","jì shù","Technique","Science"],["数字化","shù zì huà","Numérique","Science"],
+["文学","wén xué","Littérature","Arts"],["小说","xiǎo shuō","Roman","Arts"],
+["诗歌","shī gē","Poésie","Arts"],["艺术","yì shù","Art","Arts"],
+["绘画","huì huà","Peinture","Arts"],["音乐会","yīn yuè huì","Concert","Arts"],
+["心理","xīn lǐ","Psychologie","Sciences humaines"],["哲学","zhé xué","Philosophie","Sciences humaines"],
+["逻辑","luó jí","Logique","Sciences humaines"],["道德","dào dé","Éthique","Sciences humaines"],
+["坚持","jiān chí","Persévérer","Caractère"],["勇气","yǒng qì","Courage","Caractère"],
+["耐心","nài xīn","Patience","Caractère"],["谦虚","qiān xū","Humilité","Caractère"],
+["诚实","chéng shí","Honnête","Caractère"],["积极","jī jí","Positif / Actif","Caractère"],
+["乐观","lè guān","Optimiste","Caractère"],["悲观","bēi guān","Pessimiste","Caractère"],
+["移民","yí mín","Immigration","Monde"],["全球化","quán qiú huà","Mondialisation","Monde"],
+["国际","guó jì","International","Monde"],["冲突","chōng tū","Conflit","Monde"],
+["和平","hé píng","Paix","Monde"],["战争","zhàn zhēng","Guerre","Monde"]
+]},
+yct5:{label:"YCT 5",lc:"l5",icon:"🔴",desc:"Avancé",words:[
+["抽象","chōu xiàng","Abstrait","Pensée"],["具体","jù tǐ","Concret","Pensée"],
+["本质","běn zhì","Essence","Pensée"],["现象","xiàn xiàng","Phénomène","Pensée"],
+["规律","guī lǜ","Loi naturelle","Pensée"],["假设","jiǎ shè","Hypothèse","Pensée"],
+["推理","tuī lǐ","Raisonnement","Pensée"],["客观","kè guān","Objectif","Pensée"],
+["主观","zhǔ guān","Subjectif","Pensée"],["认知","rèn zhī","Cognition","Pensée"],
+["意志","yì zhì","Volonté","Psychologie"],["潜意识","qián yì shí","Inconscient","Psychologie"],
+["情绪","qíng xù","État émotionnel","Psychologie"],["动机","dòng jī","Motivation","Psychologie"],
+["焦虑","jiāo lǜ","Anxiété","Psychologie"],["抑郁","yì yù","Dépression","Psychologie"],
+["共情","gòng qíng","Empathie","Psychologie"],["自我","zì wǒ","Soi-même","Psychologie"],
+["立法","lì fǎ","Législation","Politique"],["宪法","xiàn fǎ","Constitution","Politique"],
+["主权","zhǔ quán","Souveraineté","Politique"],["选举","xuǎn jǔ","Élection","Politique"],
+["改革","gǎi gé","Réforme","Politique"],["腐败","fǔ bài","Corruption","Politique"],
+["透明度","tòu míng dù","Transparence","Politique"],["问责","wèn zé","Responsabilisation","Politique"],
+["货币","huò bì","Monnaie","Économie"],["汇率","huì lǜ","Taux de change","Économie"],
+["赤字","chì zì","Déficit","Économie"],["垄断","lǒng duàn","Monopole","Économie"],
+["金融","jīn róng","Finance","Économie"],["资本主义","zī běn zhǔ yì","Capitalisme","Économie"],
+["基因工程","jī yīn gōng chéng","Génie génétique","Sciences"],["量子计算","liàng zǐ jì suàn","Informatique quantique","Sciences"],
+["神经网络","shén jīng wǎng luò","Réseau neuronal","Sciences"],["区块链","qū kuài liàn","Blockchain","Sciences"],
+["虚拟现实","xū nǐ xiàn shí","Réalité virtuelle","Sciences"],["深度学习","shēn dù xué xí","Apprentissage profond","Sciences"],
+["叙事","xù shì","Narration","Littérature"],["隐喻","yǐn yù","Métaphore","Littérature"],
+["象征","xiàng zhēng","Symbole","Littérature"],["讽刺","fěng cì","Satire","Littérature"],
+["修辞","xiū cí","Rhétorique","Littérature"],["风格","fēng gé","Style","Littérature"],
+["生物多样性","shēng wù duō yàng xìng","Biodiversité","Environnement"],["物种","wù zhǒng","Espèce","Environnement"],
+["碳中和","tàn zhōng hé","Neutralité carbone","Environnement"],["生态系统","shēng tài xì tǒng","Écosystème","Environnement"],
+["沙漠化","shā mò huà","Désertification","Environnement"],["海平面","hǎi píng miàn","Niveau de la mer","Environnement"],
+["城镇化","chéng zhèn huà","Urbanisation","Sociologie"],["贫困","pín kùn","Pauvreté","Sociologie"],
+["不平等","bù píng děng","Inégalité","Sociologie"],["歧视","qí shì","Discrimination","Sociologie"],
+["包容","bāo róng","Inclusion","Sociologie"],["多元化","duō yuán huà","Diversité","Sociologie"],
+["企业家","qǐ yè jiā","Entrepreneur","Business"],["初创","chū chuàng","Startup","Business"],
+["品牌","pǐn pái","Marque","Business"],["营销","yíng xiāo","Marketing","Business"],
+["供应链","gōng yìng liàn","Chaîne d'approvisionnement","Business"],["商业模式","shāng yè mó shì","Modèle économique","Business"]
+]}
+};
+Object.keys(data).forEach(function(k){
+  data[k].words=data[k].words.map(function(a){return{h:a[0],p:a[1],fr:a[2],c:a[3]};});
+});
+
+// ════════════════════════════════════════════════
+// SENTENCE DATA
+// ════════════════════════════════════════════════
+var sentences={
+yct1:[
+["我___苹果。","吃","Je mange une pomme."],
+["___是我的老师。","他","Il est mon professeur."],
+["这是我的___。","书","C'est mon livre."],
+["今天我___学校。","去","Aujourd'hui je vais à l'école."],
+["我___一只猫。","有","J'ai un chat."],
+["你叫___名字？","什么","Tu t'appelles comment ?"],
+["他是我的好___。","朋友","Il est mon bon ami."],
+["我___水。","喝","Je bois de l'eau."],
+["我的___很漂亮。","妈妈","Ma maman est très belle."],
+["这只___很大。","狗","Ce chien est grand."]
+],
+yct2:[
+["我很___中国音乐。","喜欢","J'aime beaucoup la musique chinoise."],
+["他___看电影。","想","Il veut regarder un film."],
+["今天___很好，很暖和。","天气","Aujourd'hui le temps est beau, il fait chaud."],
+["她每天在___工作。","医院","Elle travaille à l'hôpital tous les jours."],
+["我们一起___歌吧！","唱","Chantons ensemble !"],
+["我每天早上喝___。","牛奶","Je bois du lait chaque matin."],
+["这件衣服很___，我买不起。","贵","Ce vêtement est très cher, je ne peux pas me le permettre."],
+["他骑___去学校。","自行车","Il va à l'école en vélo."],
+["我的朋友___喜欢足球。","也","Mon ami aime aussi le football."],
+["我们___去学校。","一起","Nous allons ensemble à l'école."]
+],
+yct3:[
+["他___了，需要吃药。","生病","Il est tombé malade, il doit prendre ses médicaments."],
+["我们___一起去旅行。","决定","Nous avons décidé de voyager ensemble."],
+["___他很累，他还是完成了工作。","虽然","Bien qu'il soit fatigué, il a quand même terminé le travail."],
+["旅行前要先办好___。","护照","Avant de voyager, il faut obtenir son passeport."],
+["飞机___的时间是早上八点。","出发","L'heure de départ de l'avion est huit heures du matin."],
+["这个___非常美丽，很多人来旅游。","城市","Cette ville est très belle, beaucoup de gens viennent y voyager."],
+["___你努力学习，就会进步。","如果","Si tu étudies sérieusement, tu progresseras."],
+["我想更多___中国文化。","了解","Je veux en savoir plus sur la culture chinoise."],
+["为了___，我们应该多运动。","健康","Pour être en bonne santé, nous devrions faire plus d'exercice."],
+["今年___天气很热，我们去游泳吧。","夏天","Cet été le temps est très chaud, allons nager."]
+],
+yct4:[
+["他在台上做了精彩的___。","演讲","Il a fait un discours brillant sur scène."],
+["保护___是我们共同的责任。","环境","Protéger l'environnement est notre responsabilité commune."],
+["___是人类追求的重要目标。","和平","La paix est un objectif important que l'humanité poursuit."],
+["他用___的态度面对生活中的困难。","乐观","Il fait face aux difficultés de la vie avec une attitude optimiste."],
+["___是社会进步的重要基础。","平等","L'égalité est une base importante du progrès social."],
+["他花了很多时间___这个问题。","研究","Il a passé beaucoup de temps à étudier ce problème."],
+["___正在改变我们的生活方式。","人工智能","L'intelligence artificielle est en train de changer nos modes de vie."],
+["只有___，才能实现目标。","坚持","Ce n'est qu'en persévérant qu'on peut atteindre ses objectifs."],
+["每个人都有___表达自己想法的权利。","自由","Chacun a le droit de s'exprimer librement."],
+["做好这份工作需要___和细心。","耐心","Bien faire ce travail nécessite de la patience et de la minutie."]
+],
+yct5:[
+["哲学家们试图探寻事物的___。","本质","Les philosophes cherchent à sonder l'essence des choses."],
+["___是将感情投射到他人处境的能力。","共情","L'empathie est la capacité de se mettre à la place d'autrui."],
+["维护___对于民主社会至关重要。","透明度","Maintenir la transparence est essentiel dans une société démocratique."],
+["保护___是应对气候变化的核心目标。","生物多样性","Protéger la biodiversité est l'objectif central pour faire face aux changements climatiques."],
+["___将彻底革新信息安全领域。","量子计算","L'informatique quantique va révolutionner le domaine de la sécurité informatique."],
+["他总是能控制自己的___，保持冷静。","情绪","Il arrive toujours à contrôler ses émotions et à rester calme."],
+["___技术让人们足不出户体验世界。","虚拟现实","La technologie de réalité virtuelle permet aux gens de découvrir le monde sans quitter leur domicile."],
+["___是通过间接比较表达深层含义的修辞手法。","隐喻","La métaphore est une figure de style qui exprime un sens profond par comparaison indirecte."],
+["应对___需要全球合作与可持续发展。","沙漠化","Faire face à la désertification nécessite une coopération mondiale et un développement durable."],
+["经济___加剧了社会矛盾与不稳定。","不平等","Les inégalités économiques aggravent les contradictions sociales et l'instabilité."]
+]
+};
+
+// ════════════════════════════════════════════════
+// STATE
+// ════════════════════════════════════════════════
+var current=null, filtered=[], activeCat='all';
+var pinyinHidden=false, hanziSize=1; // 0=small,1=normal,2=big
+var darkManual=null; // null=auto, 'dark', 'light'
+
+var quizLevel=null, quizQs=[], quizIdx=0, quizScore=0;
+var quizAnswered=false, quizResults=[], quizMode='normal'; // 'normal' | 'reverse'
+var quizStreak=0;
+
+var sentLevel=null, sentQs=[], sentIdx=0, sentScore=0;
+var sentAnswered=false, sentResults=[], sentStreak=0;
+
+var dictLevel=null, dictQs=[], dictIdx=0, dictScore=0;
+var dictAnswered=false, dictResults=[], dictStreak=0;
+
+var assocLevel=null, assocPairs=[], assocLeft=[], assocRight=[];
+var assocMatched=null, assocAttempts=0;
+var _assocPendingType=null, _assocPendingIdx=null;
+
+var flashLevel=null, flashQs=[], flashIdx=0, flashFlipped=false, flashResults=[];
+
+var _audio=null, _card=null, _sndBtn=null;
+
+// ════════════════════════════════════════════════
+// THEME
+// ════════════════════════════════════════════════
+var THEME_KEY='yct-theme';
+function _applyTheme(mode){
+  document.body.classList.remove('dark','light');
+  if(mode==='dark')document.body.classList.add('dark');
+  else if(mode==='light')document.body.classList.add('light');
+  try{localStorage.setItem(THEME_KEY,mode);}catch(e){}
+}
+(function(){_applyTheme(localStorage.getItem(THEME_KEY)||'auto');})();
+
+// ════════════════════════════════════════════════
+// AUDIO — robust TTS with voice-load wait
+// ════════════════════════════════════════════════
+function speak(hanzi,cardEl,btnEl){
+  if(_audio){_audio.pause();_audio=null;}
+  if(_card){_card.classList.remove('speaking');_card=null;}
+  if(_sndBtn){_sndBtn.classList.remove('playing');_sndBtn=null;}
+  if(cardEl){_card=cardEl;cardEl.classList.add('speaking');}
+  if(btnEl){_sndBtn=btnEl;btnEl.classList.add('playing');}
+
+  function done(){
+    if(cardEl)cardEl.classList.remove('speaking');
+    if(btnEl)btnEl.classList.remove('playing');
+    if(_audio&&_audio===thisAudio)_audio=null;
+  }
+  function fallbackTTS(){
+    if(!window.speechSynthesis)return;
+    window.speechSynthesis.cancel();
+    function doSpeak(){
+      var u=new SpeechSynthesisUtterance(hanzi);
+      u.lang='zh-CN';u.rate=0.85;
+      var voices=window.speechSynthesis.getVoices();
+      var v=voices.find(function(v){return v.lang.startsWith('zh');});
+      if(v)u.voice=v;
+      u.onend=u.onerror=done;
+      window.speechSynthesis.speak(u);
+    }
+    var voices=window.speechSynthesis.getVoices();
+    if(voices.length){doSpeak();}
+    else{window.speechSynthesis.onvoiceschanged=function(){doSpeak();window.speechSynthesis.onvoiceschanged=null;};}
+  }
+
+  var url='https://translate.google.com/translate_tts?ie=UTF-8&tl=zh-CN&client=tw-ob&q='+encodeURIComponent(hanzi);
+  var thisAudio=new Audio(url);
+  _audio=thisAudio;
+  thisAudio.onended=done;
+  thisAudio.onerror=function(){fallbackTTS();if(_audio===thisAudio)_audio=null;};
+  thisAudio.play().catch(fallbackTTS);
+}
+
+// ════════════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════════════
+function show(id){
+  document.querySelectorAll('.view').forEach(function(v){v.classList.remove('active');});
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
+function goHome(){
+  if(window.speechSynthesis)window.speechSynthesis.cancel();
+  show('home');current=quizLevel=flashLevel=sentLevel=dictLevel=assocLevel=null;activeCat='all';
+}
+function inQuizMid(){
+  var hasResult=!!document.getElementById('quiz-body').querySelector('.rcard');
+  return !hasResult&&(
+    (quizLevel&&quizIdx>0&&quizIdx<quizQs.length)||
+    (dictLevel&&dictIdx>0&&dictIdx<dictQs.length)||
+    (assocLevel&&assocMatched&&assocMatched.size>0&&assocMatched.size<assocPairs.length)
+  );
+}
+function inFlashMid(){
+  return flashLevel&&flashIdx>0&&flashIdx<flashQs.length;
+}
+
+document.getElementById('vocab-back').addEventListener('click',goHome);
+document.getElementById('flash-back').addEventListener('click',function(){
+  if(inFlashMid())openModal(goHome);else goHome();
+});
+document.getElementById('quiz-back').addEventListener('click',function(){
+  if(inQuizMid())openModal(goHome);else goHome();
+});
+function inSentMid(){
+  return sentLevel&&sentIdx>0&&sentIdx<sentQs.length&&!document.getElementById('sent-body').querySelector('.rcard');
+}
+document.getElementById('sent-back').addEventListener('click',function(){
+  if(inSentMid())openModal(goHome);else goHome();
+});
+
+// ════════════════════════════════════════════════
+// MODAL
+// ════════════════════════════════════════════════
+var _modalCb=null;
+function openModal(cb){_modalCb=cb;document.getElementById('modal-overlay').classList.add('open');}
+function closeModal(){document.getElementById('modal-overlay').classList.remove('open');_modalCb=null;}
+document.getElementById('modal-stay').addEventListener('click',closeModal);
+document.getElementById('modal-leave').addEventListener('click',function(){var cb=_modalCb;closeModal();if(cb)cb();});
+document.getElementById('modal-overlay').addEventListener('click',function(e){if(e.target===this)closeModal();});
+
+// ════════════════════════════════════════════════
+// LOCAL STORAGE — Progression
+// ════════════════════════════════════════════════
+var STORE_KEY='yct-progress';
+function _getProg(){
+  try{return JSON.parse(localStorage.getItem(STORE_KEY)||'{}');}catch(e){return {};}
+}
+function _saveProg(level,mode,pct){
+  var p=_getProg();
+  if(!p[level])p[level]={};
+  if((p[level][mode]||0)<pct)p[level][mode]=pct;
+  try{localStorage.setItem(STORE_KEY,JSON.stringify(p));}catch(e){}
+}
+function _clearProg(){
+  try{localStorage.removeItem(STORE_KEY);}catch(e){}
+}
+
+// ════════════════════════════════════════════════
+// SETTINGS
+// ════════════════════════════════════════════════
+function _updateThemeBtns(){
+  var cur=localStorage.getItem(THEME_KEY)||'auto';
+  ['light','auto','dark'].forEach(function(m){
+    document.getElementById('theme-'+m).classList.toggle('active',cur===m);
+  });
+}
+function openSettings(){
+  var p=_getProg();
+  var levels=Object.keys(p).filter(function(k){return Object.keys(p[k]).length>0;});
+  var total=0;
+  levels.forEach(function(k){total+=Object.keys(p[k]).length;});
+  var info=levels.length===0
+    ?'Aucune donnée sauvegardée pour l\'instant.'
+    :levels.length+' niveau'+(levels.length>1?'x':'')+' joués, '+total+' activité'+(total>1?'s':'')+' enregistrée'+(total>1?'s':'')+'.';
+  document.getElementById('settings-info').textContent=info;
+  _updateThemeBtns();
+  document.getElementById('settings-overlay').classList.add('open');
+}
+function closeSettings(){
+  document.getElementById('settings-overlay').classList.remove('open');
+}
+document.getElementById('settings-btn').addEventListener('click',openSettings);
+document.getElementById('settings-close').addEventListener('click',closeSettings);
+document.getElementById('settings-clear').addEventListener('click',function(){
+  _clearProg();
+  buildHome();
+  closeSettings();
+});
+document.getElementById('settings-overlay').addEventListener('click',function(e){
+  if(e.target===this)closeSettings();
+});
+['light','auto','dark'].forEach(function(m){
+  document.getElementById('theme-'+m).addEventListener('click',function(){
+    _applyTheme(m);
+    _updateThemeBtns();
+  });
+});
+
+// ════════════════════════════════════════════════
+// HOME
+// ════════════════════════════════════════════════
+var _PROG_MODES=['normal','reverse','dictee','assoc','flash','sent'];
+var _PROG_LABELS=['🀄','🔄','🎵','🔗','🃏','📝'];
+
+function buildHome(){
+  var prog=_getProg();
+  document.getElementById('home-cards').innerHTML=Object.keys(data).map(function(k){
+    var d=data[k];
+    var lp=prog[k]||{};
+    var dots=_PROG_MODES.map(function(m,i){
+      var done=lp[m]!==undefined;
+      return '<span title="'+_PROG_LABELS[i]+' '+(done?lp[m]+'%':'—')+'" style="font-size:15px;line-height:1;opacity:'+(done?'1':'.2')+'">'+_PROG_LABELS[i]+'</span>';
+    }).join('');
+    var doneCount=Object.keys(lp).length;
+    return '<div class="level-card '+d.lc+'">'
+      +'<div class="lc-top">'
+        +'<span class="lc-icon">'+d.icon+'</span>'
+        +'<div class="lc-info"><div class="lc-name">'+d.label+'</div><div class="lc-desc">'+d.desc+'</div></div>'
+        +'<span class="lc-pill">'+d.words.length+' mots</span>'
+      +'</div>'
+      +'<div class="lc-btns">'
+        +'<button class="lc-btn" onclick="showLevel(\''+k+'\')">📖 Vocabulaire</button>'
+        +'<button class="lc-btn accent" onclick="showQuizMenu(\''+k+'\')">🎯 S\'entraîner</button>'
+      +'</div>'
+      +'<div style="display:flex;align-items:center;gap:4px;margin-top:.4rem;padding-top:.4rem;border-top:1px solid var(--c-border)">'
+        +'<span style="font-size:10px;font-weight:600;color:var(--c-muted);white-space:nowrap;margin-right:2px">Succès :</span>'
+        +dots
+        +(doneCount>0?'<span style="margin-left:auto;font-size:10px;color:var(--c-muted)">'+doneCount+'/6</span>':'')
+      +'</div>'
+    +'</div>';
+  }).join('');
+}
+
+// ════════════════════════════════════════════════
+// VOCAB VIEW
+// ════════════════════════════════════════════════
+var sizeClasses=['small','','big'];
+
+function showLevel(level){
+  current=level;activeCat='all';pinyinHidden=false;hanziSize=1;
+  var d=data[level];
+  var tb=document.getElementById('vocab-topbar');
+  tb.className='topbar '+d.lc;
+  document.getElementById('view-title').textContent=d.label;
+  document.getElementById('view-badge').textContent=d.words.length+' mots';
+  document.getElementById('view-badge').className='topbar-badge';
+  document.getElementById('pinyin-toggle').className='topbar-icon-btn';
+  document.getElementById('size-toggle').className='topbar-icon-btn';
+
+  var cats=['all'];
+  d.words.forEach(function(w){if(cats.indexOf(w.c)<0)cats.push(w.c);});
+  var cs=document.getElementById('cat-scroll');
+  cs.innerHTML=cats.map(function(c){
+    return '<button class="cat-pill'+(c==='all'?' active':'')+'" data-cat="'+c+'">'+(c==='all'?'Tous':c)+'</button>';
+  }).join('');
+  cs.querySelectorAll('.cat-pill').forEach(function(pill){
+    pill.addEventListener('click',function(){
+      activeCat=pill.getAttribute('data-cat');
+      cs.querySelectorAll('.cat-pill').forEach(function(p){p.classList.remove('active');});
+      pill.classList.add('active');applyFilter();
+    });
+  });
+  document.getElementById('search').value='';
+  document.getElementById('search-clear').classList.remove('visible');
+  filtered=d.words;
+  show('vocab-view');
+  renderVocab(filtered);
+}
+
+document.getElementById('pinyin-toggle').addEventListener('click',function(){
+  pinyinHidden=!pinyinHidden;
+  this.classList.toggle('active-toggle',pinyinHidden);
+  document.querySelectorAll('.v-pinyin').forEach(function(el){el.classList.toggle('hidden',pinyinHidden);});
+});
+document.getElementById('size-toggle').addEventListener('click',function(){
+  hanziSize=(hanziSize+1)%3;
+  var labels=['A','A','A+'];this.textContent=labels[hanziSize];
+  document.querySelectorAll('.v-hanzi').forEach(function(el){
+    el.className='v-hanzi'+(sizeClasses[hanziSize]?' '+sizeClasses[hanziSize]:'');
+  });
+});
+
+function applyFilter(){
+  var q=document.getElementById('search').value.toLowerCase().trim();
+  filtered=data[current].words.filter(function(w){
+    if(activeCat!=='all'&&w.c!==activeCat)return false;
+    if(!q)return true;
+    return w.h.indexOf(q)>=0||w.p.toLowerCase().indexOf(q)>=0||w.fr.toLowerCase().indexOf(q)>=0||w.c.toLowerCase().indexOf(q)>=0;
+  });
+  renderVocab(filtered);
+}
+function renderVocab(words){
+  document.getElementById('count-label').textContent=words.length+' résultat'+(words.length!==1?'s':'');
+  var sc=sizeClasses[hanziSize];
+  var grid=document.getElementById('vocab-grid');
+  if(!words.length){grid.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="empty-icon">🔍</div><div style="font-size:13px;color:var(--c-hint)">Aucun résultat</div></div>';return;}
+  var html='';
+  words.forEach(function(w){
+    html+='<div class="vocab-card" data-hanzi="'+encodeURIComponent(w.h)+'">'
+      +'<div class="vc-top"><span class="v-hanzi'+(sc?' '+sc:'')+'">'+w.h+'</span><span class="v-sound">🔊</span></div>'
+      +'<div class="v-pinyin'+(pinyinHidden?' hidden':'')+'">'+w.p+'</div>'
+      +'<div class="v-fr">'+w.fr+'</div>'
+      +'<div class="v-cat">'+w.c+'</div>'
+    +'</div>';
+  });
+  grid.innerHTML=html;
+  grid.querySelectorAll('.vocab-card').forEach(function(card){
+    card.addEventListener('click',function(){
+      var hanzi=decodeURIComponent(card.getAttribute('data-hanzi'));
+      var w=filtered.find(function(x){return x.h===hanzi;})||{h:hanzi,p:'',fr:'',c:''};
+      openWordSheet(w,card);
+    });
+  });
+}
+document.getElementById('search').addEventListener('input',function(){
+  document.getElementById('search-clear').classList.toggle('visible',this.value.length>0);
+  applyFilter();
+});
+document.getElementById('search-clear').addEventListener('click',function(){
+  document.getElementById('search').value='';this.classList.remove('visible');applyFilter();
+});
+
+// ════════════════════════════════════════════════
+// FLASH CARDS
+// ════════════════════════════════════════════════
+function startFlash(level,pool){
+  flashLevel=level;flashIdx=0;flashFlipped=false;flashResults=[];
+  flashQs=shuffle(pool||data[level].words).slice(0,Math.min(20,data[level].words.length));
+  var d=data[level];
+  document.getElementById('flash-topbar').className='topbar '+d.lc;
+  document.getElementById('flash-title').textContent=d.label+' — Flash';
+  document.getElementById('flash-badge').textContent=flashQs.length+' cartes';
+  document.getElementById('flash-badge').className='topbar-badge';
+  show('flash-view');
+  renderFlash();
+}
+function renderFlash(){
+  var w=flashQs[flashIdx];
+  flashFlipped=false;
+  var dots=flashQs.map(function(_,i){
+    var cls=i<flashIdx?(flashResults[i]?'ok':'ko'):i===flashIdx?'cur':'';
+    return '<div class="fp-dot'+(cls?' '+cls:'')+'"></div>';
+  }).join('');
+  var body=document.getElementById('flash-body');
+  body.innerHTML=
+    '<div class="flash-meta"><span>Carte '+(flashIdx+1)+' / '+flashQs.length+'</span>'
+      +'<span>✓ '+flashResults.filter(Boolean).length+' / '+flashIdx+'</span></div>'
+    +'<div class="flash-progress">'+dots+'</div>'
+    +'<div class="flash-scene" id="flash-scene">'
+      +'<div class="flash-card-3d" id="flash-card3d">'
+        +'<div class="flash-face front">'
+          +'<div class="flash-face-label">Hanzi</div>'
+          +'<div class="flash-hanzi" id="flash-h">'+w.h+'</div>'
+          +'<div class="flash-tap-hint">Appuyer pour révéler</div>'
+        +'</div>'
+        +'<div class="flash-face back">'
+          +'<div class="flash-face-label">Traduction</div>'
+          +'<div class="flash-fr">'+w.fr+'</div>'
+          +'<div class="flash-pinyin">'+w.p+'</div>'
+          +'<div class="flash-cat">'+w.c+'</div>'
+        +'</div>'
+      +'</div>'
+    +'</div>'
+    +'<div class="flash-actions" id="flash-btns" style="display:none">'
+      +'<button class="flash-btn fail" id="fl-fail">✗ À revoir</button>'
+      +'<button class="flash-btn pass" id="fl-pass">✓ Je sais</button>'
+    +'</div>'
+    +'<div style="text-align:center;margin-top:.5rem">'
+      +'<button class="q-sound-btn" id="fl-snd">🔊 Écouter</button>'
+    +'</div>';
+
+  document.getElementById('flash-scene').addEventListener('click',function(){
+    if(flashFlipped)return;
+    flashFlipped=true;
+    document.getElementById('flash-card3d').classList.add('flipped');
+    document.getElementById('flash-btns').style.display='grid';
+    speak(w.h,null,null);
+  });
+  document.getElementById('fl-snd').addEventListener('click',function(){speak(w.h,null,this);});
+  document.getElementById('fl-fail').addEventListener('click',function(){flashNext(false);});
+  document.getElementById('fl-pass').addEventListener('click',function(){flashNext(true);});
+}
+function flashNext(pass){
+  flashResults.push(pass);
+  flashIdx++;
+  if(flashIdx>=flashQs.length){showFlashResults();return;}
+  renderFlash();
+}
+function showFlashResults(){
+  var ok=flashResults.filter(Boolean).length;
+  var total=flashQs.length;
+  var pct=Math.round(ok/total*100);
+  _saveProg(flashLevel,'flash',pct);
+  var wrongs=flashQs.filter(function(_,i){return !flashResults[i];});
+  var body=document.getElementById('flash-body');
+  body.innerHTML=
+    '<div class="rcard">'
+      +'<div class="remoji">'+(pct===100?'🏆':pct>=70?'🌟':'💪')+'</div>'
+      +'<div class="rscore">'+ok+'<span>/'+total+'</span></div>'
+      +'<div class="rtotal">'+pct+'% mémorisées</div>'
+      +'<div class="rmsg">'+(pct===100?'Parfait !':pct>=70?'Bien joué !':'Continue !')+'</div>'
+      +'<div class="ractns">'
+        +(wrongs.length?'<button id="fl-rewrong" class="cta">🔁 Revoir les ratées ('+wrongs.length+')</button>':'')
+        +'<button id="fl-again">🔀 Rejouer</button>'
+        +'<button id="fl-menu">🎯 Activités</button>'
+        +'<button id="fl-home">🏠</button>'
+      +'</div>'
+    +'</div>';
+  if(wrongs.length)document.getElementById('fl-rewrong').addEventListener('click',function(){startFlash(flashLevel,wrongs);});
+  document.getElementById('fl-again').addEventListener('click',function(){startFlash(flashLevel);});
+  document.getElementById('fl-menu').addEventListener('click',function(){showQuizMenu(flashLevel);});
+  document.getElementById('fl-home').addEventListener('click',goHome);
+}
+
+// ════════════════════════════════════════════════
+// QUIZ MENU (mode selector)
+// ════════════════════════════════════════════════
+function showQuizMenu(level){
+  // Inline mini-modal in quiz view
+  quizLevel=level;
+  var d=data[level];
+  document.getElementById('quiz-topbar').className='topbar '+d.lc;
+  document.getElementById('quiz-title').textContent=d.label+' — S\'entraîner';
+  document.getElementById('quiz-badge').textContent='';
+  show('quiz-view');
+  document.getElementById('quiz-body').innerHTML=
+    '<div style="max-width:420px;margin:0 auto;padding-top:.5rem">'
+      +'<div style="font-size:16px;font-weight:700;margin-bottom:.5rem">Choisir une activité</div>'
+      +'<div style="font-size:13px;color:var(--c-muted);margin-bottom:1.2rem">Comment veux-tu t\'entraîner ?</div>'
+      +'<div style="display:flex;flex-direction:column;gap:10px">'
+        +'<button class="qnext" id="qm-normal" style="background:var(--lc);color:#fff;border:none">🀄 Hanzi → Français<br><span style="font-size:12px;font-weight:400;opacity:.85">Lis le hanzi, trouve la traduction</span></button>'
+        +'<button class="qnext" id="qm-reverse" style="background:var(--c-surface);color:var(--c-text);border:1.5px solid var(--c-border)">🔄 Français → Hanzi<br><span style="font-size:12px;font-weight:400;color:var(--c-muted)">Lis le français, trouve le hanzi</span></button>'
+        +'<button class="qnext" id="qm-dictee" style="background:var(--c-surface);color:var(--c-text);border:1.5px solid var(--c-border)">🎵 Dictée — Audio → Hanzi<br><span style="font-size:12px;font-weight:400;color:var(--c-muted)">Écoute le mot, trouve le caractère</span></button>'
+        +'<button class="qnext" id="qm-assoc" style="background:var(--c-surface);color:var(--c-text);border:1.5px solid var(--c-border)">🔗 Association — Relier les paires<br><span style="font-size:12px;font-weight:400;color:var(--c-muted)">Associe chaque hanzi à sa traduction</span></button>'
+        +'<button class="qnext" id="qm-flash" style="background:var(--c-surface);color:var(--c-text);border:1.5px solid var(--c-border)">🃏 Flash Cards<br><span style="font-size:12px;font-weight:400;color:var(--c-muted)">Mémorise les mots avec des cartes à retourner</span></button>'
+        +'<button class="qnext" id="qm-sent" style="background:var(--c-surface);color:var(--c-text);border:1.5px solid var(--c-border)">📝 Phrases à compléter<br><span style="font-size:12px;font-weight:400;color:var(--c-muted)">Trouve le mot manquant dans la phrase</span></button>'
+      +'</div>'
+    +'</div>';
+  document.getElementById('quiz-body').closest('.view').className='view active '+d.lc;
+  document.getElementById('qm-normal').addEventListener('click',function(){startQuiz(level,'normal');});
+  document.getElementById('qm-reverse').addEventListener('click',function(){startQuiz(level,'reverse');});
+  document.getElementById('qm-dictee').addEventListener('click',function(){startDict(level);});
+  document.getElementById('qm-assoc').addEventListener('click',function(){startAssoc(level);});
+  document.getElementById('qm-flash').addEventListener('click',function(){startFlash(level);});
+  document.getElementById('qm-sent').addEventListener('click',function(){startSentGame(level);});
+}
+
+// ════════════════════════════════════════════════
+// QUIZ
+// ════════════════════════════════════════════════
+function shuffle(a){return a.slice().sort(function(){return Math.random()-.5;});}
+
+function startQuiz(level,mode,pool){
+  quizLevel=level;quizMode=mode||'normal';quizIdx=0;quizScore=0;
+  quizAnswered=false;quizResults=[];quizStreak=0;
+  quizQs=shuffle(pool||data[level].words).slice(0,Math.min(15,data[level].words.length));
+  var d=data[level];
+  document.getElementById('quiz-topbar').className='topbar '+d.lc;
+  var modeLabel=quizMode==='reverse'?' — FR→ZH':' — Quiz';
+  document.getElementById('quiz-title').textContent=d.label+modeLabel;
+  document.getElementById('quiz-badge').textContent=quizQs.length+' q.';
+  document.getElementById('quiz-badge').className='topbar-badge';
+  show('quiz-view');
+  document.getElementById('quiz-view').className='view active '+d.lc;
+  renderQ();
+}
+
+function getDistr(correct,level){
+  return shuffle(data[level].words.filter(function(w){return w.h!==correct.h;})).slice(0,3);
+}
+
+function renderQ(){
+  quizAnswered=false;
+  var q=quizQs[quizIdx];
+  var distr=getDistr(q,quizLevel);
+  var opts=shuffle([q].concat(distr));
+  var pct=Math.round(quizIdx/quizQs.length*100);
+  var isLast=quizIdx+1>=quizQs.length;
+  var streakHtml=quizStreak>=2?'🔥 '+quizStreak+' d\'affilée':'&nbsp;';
+
+  var body=document.getElementById('quiz-body');
+  if(quizMode==='reverse'){
+    // Show French word, choose hanzi
+    body.innerHTML=
+      '<div class="qpbar"><div class="qpfill" style="width:'+pct+'%"></div></div>'
+      +'<div class="qmeta">'
+        +'<span>Question '+(quizIdx+1)+' / '+quizQs.length+'</span>'
+        +'<span class="streak'+(quizStreak<2?' hidden':'')+'">'+streakHtml+'</span>'
+        +'<span id="qlive">Score : '+quizScore+' / '+quizIdx+'</span>'
+      +'</div>'
+      +'<div class="qcard">'
+        +'<div class="q-fr-prompt">'+q.fr+'</div>'
+        +'<div class="q-pinyin" style="font-style:italic;font-size:13px;color:var(--c-hint)">'+q.c+'</div>'
+        +'<div class="q-lbl">Quel est le hanzi ?</div>'
+      +'</div>'
+      +'<div class="qopts" id="qopts">'
+        +opts.map(function(o,i){return '<button class="qopt" id="o'+i+'" style="font-size:22px;">'+o.h+'<div style="font-size:11px;color:var(--c-hint)">'+o.p+'</div></button>';}).join('')
+      +'</div>'
+      +'<div class="qfb" id="qfb"></div>'
+      +'<button class="qnext" id="qnext" style="display:none">'+(isLast?'Voir les résultats →':'Suivant →')+'</button>';
+  } else {
+    body.innerHTML=
+      '<div class="qpbar"><div class="qpfill" style="width:'+pct+'%"></div></div>'
+      +'<div class="qmeta">'
+        +'<span>Question '+(quizIdx+1)+' / '+quizQs.length+'</span>'
+        +'<span class="streak'+(quizStreak<2?' hidden':'')+'">'+streakHtml+'</span>'
+        +'<span id="qlive">Score : '+quizScore+' / '+quizIdx+'</span>'
+      +'</div>'
+      +'<div class="qcard">'
+        +'<div class="q-hanzi">'+q.h+'</div>'
+        +'<button class="q-sound-btn" id="q-snd">🔊 Écouter</button>'
+        +'<div class="q-pinyin">'+q.p+'</div>'
+        +'<div class="q-lbl">Quelle est la traduction ?</div>'
+      +'</div>'
+      +'<div class="qopts" id="qopts">'
+        +opts.map(function(o,i){return '<button class="qopt" id="o'+i+'">'+o.fr+'</button>';}).join('')
+      +'</div>'
+      +'<div class="qfb" id="qfb"></div>'
+      +'<button class="qnext" id="qnext" style="display:none">'+(isLast?'Voir les résultats →':'Suivant →')+'</button>';
+    var sndBtn=document.getElementById('q-snd');
+    sndBtn.addEventListener('click',function(){speak(q.h,null,this);});
+    speak(q.h,null,sndBtn);
+  }
+
+  opts.forEach(function(o,i){
+    document.getElementById('o'+i).addEventListener('click',function(){answerQ(i,o,q);});
+  });
+  document.getElementById('qnext').addEventListener('click',nextQ);
+}
+
+function answerQ(idx,chosen,correct){
+  if(quizAnswered)return;
+  quizAnswered=true;
+  var isOk=chosen.h===correct.h;
+  if(isOk){quizScore++;quizStreak++;}else{quizStreak=0;}
+  quizResults.push({word:correct,correct:isOk});
+
+  document.querySelectorAll('.qopt').forEach(function(b,i){
+    b.classList.add('disabled');
+    if(i===idx)b.classList.add(isOk?'correct':'wrong');
+    if(!isOk&&(quizMode==='reverse'?b.style.fontSize&&b.textContent.indexOf(correct.h)>=0:b.textContent.trim()===correct.fr))b.classList.add('correct');
+  });
+  // For reverse mode mark correct hanzi
+  if(!isOk&&quizMode==='reverse'){
+    document.querySelectorAll('.qopt').forEach(function(b){
+      if(b.textContent.indexOf(correct.h)>=0)b.classList.add('correct');
+    });
+  }
+  var fb=document.getElementById('qfb');
+  var fbExtra=quizStreak>=3?' 🔥 '+quizStreak+' d\'affilée !':'';
+  fb.textContent=isOk?'✓ Correct !'+fbExtra:'✗ '+(quizMode==='reverse'?correct.h+' ('+correct.fr+')':correct.fr);
+  fb.style.color=isOk?'var(--c1)':'var(--c5)';
+  document.getElementById('qlive').textContent='Score : '+quizScore+' / '+(quizIdx+1);
+  document.getElementById('qnext').style.display='block';
+}
+function nextQ(){quizIdx++;if(quizIdx>=quizQs.length){showResults();return;}renderQ();}
+
+function showResults(){
+  var total=quizQs.length,pct=Math.round(quizScore/total*100);
+  _saveProg(quizLevel,quizMode,pct);
+  var stars=pct===100?3:pct>=80?3:pct>=60?2:pct>=40?1:0;
+  var emoji=pct===100?'🏆':pct>=80?'🌟':pct>=60?'👍':pct>=40?'💪':'📚';
+  var msg=pct===100?'Parfait ! Maîtrise totale !':pct>=80?'Excellent !':pct>=60?'Bien joué !':pct>=40?'Continue !':'Révise encore !';
+  var wrong=quizResults.filter(function(r){return !r.correct;});
+  var body=document.getElementById('quiz-body');
+
+  body.innerHTML=
+    '<div class="qpbar"><div class="qpfill" style="width:100%"></div></div>'
+    +'<div class="rcard">'
+      +'<div class="remoji">'+emoji+'</div>'
+      +'<div class="rscore">'+quizScore+'<span>/'+total+'</span></div>'
+      +'<div class="rtotal">'+pct+'% de bonnes réponses</div>'
+      +'<div class="stars-row">'
+        +'<span class="star" id="s1">⭐</span><span class="star" id="s2">⭐</span><span class="star" id="s3">⭐</span>'
+      +'</div>'
+      +'<div class="rmsg">'+msg+'</div>'
+      +'<div class="ractns">'
+        +(wrong.length?'<button id="r-wrongs" class="cta">🔁 Erreurs ('+wrong.length+')</button>':'')
+        +'<button id="r-retry">🔀 Nouveau quiz</button>'
+        +'<button id="r-flip">🃏 Flash</button>'
+        +'<button id="r-vocab">📖 Vocabulaire</button>'
+        +'<button id="r-home">🏠</button>'
+      +'</div>'
+    +'</div>'
+    +(wrong.length
+      ?'<div class="wrong-section">'
+        +'<div class="wrong-title">À retravailler ('+wrong.length+') :</div>'
+        +wrong.map(function(r){
+          return '<div class="rb-row">'
+            +'<div class="rb-h" data-hanzi="'+encodeURIComponent(r.word.h)+'">'+r.word.h+'</div>'
+            +'<div class="rb-pin">'+r.word.p+'</div>'
+            +'<div class="rb-fr">'+r.word.fr+'</div>'
+            +'<div class="rb-x">✗</div>'
+          +'</div>';
+        }).join('')
+      +'</div>'
+      :'<div style="font-size:13px;color:var(--c1);margin-top:8px">✓ Aucune erreur — bravo !</div>');
+
+  // Animate stars
+  setTimeout(function(){
+    for(var i=1;i<=3;i++){
+      (function(n){
+        setTimeout(function(){if(n<=stars)document.getElementById('s'+n).classList.add('lit');},n*220);
+      })(i);
+    }
+  },150);
+
+  if(wrong.length){
+    document.getElementById('r-wrongs').addEventListener('click',function(){
+      startQuiz(quizLevel,quizMode,wrong.map(function(r){return r.word;}));
+    });
+  }
+  document.getElementById('r-retry').addEventListener('click',function(){startQuiz(quizLevel,quizMode);});
+  document.getElementById('r-flip').addEventListener('click',function(){startFlash(quizLevel);});
+  document.getElementById('r-vocab').addEventListener('click',function(){showLevel(quizLevel);});
+  document.getElementById('r-home').addEventListener('click',goHome);
+  document.querySelectorAll('.rb-h').forEach(function(el){
+    el.addEventListener('click',function(){speak(decodeURIComponent(el.getAttribute('data-hanzi')),null,null);});
+  });
+}
+
+// ════════════════════════════════════════════════
+// DICTÉE — Audio → Hanzi
+// ════════════════════════════════════════════════
+function startDict(level){
+  dictLevel=level;dictIdx=0;dictScore=0;dictAnswered=false;dictResults=[];dictStreak=0;
+  var d=data[level];
+  dictQs=shuffle(d.words).slice(0,Math.min(15,d.words.length));
+  document.getElementById('quiz-topbar').className='topbar '+d.lc;
+  document.getElementById('quiz-title').textContent=d.label+' — Dictée';
+  document.getElementById('quiz-badge').textContent=dictQs.length+' q.';
+  document.getElementById('quiz-badge').className='topbar-badge';
+  show('quiz-view');
+  document.getElementById('quiz-view').className='view active '+d.lc;
+  renderDict();
+}
+
+function _getDictDistr(correct,level){
+  var pool=shuffle(data[level].words.filter(function(w){return w.h!==correct.h;}));
+  var sameCat=pool.filter(function(w){return w.c===correct.c;});
+  return sameCat.concat(pool.filter(function(w){return w.c!==correct.c;})).slice(0,3);
+}
+
+function renderDict(){
+  dictAnswered=false;
+  var q=dictQs[dictIdx];
+  var opts=shuffle([q].concat(_getDictDistr(q,dictLevel)));
+  var pct=Math.round(dictIdx/dictQs.length*100);
+  var isLast=dictIdx+1>=dictQs.length;
+  var streakHtml=dictStreak>=2?'🔥 '+dictStreak+' d\'affilée':'&nbsp;';
+
+  var body=document.getElementById('quiz-body');
+  body.innerHTML=
+    '<div class="qpbar"><div class="qpfill" style="width:'+pct+'%"></div></div>'
+    +'<div class="qmeta">'
+      +'<span>Question '+(dictIdx+1)+' / '+dictQs.length+'</span>'
+      +'<span class="streak'+(dictStreak<2?' hidden':'')+'">'+streakHtml+'</span>'
+      +'<span id="dlive">Score : '+dictScore+' / '+dictIdx+'</span>'
+    +'</div>'
+    +'<div class="qcard">'
+      +'<button class="dict-listen-btn" id="dict-snd"><span class="dict-snd-icon">🔊</span><span class="dict-snd-lbl">Écouter</span></button>'
+      +'<div class="q-lbl">Quel est ce mot ?</div>'
+      +'<div id="dict-reveal" style="min-height:44px;margin-top:.4rem"></div>'
+    +'</div>'
+    +'<div class="qopts" id="dopts">'
+      +opts.map(function(o,i){return '<button class="qopt" id="do'+i+'" style="font-size:22px">'+o.h+'</button>';}).join('')
+    +'</div>'
+    +'<div class="qfb" id="dfb"></div>'
+    +'<button class="qnext" id="dnext" style="display:none">'+(isLast?'Voir les résultats →':'Suivant →')+'</button>';
+
+  var sndBtn=document.getElementById('dict-snd');
+  sndBtn.addEventListener('click',function(){speak(q.h,null,this);});
+  speak(q.h,null,sndBtn); // auto-lecture à l'affichage
+
+  opts.forEach(function(o,i){
+    document.getElementById('do'+i).addEventListener('click',function(){_answerDict(i,o,q,opts);});
+  });
+  document.getElementById('dnext').addEventListener('click',nextDict);
+}
+
+function _answerDict(idx,chosen,correct,opts){
+  if(dictAnswered)return;
+  dictAnswered=true;
+  var isOk=chosen.h===correct.h;
+  if(isOk){dictScore++;dictStreak++;}else{dictStreak=0;}
+  dictResults.push({word:correct,chosen:chosen,correct:isOk});
+
+  // Révèle pinyin + français dans la carte
+  document.getElementById('dict-reveal').innerHTML=
+    '<div style="font-size:15px;color:var(--c-muted)">'+correct.p+'</div>'
+    +'<div style="font-size:14px;font-weight:700;margin-top:3px">'+correct.fr+'</div>';
+
+  // Révèle le pinyin sous chaque option + colorie
+  document.querySelectorAll('.qopt').forEach(function(b,i){
+    b.classList.add('disabled');
+    b.innerHTML=opts[i].h+'<div style="font-size:11px;color:var(--c-hint)">'+opts[i].p+'</div>';
+    if(i===idx)b.classList.add(isOk?'correct':'wrong');
+    if(!isOk&&opts[i].h===correct.h)b.classList.add('correct');
+  });
+
+  var fb=document.getElementById('dfb');
+  var fbExtra=dictStreak>=3?' 🔥 '+dictStreak+' d\'affilée !':'';
+  fb.textContent=isOk?'✓ Correct !'+fbExtra:'✗ '+correct.h+' — '+correct.fr;
+  fb.style.color=isOk?'var(--c1)':'var(--c5)';
+  document.getElementById('dlive').textContent='Score : '+dictScore+' / '+(dictIdx+1);
+  document.getElementById('dnext').style.display='block';
+}
+
+function nextDict(){dictIdx++;if(dictIdx>=dictQs.length){showDictResults();return;}renderDict();}
+
+function showDictResults(){
+  var total=dictQs.length,pct=Math.round(dictScore/total*100);
+  _saveProg(dictLevel,'dictee',pct);
+  var stars=pct===100?3:pct>=80?3:pct>=60?2:pct>=40?1:0;
+  var emoji=pct===100?'🏆':pct>=80?'🌟':pct>=60?'👍':pct>=40?'💪':'📚';
+  var msg=pct===100?'Parfait ! Oreille absolue !':pct>=80?'Excellent !':pct>=60?'Bien joué !':pct>=40?'Continue !':'Écoute encore !';
+  var wrong=dictResults.filter(function(r){return !r.correct;});
+  var body=document.getElementById('quiz-body');
+
+  body.innerHTML=
+    '<div class="qpbar"><div class="qpfill" style="width:100%"></div></div>'
+    +'<div class="rcard">'
+      +'<div class="remoji">'+emoji+'</div>'
+      +'<div class="rscore">'+dictScore+'<span>/'+total+'</span></div>'
+      +'<div class="rtotal">'+pct+'% de bonnes réponses</div>'
+      +'<div class="stars-row"><span class="star" id="ds1">⭐</span><span class="star" id="ds2">⭐</span><span class="star" id="ds3">⭐</span></div>'
+      +'<div class="rmsg">'+msg+'</div>'
+      +'<div class="ractns">'
+        +(wrong.length?'<button id="dr-wrongs" class="cta">🔁 Erreurs ('+wrong.length+')</button>':'')
+        +'<button id="dr-retry">🔀 Rejouer</button>'
+        +'<button id="dr-quiz">🎯 Quiz</button>'
+        +'<button id="dr-vocab">📖 Vocabulaire</button>'
+        +'<button id="dr-home">🏠</button>'
+      +'</div>'
+    +'</div>'
+    +(wrong.length
+      ?'<div class="wrong-section"><div class="wrong-title">À retravailler ('+wrong.length+') :</div>'
+        +wrong.map(function(r){
+          return '<div class="rb-row">'
+            +'<div class="rb-h" data-hanzi="'+encodeURIComponent(r.word.h)+'">'+r.word.h+'</div>'
+            +'<div class="rb-pin">'+r.word.p+'</div>'
+            +'<div class="rb-fr">'+r.word.fr+'</div>'
+            +'<div class="rb-x">✗</div>'
+          +'</div>';
+        }).join('')+'</div>'
+      :'<div style="font-size:13px;color:var(--c1);margin-top:8px">✓ Aucune erreur — bravo !</div>');
+
+  setTimeout(function(){
+    for(var i=1;i<=3;i++){(function(n){
+      setTimeout(function(){if(n<=stars)document.getElementById('ds'+n).classList.add('lit');},n*220);
+    })(i);}
+  },150);
+
+  if(wrong.length){
+    document.getElementById('dr-wrongs').addEventListener('click',function(){
+      dictQs=wrong.map(function(r){return r.word;});
+      dictIdx=0;dictScore=0;dictAnswered=false;dictResults=[];dictStreak=0;
+      renderDict();
+    });
+  }
+  document.getElementById('dr-retry').addEventListener('click',function(){startDict(dictLevel);});
+  document.getElementById('dr-quiz').addEventListener('click',function(){showQuizMenu(dictLevel);});
+  document.getElementById('dr-vocab').addEventListener('click',function(){showLevel(dictLevel);});
+  document.getElementById('dr-home').addEventListener('click',goHome);
+  document.querySelectorAll('.rb-h').forEach(function(el){
+    el.addEventListener('click',function(){speak(decodeURIComponent(el.getAttribute('data-hanzi')),null,null);});
+  });
+}
+
+// ════════════════════════════════════════════════
+// ASSOCIATION — Relier les paires
+// ════════════════════════════════════════════════
+var ASSOC_N=5;
+
+function startAssoc(level){
+  assocLevel=level;assocAttempts=0;
+  assocMatched=new Set();
+  _assocPendingType=null;_assocPendingIdx=null;
+  var d=data[level];
+  assocPairs=shuffle(d.words).slice(0,Math.min(ASSOC_N,d.words.length));
+  assocLeft=shuffle(assocPairs.slice());
+  assocRight=shuffle(assocPairs.slice());
+  document.getElementById('quiz-topbar').className='topbar '+d.lc;
+  document.getElementById('quiz-title').textContent=d.label+' — Association';
+  document.getElementById('quiz-badge').textContent='0 / '+assocPairs.length+' paires';
+  document.getElementById('quiz-badge').className='topbar-badge';
+  show('quiz-view');
+  document.getElementById('quiz-view').className='view active '+d.lc;
+  renderAssoc();
+}
+
+function renderAssoc(){
+  var body=document.getElementById('quiz-body');
+  body.innerHTML=
+    '<div style="font-size:13px;color:var(--c-muted);text-align:center;margin:.3rem 0 .8rem">Relie chaque hanzi à sa traduction française</div>'
+    +'<div class="assoc-area">'
+      +'<div class="assoc-col">'
+        +assocLeft.map(function(w,i){
+          return '<button class="assoc-card h-card" id="ac-h-'+i+'">'+w.h+'</button>';
+        }).join('')
+      +'</div>'
+      +'<div class="assoc-col">'
+        +assocRight.map(function(w,i){
+          return '<button class="assoc-card fr-card" id="ac-fr-'+i+'">'+w.fr+'</button>';
+        }).join('')
+      +'</div>'
+    +'</div>'
+    +'<div class="qfb" id="assoc-fb" style="text-align:center;min-height:20px"></div>';
+
+  assocLeft.forEach(function(w,i){
+    document.getElementById('ac-h-'+i).addEventListener('click',function(){_assocTap('h',i);});
+  });
+  assocRight.forEach(function(w,i){
+    document.getElementById('ac-fr-'+i).addEventListener('click',function(){_assocTap('fr',i);});
+  });
+  // Restaure les paires déjà trouvées (si re-render)
+  assocMatched.forEach(function(h){
+    var li=assocLeft.findIndex(function(w){return w.h===h;});
+    var ri=assocRight.findIndex(function(w){return w.h===h;});
+    if(li>=0)_assocSetCard('h',li,'matched');
+    if(ri>=0)_assocSetCard('fr',ri,'matched');
+  });
+}
+
+function _assocSetCard(type,idx,state){
+  var el=document.getElementById('ac-'+type+'-'+idx);
+  if(!el)return;
+  el.className='assoc-card '+(type==='h'?'h-card':'fr-card')+(state?' '+state:'');
+}
+
+function _assocTap(type,idx){
+  var word=type==='h'?assocLeft[idx]:assocRight[idx];
+  if(assocMatched.has(word.h))return;
+
+  if(_assocPendingType===null){
+    _assocPendingType=type;_assocPendingIdx=idx;
+    _assocSetCard(type,idx,'selected');
+    return;
+  }
+  if(_assocPendingType===type){
+    // Même colonne → change de sélection
+    _assocSetCard(_assocPendingType,_assocPendingIdx,'');
+    _assocPendingType=type;_assocPendingIdx=idx;
+    _assocSetCard(type,idx,'selected');
+    return;
+  }
+  // Colonnes différentes → vérifier la paire
+  var pendingWord=_assocPendingType==='h'?assocLeft[_assocPendingIdx]:assocRight[_assocPendingIdx];
+  var pType=_assocPendingType,pIdx=_assocPendingIdx;
+  _assocPendingType=null;_assocPendingIdx=null;
+  assocAttempts++;
+
+  var fb=document.getElementById('assoc-fb');
+  if(pendingWord.h===word.h){
+    // ✓ Bonne paire
+    assocMatched.add(word.h);
+    _assocSetCard(pType,pIdx,'matched');
+    _assocSetCard(type,idx,'matched');
+    fb.textContent='✓ '+word.h+' = '+word.fr+'  ('+word.p+')';
+    fb.style.color='var(--c1)';
+    document.getElementById('quiz-badge').textContent=assocMatched.size+' / '+assocPairs.length+' paires';
+    if(assocMatched.size===assocPairs.length)setTimeout(showAssocResults,800);
+  }else{
+    // ✗ Mauvaise paire
+    _assocSetCard(pType,pIdx,'wrong');
+    _assocSetCard(type,idx,'wrong');
+    fb.textContent='✗ Pas la bonne paire, essaie encore !';
+    fb.style.color='var(--c5)';
+    setTimeout(function(){
+      if(!assocMatched.has(pendingWord.h))_assocSetCard(pType,pIdx,'');
+      if(!assocMatched.has(word.h))_assocSetCard(type,idx,'');
+      var fb2=document.getElementById('assoc-fb');
+      if(fb2&&fb2.style.color==='var(--c5)')fb2.textContent='';
+    },750);
+  }
+}
+
+function showAssocResults(){
+  var n=assocPairs.length;
+  var stars=assocAttempts===n?3:assocAttempts<=n+2?2:assocAttempts<=n*2?1:0;
+  var pct=Math.round(n/assocAttempts*100);
+  _saveProg(assocLevel,'assoc',pct);
+  var emoji=stars===3?'🏆':stars===2?'🌟':stars===1?'👍':'📚';
+  var msg=stars===3?'Parfait du premier coup !':stars===2?'Très bien joué !':stars===1?'Bien joué !':'Continue à t\'entraîner !';
+  var body=document.getElementById('quiz-body');
+
+  body.innerHTML=
+    '<div class="rcard">'
+      +'<div class="remoji">'+emoji+'</div>'
+      +'<div class="rscore">'+assocAttempts+'<span> essais</span></div>'
+      +'<div class="rtotal">'+n+' paires — '+pct+'% d\'efficacité</div>'
+      +'<div class="stars-row"><span class="star" id="as1">⭐</span><span class="star" id="as2">⭐</span><span class="star" id="as3">⭐</span></div>'
+      +'<div class="rmsg">'+msg+'</div>'
+      +'<div class="ractns">'
+        +'<button id="ar-retry" class="cta">🔁 Rejouer</button>'
+        +'<button id="ar-quiz">🎯 Quiz</button>'
+        +'<button id="ar-vocab">📖 Vocabulaire</button>'
+        +'<button id="ar-home">🏠</button>'
+      +'</div>'
+    +'</div>';
+
+  setTimeout(function(){
+    for(var i=1;i<=3;i++){(function(n2){
+      setTimeout(function(){if(n2<=stars)document.getElementById('as'+n2).classList.add('lit');},n2*220);
+    })(i);}
+  },150);
+
+  document.getElementById('ar-retry').addEventListener('click',function(){startAssoc(assocLevel);});
+  document.getElementById('ar-quiz').addEventListener('click',function(){showQuizMenu(assocLevel);});
+  document.getElementById('ar-vocab').addEventListener('click',function(){showLevel(assocLevel);});
+  document.getElementById('ar-home').addEventListener('click',goHome);
+}
+
+// ════════════════════════════════════════════════
+// SENTENCE COMPLETION GAME
+// ════════════════════════════════════════════════
+function getSentDistr(answerWord,level){
+  var pool=shuffle(data[level].words.filter(function(w){return w.h!==answerWord.h;}));
+  var sameCat=pool.filter(function(w){return w.c===answerWord.c;});
+  var diff=pool.filter(function(w){return w.c!==answerWord.c;});
+  return sameCat.concat(diff).slice(0,3);
+}
+
+function startSentGame(level){
+  sentLevel=level;sentIdx=0;sentScore=0;sentAnswered=false;sentResults=[];sentStreak=0;
+  var d=data[level];
+  var raw=sentences[level]||[];
+  sentQs=shuffle(raw).slice(0,Math.min(10,raw.length)).map(function(s){
+    var w=data[level].words.find(function(x){return x.h===s[1];});
+    return w?{s:s[0],word:w,fr:s[2]}:null;
+  }).filter(Boolean);
+  document.getElementById('sent-topbar').className='topbar '+d.lc;
+  document.getElementById('sent-title').textContent=d.label+' — Phrases';
+  document.getElementById('sent-badge').textContent=sentQs.length+' ph.';
+  document.getElementById('sent-badge').className='topbar-badge';
+  show('sent-view');
+  document.getElementById('sent-view').className='view active '+d.lc;
+  renderSent();
+}
+
+function _renderSentence(s,word,filled){
+  var parts=s.split('___');
+  var blankHtml=filled
+    ?'<span class="sent-blank filled">'+word.h+'</span>'
+    :'<span class="sent-blank">___</span>';
+  return parts[0]+blankHtml+(parts[1]||'');
+}
+
+function renderSent(){
+  sentAnswered=false;
+  var q=sentQs[sentIdx];
+  var distr=getSentDistr(q.word,sentLevel);
+  var opts=shuffle([q.word].concat(distr));
+  var pct=Math.round(sentIdx/sentQs.length*100);
+  var isLast=sentIdx+1>=sentQs.length;
+  var streakHtml=sentStreak>=2?'🔥 '+sentStreak+' d\'affilée':'&nbsp;';
+
+  var body=document.getElementById('sent-body');
+  body.innerHTML=
+    '<div class="qpbar"><div class="qpfill" style="width:'+pct+'%"></div></div>'
+    +'<div class="qmeta">'
+      +'<span>Phrase '+(sentIdx+1)+' / '+sentQs.length+'</span>'
+      +'<span class="streak'+(sentStreak<2?' hidden':'')+'">'+streakHtml+'</span>'
+      +'<span id="slive">Score : '+sentScore+' / '+sentIdx+'</span>'
+    +'</div>'
+    +'<div class="qcard">'
+      +'<div class="sent-sentence" id="sent-sent">'+_renderSentence(q.s,q.word,false)+'</div>'
+      +'<div class="sent-fr">'+q.fr+'</div>'
+    +'</div>'
+    +'<div class="qopts" id="sopts">'
+      +opts.map(function(o,i){
+        return '<button class="qopt" id="so'+i+'" style="font-size:20px;line-height:1.3">'
+          +o.h+'<div style="font-size:11px;color:var(--c-hint)">'+o.p+'</div></button>';
+      }).join('')
+    +'</div>'
+    +'<div class="qfb" id="sfb"></div>'
+    +'<button class="qnext" id="snext" style="display:none">'+(isLast?'Voir les résultats →':'Suivant →')+'</button>';
+
+  opts.forEach(function(o,i){
+    document.getElementById('so'+i).addEventListener('click',function(){answerSent(i,o,q);});
+  });
+  document.getElementById('snext').addEventListener('click',nextSent);
+}
+
+function answerSent(idx,chosen,q){
+  if(sentAnswered)return;
+  sentAnswered=true;
+  var isOk=chosen.h===q.word.h;
+  if(isOk){sentScore++;sentStreak++;}else{sentStreak=0;}
+  sentResults.push({q:q,chosen:chosen,correct:isOk});
+
+  document.getElementById('sent-sent').innerHTML=_renderSentence(q.s,q.word,true);
+
+  document.querySelectorAll('.qopt').forEach(function(b,i){
+    b.classList.add('disabled');
+    if(i===idx)b.classList.add(isOk?'correct':'wrong');
+  });
+  if(!isOk){
+    document.querySelectorAll('.qopt').forEach(function(b){
+      if(b.textContent.indexOf(q.word.h)>=0)b.classList.add('correct');
+    });
+  }
+  var fb=document.getElementById('sfb');
+  var fbExtra=sentStreak>=3?' 🔥 '+sentStreak+' d\'affilée !':'';
+  fb.textContent=isOk?'✓ Correct !'+fbExtra:'✗ '+q.word.h+' ('+q.word.fr+')';
+  fb.style.color=isOk?'var(--c1)':'var(--c5)';
+  document.getElementById('slive').textContent='Score : '+sentScore+' / '+(sentIdx+1);
+  document.getElementById('snext').style.display='block';
+}
+
+function nextSent(){sentIdx++;if(sentIdx>=sentQs.length){showSentResults();return;}renderSent();}
+
+function showSentResults(){
+  var total=sentQs.length,pct=Math.round(sentScore/total*100);
+  _saveProg(sentLevel,'sent',pct);
+  var stars=pct===100?3:pct>=80?3:pct>=60?2:pct>=40?1:0;
+  var emoji=pct===100?'🏆':pct>=80?'🌟':pct>=60?'👍':pct>=40?'💪':'📚';
+  var msg=pct===100?'Parfait ! Maîtrise totale !':pct>=80?'Excellent !':pct>=60?'Bien joué !':pct>=40?'Continue !':'Révise encore !';
+  var wrong=sentResults.filter(function(r){return !r.correct;});
+  var body=document.getElementById('sent-body');
+
+  body.innerHTML=
+    '<div class="qpbar"><div class="qpfill" style="width:100%"></div></div>'
+    +'<div class="rcard">'
+      +'<div class="remoji">'+emoji+'</div>'
+      +'<div class="rscore">'+sentScore+'<span>/'+total+'</span></div>'
+      +'<div class="rtotal">'+pct+'% de bonnes réponses</div>'
+      +'<div class="stars-row">'
+        +'<span class="star" id="ss1">⭐</span><span class="star" id="ss2">⭐</span><span class="star" id="ss3">⭐</span>'
+      +'</div>'
+      +'<div class="rmsg">'+msg+'</div>'
+      +'<div class="ractns">'
+        +'<button id="sr-retry" class="cta">🔁 Rejouer</button>'
+        +'<button id="sr-quiz">🎯 Quiz</button>'
+        +'<button id="sr-vocab">📖 Vocabulaire</button>'
+        +'<button id="sr-home">🏠</button>'
+      +'</div>'
+    +'</div>'
+    +(wrong.length
+      ?'<div class="wrong-section">'
+        +'<div class="wrong-title">À retravailler ('+wrong.length+') :</div>'
+        +wrong.map(function(r){
+          return '<div class="rb-row">'
+            +'<div class="rb-h" data-hanzi="'+encodeURIComponent(r.q.word.h)+'">'+r.q.word.h+'</div>'
+            +'<div class="rb-pin">'+r.q.word.p+'</div>'
+            +'<div class="rb-fr">'+r.q.word.fr+'</div>'
+            +'<div class="rb-x">✗</div>'
+          +'</div>';
+        }).join('')
+      +'</div>'
+      :'<div style="font-size:13px;color:var(--c1);margin-top:8px">✓ Aucune erreur — bravo !</div>');
+
+  setTimeout(function(){
+    for(var i=1;i<=3;i++){
+      (function(n){
+        setTimeout(function(){if(n<=stars)document.getElementById('ss'+n).classList.add('lit');},n*220);
+      })(i);
+    }
+  },150);
+
+  document.getElementById('sr-retry').addEventListener('click',function(){startSentGame(sentLevel);});
+  document.getElementById('sr-quiz').addEventListener('click',function(){showQuizMenu(sentLevel);});
+  document.getElementById('sr-vocab').addEventListener('click',function(){showLevel(sentLevel);});
+  document.getElementById('sr-home').addEventListener('click',goHome);
+  document.querySelectorAll('.rb-h').forEach(function(el){
+    el.addEventListener('click',function(){speak(decodeURIComponent(el.getAttribute('data-hanzi')),null,null);});
+  });
+}
+
+// ════════════════════════════════════════════════
+// WORD ACTION SHEET
+// ════════════════════════════════════════════════
+var _wsWord=null,_wsCard=null;
+
+function openWordSheet(w,cardEl){
+  _wsWord=w;_wsCard=cardEl;
+  document.getElementById('ws-hanzi').textContent=w.h;
+  document.getElementById('ws-pinyin').textContent=w.p;
+  document.getElementById('ws-fr').textContent=w.fr;
+  // Apply current level color
+  var sheet=document.getElementById('word-sheet');
+  sheet.className='word-sheet '+(current?data[current].lc:'');
+  document.getElementById('word-sheet-overlay').classList.add('open');
+}
+function closeWordSheet(){
+  document.getElementById('word-sheet-overlay').classList.remove('open');
+}
+document.getElementById('ws-listen').addEventListener('click',function(){
+  closeWordSheet();
+  if(_wsWord)speak(_wsWord.h,_wsCard,null);
+});
+document.getElementById('ws-write').addEventListener('click',function(){
+  closeWordSheet();
+  if(_wsWord)openWrite(_wsWord);
+});
+document.getElementById('word-sheet-overlay').addEventListener('click',function(e){
+  if(e.target===this)closeWordSheet();
+});
+
+// ════════════════════════════════════════════════
+// WRITE VIEW — HanziWriter
+// ════════════════════════════════════════════════
+var _writeWord=null,_writeChars=[],_writeCharIdx=0;
+var _hanziWriter=null,_writeStrokeCount=0,_writeDoneStrokes=0,_writePhase='idle';
+// _writePhase: 'idle' | 'animating' | 'quiz'
+
+function _isDark(){
+  return document.body.classList.contains('dark')||
+    (!document.body.classList.contains('light')&&window.matchMedia('(prefers-color-scheme:dark)').matches);
+}
+
+function openWrite(word){
+  _writeWord=word;
+  _writeChars=Array.from(word.h); // proper Unicode split
+  _writeCharIdx=0;
+  document.getElementById('write-word-hanzi').textContent=word.h;
+  document.getElementById('write-word-sub').textContent=word.p+' — '+word.fr;
+  var tb=document.getElementById('write-topbar');
+  tb.className='write-topbar '+(current?data[current].lc:'');
+  document.getElementById('write-view').classList.add('wv-open');
+  // Multi-char navigation
+  var nav=document.getElementById('write-char-nav');
+  if(_writeChars.length>1){
+    nav.style.display='flex';
+    updateCharNav();
+  } else {
+    nav.style.display='none';
+  }
+  requestAnimationFrame(function(){requestAnimationFrame(initHanziWriter);});
+}
+function closeWrite(){
+  if(_hanziWriter){_hanziWriter=null;}
+  document.getElementById('hanzi-writer-target').innerHTML='';
+  document.getElementById('write-view').classList.remove('wv-open');
+  _writePhase='idle';
+}
+
+function updateCharNav(){
+  var n=_writeChars.length;
+  document.getElementById('write-char-label').textContent=
+    _writeChars[_writeCharIdx]+' ('+((_writeCharIdx+1))+'/'+n+')';
+  document.getElementById('write-prev').disabled=_writeCharIdx===0;
+  document.getElementById('write-next').disabled=_writeCharIdx===n-1;
+}
+
+function _lcColor(){
+  if(!current)return'#0F6E56';
+  var map={l1:'#0F6E56',l2:'#185FA5',l3:'#534AB7',l4:'#C45E00',l5:'#A32D2D'};
+  var dark={l1:'#2CC48A',l2:'#4D9EE8',l3:'#8E88F0',l4:'#F59A3C',l5:'#E06060'};
+  return _isDark()?(dark[data[current].lc]||'#2CC48A'):(map[data[current].lc]||'#0F6E56');
+}
+
+function initHanziWriter(){
+  if(_hanziWriter){_hanziWriter=null;}
+  var target=document.getElementById('hanzi-writer-target');
+  target.innerHTML='';
+  var wrap=document.getElementById('write-hw-wrap');
+  // Size: square fitting the available space
+  var bodyH=document.getElementById('write-body').offsetHeight;
+  var bodyW=document.getElementById('write-body').offsetWidth;
+  // Reserve space for nav + dots + status + actions (~180px)
+  var maxSz=Math.min(bodyW-32, bodyH-180, 380);
+  var sz=Math.max(maxSz,180);
+  wrap.style.width=sz+'px';
+  wrap.style.height=sz+'px';
+
+  var dark=_isDark();
+  var lc=_lcColor();
+  var char=_writeChars[_writeCharIdx];
+
+  setWriteStatus('Chargement…','');
+  document.getElementById('write-stroke-dots').innerHTML='';
+  _writePhase='idle';
+
+  try{
+    _hanziWriter=HanziWriter.create('hanzi-writer-target',char,{
+      width:sz,height:sz,
+      padding:sz*0.06,
+      showOutline:true,
+      outlineColor:dark?'rgba(255,255,255,0.18)':'rgba(0,0,0,0.14)',
+      showCharacter:false,
+      strokeColor:dark?'rgba(200,192,170,0.9)':'rgba(26,24,20,0.85)',
+      strokeAnimationSpeed:1.2,
+      delayBetweenStrokes:120,
+      drawingColor:dark?'rgba(200,192,170,0.95)':'rgba(26,24,20,0.92)',
+      drawingWidth:Math.max(5,sz/55),
+      highlightColor:lc,
+      highlightOnComplete:true,
+      leniency:1.25,
+      showHintAfterMisses:3,
+      gridColor:dark?'rgba(255,255,255,0.10)':'rgba(0,0,0,0.09)',
+      renderer:'svg',
+      onLoadCharDataSuccess:function(charData){
+        _writeStrokeCount=charData.strokes.length;
+        buildStrokeDots(_writeStrokeCount);
+        animateWrite();
+      },
+      onLoadCharDataError:function(){
+        setWriteStatus('Caractère non disponible','err');
+      }
+    });
+  }catch(e){
+    setWriteStatus('Erreur HanziWriter','err');
+  }
+}
+
+function buildStrokeDots(n){
+  var el=document.getElementById('write-stroke-dots');
+  var html='';
+  for(var i=0;i<n;i++) html+='<div class="wsd" id="wsd-'+i+'"></div>';
+  el.innerHTML=html;
+  if(n>0) document.getElementById('wsd-0').classList.add('active');
+}
+function setDot(i,cls){
+  var d=document.getElementById('wsd-'+i);
+  if(d){d.className='wsd '+cls;}
+}
+function setWriteStatus(msg,cls){
+  var el=document.getElementById('write-status');
+  el.textContent=msg;
+  el.className='write-status'+(cls?' '+cls:'');
+}
+
+function animateWrite(){
+  _writePhase='animating';
+  setWriteStatus('Regardez l\'ordre des traits…','');
+  if(!_hanziWriter)return;
+  _hanziWriter.animateCharacter({
+    onComplete:function(){
+      setTimeout(startWriteQuiz,600);
+    }
+  });
+}
+
+function startWriteQuiz(){
+  if(!_hanziWriter)return;
+  _writePhase='quiz';
+  _writeDoneStrokes=0;
+  buildStrokeDots(_writeStrokeCount);
+  setWriteStatus('À vous ! Tracez trait par trait ✍️','');
+  _hanziWriter.quiz({
+    onMistake:function(strokeData){
+      var wrap=document.getElementById('write-hw-wrap');
+      wrap.classList.remove('shake');
+      void wrap.offsetWidth; // reflow
+      wrap.classList.add('shake');
+      setTimeout(function(){wrap.classList.remove('shake');},260);
+      var rem=strokeData.strokesRemaining;
+      setWriteStatus('↩ Essayez encore ce trait ('+rem+' restant'+(rem>1?'s':'')+')', 'err');
+      setDot(_writeDoneStrokes,'err');
+      setTimeout(function(){
+        if(_writePhase==='quiz')setDot(_writeDoneStrokes,'active');
+        setWriteStatus('Continuez ! ('+(rem)+' trait'+(rem>1?'s':'')+')', '');
+      },800);
+    },
+    onCorrectStroke:function(strokeData){
+      setDot(_writeDoneStrokes,'done');
+      _writeDoneStrokes++;
+      var rem=strokeData.strokesRemaining;
+      if(rem>0){
+        setDot(_writeDoneStrokes,'active');
+        setWriteStatus('✓ Trait suivant… ('+rem+' restant'+(rem>1?'s':'')+')', 'ok');
+      }
+    },
+    onComplete:function(summaryData){
+      _writePhase='done';
+      var err=summaryData.totalMistakes;
+      var msg=err===0?'🏆 Parfait ! Aucune erreur !':err<=2?'🌟 Très bien ! '+err+' erreur'+(err>1?'s':'')+'!':'👍 Tracé complet ! '+err+' erreur'+(err>1?'s':'');
+      setWriteStatus(msg,'ok');
+      // Auto-advance for multi-char words
+      if(_writeChars.length>1&&_writeCharIdx<_writeChars.length-1){
+        setTimeout(function(){
+          _writeCharIdx++;
+          updateCharNav();
+          initHanziWriter();
+        },1800);
+      }
+    }
+  });
+}
+
+// Controls
+document.getElementById('write-back').addEventListener('click',closeWrite);
+document.getElementById('write-replay').addEventListener('click',function(){
+  if(!_hanziWriter)return;
+  if(_writePhase==='quiz'||_writePhase==='done'){
+    _writePhase='animating';
+    buildStrokeDots(_writeStrokeCount);
+    setWriteStatus('Regardez l\'ordre des traits…','');
+    _hanziWriter.animateCharacter({onComplete:function(){setTimeout(startWriteQuiz,600);}});
+  } else if(_writePhase==='animating'){
+    _hanziWriter.cancelAnimation();
+    setTimeout(startWriteQuiz,200);
+  }
+});
+document.getElementById('write-hint-btn').addEventListener('click',function(){
+  if(!_hanziWriter||_writePhase!=='quiz')return;
+  _hanziWriter.showCharacter();
+  setWriteStatus('Mémorisez bien… 👀','');
+  setTimeout(function(){
+    _hanziWriter.hideCharacter();
+    if(_writePhase==='quiz')setWriteStatus('À vous ! Retracez trait par trait ✍️','');
+  },2000);
+});
+document.getElementById('write-retry-btn').addEventListener('click',function(){
+  if(_hanziWriter)initHanziWriter();
+});
+document.getElementById('write-prev').addEventListener('click',function(){
+  if(_writeCharIdx>0){_writeCharIdx--;updateCharNav();initHanziWriter();}
+});
+document.getElementById('write-next').addEventListener('click',function(){
+  if(_writeCharIdx<_writeChars.length-1){_writeCharIdx++;updateCharNav();initHanziWriter();}
+});
+
+window.addEventListener('resize',function(){
+  if(document.getElementById('write-view').classList.contains('wv-open'))
+    requestAnimationFrame(initHanziWriter);
+});
+
+// ════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════
+buildHome();
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js').catch(function(){});
+}
+</script>
+</body>
+</html>
