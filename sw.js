@@ -1,7 +1,8 @@
-const CACHE = 'yct-vocab-v3';
+const CACHE = 'yct-vocab-v10';
 const ASSETS = [
   './yct_app_Android.html',
   './yct_app_Iphone.html',
+  './config.js',
   './icon.svg',
   './manifest.json',
   'https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js'
