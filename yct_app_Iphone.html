@@ -1156,10 +1156,11 @@ function _applyTheme(mode){
 (function(){_applyTheme(localStorage.getItem(THEME_KEY)||'auto');})();
 
 // ════════════════════════════════════════════════
-// AUDIO — robust TTS with voice-load wait
+// AUDIO — SpeechSynthesis primary, Google TTS fallback
 // ════════════════════════════════════════════════
 function speak(hanzi,cardEl,btnEl){
   if(_audio){_audio.pause();_audio=null;}
+  if(window.speechSynthesis)window.speechSynthesis.cancel();
   if(_card){_card.classList.remove('speaking');_card=null;}
   if(_sndBtn){_sndBtn.classList.remove('playing');_sndBtn=null;}
   if(cardEl){_card=cardEl;cardEl.classList.add('speaking');}
@@ -1168,33 +1169,42 @@ function speak(hanzi,cardEl,btnEl){
   function done(){
     if(cardEl)cardEl.classList.remove('speaking');
     if(btnEl)btnEl.classList.remove('playing');
-    if(_audio&&_audio===thisAudio)_audio=null;
-  }
-  function fallbackTTS(){
-    if(!window.speechSynthesis)return;
-    window.speechSynthesis.cancel();
-    function doSpeak(){
-      var u=new SpeechSynthesisUtterance(hanzi);
-      u.lang='zh-CN';u.rate=0.85;
-      var voices=window.speechSynthesis.getVoices();
-      var v=voices.find(function(v){return v.lang.startsWith('zh');});
-      if(v)u.voice=v;
-      u.onend=u.onerror=done;
-      window.speechSynthesis.speak(u);
-    }
-    var voices=window.speechSynthesis.getVoices();
-    if(voices.length){doSpeak();}
-    else{window.speechSynthesis.onvoiceschanged=function(){doSpeak();window.speechSynthesis.onvoiceschanged=null;};}
+    if(_audio)_audio=null;
   }
 
-  var url='https://translate.google.com/translate_tts?ie=UTF-8&tl=zh-CN&client=tw-ob&q='+encodeURIComponent(hanzi);
-  var thisAudio=new Audio();
-  thisAudio.referrerPolicy='no-referrer';
-  thisAudio.src=url;
-  _audio=thisAudio;
-  thisAudio.onended=done;
-  thisAudio.onerror=function(){fallbackTTS();if(_audio===thisAudio)_audio=null;};
-  thisAudio.play().catch(fallbackTTS);
+  function tryGoogleTTS(){
+    var url='https://translate.google.com/translate_tts?ie=UTF-8&tl=zh-CN&client=tw-ob&q='+encodeURIComponent(hanzi);
+    var a=new Audio();
+    a.referrerPolicy='no-referrer';
+    a.src=url;
+    _audio=a;
+    a.onended=done;
+    a.onerror=done;
+    a.play().catch(done);
+  }
+
+  function doSpeechAPI(){
+    var u=new SpeechSynthesisUtterance(hanzi);
+    u.lang='zh-CN';u.rate=0.85;
+    var voices=window.speechSynthesis.getVoices();
+    var v=voices.find(function(x){return x.lang.startsWith('zh');});
+    if(v)u.voice=v;
+    u.onend=done;
+    u.onerror=function(){tryGoogleTTS();};
+    window.speechSynthesis.speak(u);
+  }
+
+  if(!window.speechSynthesis){tryGoogleTTS();return;}
+  var voices=window.speechSynthesis.getVoices();
+  if(voices.length){doSpeechAPI();}
+  else{
+    var _fallbackTimer=setTimeout(tryGoogleTTS,600);
+    window.speechSynthesis.onvoiceschanged=function(){
+      clearTimeout(_fallbackTimer);
+      window.speechSynthesis.onvoiceschanged=null;
+      doSpeechAPI();
+    };
+  }
 }
 
 // ════════════════════════════════════════════════
