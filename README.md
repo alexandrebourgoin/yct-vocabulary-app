@@ -88,10 +88,20 @@ Les scores sont sauvegardés localement sur l'appareil (LocalStorage). Sur la pa
 
 ## ⚠️ Remarques
 
-- La **prononciation** nécessite une connexion Internet (Google TTS)
 - Le **tracé des caractères** (HanziWriter) nécessite Internet au premier lancement, puis fonctionne hors-ligne
 - La version **iPhone** désactive la lecture audio automatique (restriction Safari)
 - Les données de progression sont stockées **sur l'appareil uniquement** — elles ne sont pas synchronisées entre appareils
+
+### 🔊 Prononciation — installation requise sur Android
+
+La prononciation utilise le moteur de synthèse vocale intégré à Android. Pour que le **chinois mandarin** soit disponible, il faut installer le pack de langue :
+
+1. Aller dans **Paramètres** → **Accessibilité** → **Synthèse vocale**
+2. Vérifier que le moteur **Google** est sélectionné
+3. Appuyer sur ⚙️ à côté du moteur → **Installer les données vocales**
+4. Chercher **Chinois (Chine)** ou **中文(中国)** et télécharger
+
+> Sans ce pack, la prononciation ne fonctionnera pas.
 
 ---
 
