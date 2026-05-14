@@ -9,7 +9,7 @@
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon.svg">
-<meta name="theme-color" content="#0F6E56">
+<meta name="theme-color" content="#CC0000">
 <style>
 /* ══════════════════════════════════════════════
    TOKENS — Light
@@ -401,6 +401,50 @@ body{font-family:'Georgia',serif;-webkit-tap-highlight-color:transparent;color:v
 .rb-x{color:var(--c5);font-size:14px;}
 
 /* ══════════════════════════════════════════════
+   STATS
+══════════════════════════════════════════════ */
+.stats-overlay{
+  position:fixed;inset:0;background:var(--c-bg);z-index:200;
+  display:none;overflow-y:auto;
+}
+.stats-overlay.open{display:block;animation:fadeUp .22s ease both;}
+.stats-header{
+  display:flex;align-items:center;gap:10px;
+  padding:1rem 1rem .75rem;
+  position:sticky;top:0;z-index:1;
+  background:var(--topbar-bg);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--c-border);
+}
+.stats-back{
+  background:none;border:1.5px solid var(--c-border);border-radius:var(--radius-sm);
+  padding:6px 10px;font-size:14px;cursor:pointer;color:var(--c-text);font-family:inherit;
+  min-height:36px;transition:background .12s;
+}
+.stats-back:active{background:var(--c-border);}
+.stats-title{font-size:17px;font-weight:700;}
+.stats-body{padding:.75rem;max-width:640px;margin:0 auto;}
+.stats-level{
+  background:var(--c-surface);border:1.5px solid var(--c-border);
+  border-radius:var(--radius);padding:.85rem 1rem .75rem;
+  box-shadow:var(--shadow);margin-bottom:.75rem;
+}
+.stats-grid{
+  display:grid;grid-template-columns:repeat(6,1fr);gap:5px;margin-top:.6rem;
+}
+.stats-cell{
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  padding:6px 2px;border-radius:var(--radius-sm);
+  background:var(--c-bg);
+}
+.stats-cell.done{background:var(--lc-bg);}
+.stats-cell-icon{font-size:17px;line-height:1;}
+.stats-cell-label{font-size:8px;color:var(--c-muted);font-weight:600;text-align:center;line-height:1.2;}
+.stats-cell-score{font-size:11px;font-weight:700;color:var(--c-hint);}
+.stats-cell.done .stats-cell-score{color:var(--lc);}
+.stats-empty{text-align:center;padding:3rem 1rem;color:var(--c-muted);}
+.stats-empty-icon{font-size:40px;margin-bottom:.5rem;}
+
+/* ══════════════════════════════════════════════
    MODAL
 ══════════════════════════════════════════════ */
 .modal-overlay{
@@ -714,6 +758,15 @@ body{min-height:-webkit-fill-available;}
   </div>
 </div>
 
+<!-- Stats overlay -->
+<div class="stats-overlay" id="stats-overlay">
+  <div class="stats-header">
+    <button class="stats-back" id="stats-close">← Retour</button>
+    <span class="stats-title">📊 Statistiques</span>
+  </div>
+  <div class="stats-body" id="stats-body"></div>
+</div>
+
 <!-- Settings sheet -->
 <div class="modal-overlay" id="settings-overlay">
   <div class="modal">
@@ -727,6 +780,7 @@ body{min-height:-webkit-fill-available;}
     <div style="font-size:11px;font-weight:700;letter-spacing:.07em;color:var(--c-muted);margin-bottom:.5rem">DONNÉES</div>
     <div class="modal-sub" id="settings-info" style="margin-bottom:.8rem">Chargement…</div>
     <div class="modal-btns">
+      <button id="settings-stats">📊 Statistiques détaillées</button>
       <button id="settings-clear" style="background:var(--c5-bg);color:var(--c5);border-color:var(--c5)">🗑️ Effacer toutes les données</button>
       <button class="modal-btn-stay" id="settings-close">Fermer</button>
     </div>
@@ -1108,6 +1162,59 @@ document.getElementById('sent-back').addEventListener('click',function(){
 });
 
 // ════════════════════════════════════════════════
+// STATS
+// ════════════════════════════════════════════════
+var _ACT_NAMES=['Hanzi→FR','FR→Hanzi','Dictée','Assoc.','Flash','Phrases'];
+function buildStats(){
+  var prog=_getProg();
+  var hasAny=Object.keys(prog).some(function(k){return Object.keys(prog[k]).length>0;});
+  if(!hasAny){
+    document.getElementById('stats-body').innerHTML=
+      '<div class="stats-empty">'
+        +'<div class="stats-empty-icon">📊</div>'
+        +'<div>Aucune statistique pour l\'instant.</div>'
+        +'<div style="font-size:13px;margin-top:.3rem;color:var(--c-hint)">Lance une activité pour voir tes résultats ici.</div>'
+      +'</div>';
+    return;
+  }
+  var html=Object.keys(data).map(function(k){
+    var d=data[k];
+    var lp=prog[k]||{};
+    var doneCount=Object.keys(lp).length;
+    var cells=_PROG_MODES.map(function(m,i){
+      var done=lp[m]!==undefined;
+      return '<div class="stats-cell'+(done?' done':'')+'">'
+        +'<span class="stats-cell-icon" style="opacity:'+(done?'1':'.2')+'">'+_PROG_LABELS[i]+'</span>'
+        +'<span class="stats-cell-label">'+_ACT_NAMES[i]+'</span>'
+        +'<span class="stats-cell-score">'+(done?lp[m]+'%':'—')+'</span>'
+      +'</div>';
+    }).join('');
+    return '<div class="stats-level '+d.lc+'">'
+      +'<div class="lc-top" style="margin-bottom:0">'
+        +'<span class="lc-icon">'+d.icon+'</span>'
+        +'<div class="lc-info"><div class="lc-name">'+d.label+'</div></div>'
+        +'<span class="lc-pill">'+doneCount+'/6</span>'
+      +'</div>'
+      +'<div class="stats-grid">'+cells+'</div>'
+    +'</div>';
+  }).join('');
+  document.getElementById('stats-body').innerHTML=html;
+}
+function openStats(){
+  buildStats();
+  document.getElementById('stats-overlay').classList.add('open');
+  document.getElementById('stats-overlay').scrollTop=0;
+}
+function closeStats(){
+  document.getElementById('stats-overlay').classList.remove('open');
+}
+document.getElementById('stats-close').addEventListener('click',closeStats);
+document.getElementById('settings-stats').addEventListener('click',function(){
+  closeSettings();
+  openStats();
+});
+
+// ════════════════════════════════════════════════
 // MODAL
 // ════════════════════════════════════════════════
 var _modalCb=null;
@@ -1188,7 +1295,10 @@ function buildHome(){
     var lp=prog[k]||{};
     var dots=_PROG_MODES.map(function(m,i){
       var done=lp[m]!==undefined;
-      return '<span title="'+_PROG_LABELS[i]+' '+(done?lp[m]+'%':'—')+'" style="font-size:15px;line-height:1;opacity:'+(done?'1':'.2')+'">'+_PROG_LABELS[i]+'</span>';
+      return '<div style="display:flex;flex-direction:column;align-items:center;gap:1px">'
+        +'<span style="font-size:14px;line-height:1;opacity:'+(done?'1':'.2')+'">'+_PROG_LABELS[i]+'</span>'
+        +'<span style="font-size:9px;font-weight:700;color:'+(done?'var(--lc)':'var(--c-border)')+'">'+( done?lp[m]+'%':'—')+'</span>'
+      +'</div>';
     }).join('');
     var doneCount=Object.keys(lp).length;
     return '<div class="level-card '+d.lc+'">'
@@ -1201,10 +1311,10 @@ function buildHome(){
         +'<button class="lc-btn" onclick="showLevel(\''+k+'\')">📖 Vocabulaire</button>'
         +'<button class="lc-btn accent" onclick="showQuizMenu(\''+k+'\')">🎯 S\'entraîner</button>'
       +'</div>'
-      +'<div style="display:flex;align-items:center;gap:4px;margin-top:.4rem;padding-top:.4rem;border-top:1px solid var(--c-border)">'
-        +'<span style="font-size:10px;font-weight:600;color:var(--c-muted);white-space:nowrap;margin-right:2px">Succès :</span>'
+      +'<div style="display:flex;align-items:flex-start;gap:5px;margin-top:.4rem;padding-top:.4rem;border-top:1px solid var(--c-border)">'
+        +'<span style="font-size:10px;font-weight:600;color:var(--c-muted);white-space:nowrap;margin-right:2px;padding-top:1px">Succès :</span>'
         +dots
-        +(doneCount>0?'<span style="margin-left:auto;font-size:10px;color:var(--c-muted)">'+doneCount+'/6</span>':'')
+        +(doneCount>0?'<span style="margin-left:auto;font-size:10px;color:var(--c-muted);padding-top:1px">'+doneCount+'/6</span>':'')
       +'</div>'
     +'</div>';
   }).join('');
