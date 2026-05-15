@@ -90,6 +90,12 @@ body{font-family:'Georgia',serif;-webkit-tap-highlight-color:transparent;color:v
 .home-logo{font-size:28px;}
 .home-title{font-size:22px;font-weight:700;letter-spacing:-.5px;}
 .home-sub{font-size:13px;color:var(--c-muted);margin-top:2px;}
+.streak-badge{
+  display:inline-flex;align-items:center;gap:3px;margin-top:4px;
+  font-size:11px;font-weight:700;color:var(--c-muted);
+}
+.streak-badge.active{color:#E07020;}
+.streak-num{font-size:13px;}
 .home-dark-btn{
   margin-left:auto;background:none;border:1.5px solid var(--c-border);
   border-radius:var(--radius-sm);padding:7px 10px;font-size:16px;cursor:pointer;
@@ -656,6 +662,7 @@ body{min-height:-webkit-fill-available;}
       <div>
         <div class="home-title">YCT Vocab</div>
         <div class="home-sub">Vocabulaire chinois — 5 niveaux</div>
+        <div class="streak-badge" id="streak-badge"></div>
       </div>
       <button class="home-dark-btn" id="settings-btn" title="Paramètres">⚙️</button>
     </div>
@@ -764,6 +771,7 @@ body{min-height:-webkit-fill-available;}
     <div class="ws-hanzi" id="ws-hanzi"></div>
     <div class="ws-pinyin" id="ws-pinyin"></div>
     <div class="ws-fr" id="ws-fr"></div>
+    <div id="ws-radicals" style="display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-bottom:1rem;min-height:1.2em"></div>
     <div class="ws-btns">
       <button id="ws-listen">🔊 Écouter</button>
       <button class="ws-btn-write" id="ws-write">✏️ Écrire</button>
@@ -1312,6 +1320,39 @@ document.getElementById('modal-overlay').addEventListener('click',function(e){if
 // ════════════════════════════════════════════════
 // LOCAL STORAGE — Progression
 // ════════════════════════════════════════════════
+// ════════════════════════════════════════════════
+// STREAK
+// ════════════════════════════════════════════════
+var STREAK_KEY='yct-streak';
+function _getStreak(){
+  try{return JSON.parse(localStorage.getItem(STREAK_KEY)||'{"count":0,"last":""}');}
+  catch(e){return{count:0,last:''};}
+}
+function _markToday(){
+  var today=new Date().toISOString().slice(0,10);
+  var s=_getStreak();
+  if(s.last===today)return;
+  var yest=new Date(Date.now()-86400000).toISOString().slice(0,10);
+  s.count=(s.last===yest)?s.count+1:1;
+  s.last=today;
+  try{localStorage.setItem(STREAK_KEY,JSON.stringify(s));}catch(e){}
+}
+function _buildStreakBadge(){
+  var s=_getStreak();
+  var el=document.getElementById('streak-badge');
+  if(!el)return;
+  if(s.count>=2){
+    el.className='streak-badge active';
+    el.innerHTML='🔥 <span class="streak-num">'+s.count+'</span> jour'+(s.count>1?'s':'')+' de suite';
+  } else if(s.count===1){
+    el.className='streak-badge active';
+    el.innerHTML='🔥 1er jour !';
+  } else {
+    el.className='streak-badge';
+    el.innerHTML='';
+  }
+}
+
 var STORE_KEY='yct-progress';
 function _getProg(){
   try{return JSON.parse(localStorage.getItem(STORE_KEY)||'{}');}catch(e){return {};}
@@ -1321,6 +1362,7 @@ function _saveProg(level,mode,pct){
   if(!p[level])p[level]={};
   if((p[level][mode]||0)<pct)p[level][mode]=pct;
   try{localStorage.setItem(STORE_KEY,JSON.stringify(p));}catch(e){}
+  _markToday();
 }
 function _clearProg(){
   try{localStorage.removeItem(STORE_KEY);}catch(e){}
@@ -1401,6 +1443,7 @@ var _PROG_MODES=['normal','reverse','dictee','assoc','flash','sent'];
 var _PROG_LABELS=['🀄','🔄','🎵','🔗','🃏','📝'];
 
 function buildHome(){
+  _buildStreakBadge();
   var prog=_getProg();
   document.getElementById('home-cards').innerHTML=Object.keys(data).map(function(k){
     var d=data[k];
@@ -2275,6 +2318,19 @@ function openWordSheet(w,cardEl){
   document.getElementById('ws-hanzi').textContent=w.h;
   document.getElementById('ws-pinyin').textContent=w.p;
   document.getElementById('ws-fr').textContent=w.fr;
+  // Radicaux
+  var radEl=document.getElementById('ws-radicals');
+  var chars=w.h.split('');
+  var radHtml=chars.map(function(ch){
+    var r=RADICALS&&RADICALS[ch];
+    if(!r)return '';
+    return '<span style="font-size:11px;color:var(--c-muted);background:var(--c-bg);border:1px solid var(--c-border);border-radius:6px;padding:2px 7px;white-space:nowrap">'
+      +'<span style="font-size:13px;color:var(--c-text)">'+ch+'</span>'
+      +' · <span style="font-size:14px">'+r[0]+'</span>'
+      +' <span style="color:var(--c-hint)">'+r[1]+'</span>'
+      +'</span>';
+  }).join('');
+  radEl.innerHTML=radHtml;
   // Apply current level color
   var sheet=document.getElementById('word-sheet');
   sheet.className='word-sheet '+(current?data[current].lc:'');
