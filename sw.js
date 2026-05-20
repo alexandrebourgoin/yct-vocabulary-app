@@ -1,4 +1,4 @@
-const CACHE = 'yct-vocab-v14';
+const CACHE = 'yct-vocab-v15';
 const ASSETS = [
   './yct_app_Android.html',
   './yct_app_Iphone.html',

@@ -394,9 +394,14 @@ body{font-family:'Georgia',serif;-webkit-tap-highlight-color:transparent;color:v
 .quiz-wrap{max-width:480px;margin:0 auto;}
 .qpbar{height:5px;background:var(--c-border);border-radius:3px;margin-bottom:.9rem;overflow:hidden;}
 .qpfill{height:100%;border-radius:3px;background:var(--lc);transition:width .4s ease;}
-/* Quiz chrono timer bar */
-.qtimer-wrap{height:4px;background:var(--c-border);border-radius:2px;margin-top:-7px;margin-bottom:7px;overflow:hidden;}
-.qtimer-fill{height:100%;border-radius:2px;transition:width 1s linear;}
+/* Quiz chrono timer */
+.qtimer-row{display:flex;align-items:center;gap:10px;margin:0 0 10px;padding:6px 10px;background:var(--c-surface);border:1.5px solid var(--c-border);border-radius:10px;}
+.qtimer-num{font-size:20px;font-weight:900;min-width:2.2ch;text-align:center;font-variant-numeric:tabular-nums;transition:color .3s;}
+.qtimer-num.warn{color:#E8933A;}
+.qtimer-num.danger{color:var(--c5);animation:qtimer-pulse .5s ease-in-out infinite;}
+.qtimer-track{flex:1;height:8px;background:var(--c-border);border-radius:4px;overflow:hidden;}
+.qtimer-fill{height:100%;border-radius:4px;transition:width 1s linear;}
+@keyframes qtimer-pulse{0%,100%{opacity:1;}50%{opacity:.5;}}
 .qmeta{display:flex;justify-content:space-between;font-size:12px;color:var(--c-muted);margin-bottom:.9rem;align-items:center;}
 .streak{font-size:13px;font-weight:700;color:#F59A3C;min-width:60px;text-align:right;transition:opacity .3s;}
 .streak.hidden{opacity:0;}
@@ -1419,18 +1424,21 @@ function _applyTheme(mode){
 // ════════════════════════════════════════════════
 // AUDIO — SpeechSynthesis primary, Google TTS fallback
 // ════════════════════════════════════════════════
+var _speakFallbackTimer=null;
 function speak(hanzi,cardEl,btnEl){
-  if(_audio){_audio.pause();_audio=null;}
-  if(window.speechSynthesis)window.speechSynthesis.cancel();
+  // Arrêt complet de tout audio en cours
+  clearTimeout(_speakFallbackTimer);_speakFallbackTimer=null;
+  if(window.speechSynthesis){window.speechSynthesis.onvoiceschanged=null;window.speechSynthesis.cancel();}
+  if(_audio){_audio.pause();_audio.src='';_audio=null;}
   if(_card){_card.classList.remove('speaking');_card=null;}
   if(_sndBtn){_sndBtn.classList.remove('playing');_sndBtn=null;}
   if(cardEl){_card=cardEl;cardEl.classList.add('speaking');}
   if(btnEl){_sndBtn=btnEl;btnEl.classList.add('playing');}
 
   function done(){
-    if(cardEl)cardEl.classList.remove('speaking');
-    if(btnEl)btnEl.classList.remove('playing');
-    if(_audio)_audio=null;
+    if(_card){_card.classList.remove('speaking');_card=null;}
+    if(_sndBtn){_sndBtn.classList.remove('playing');_sndBtn=null;}
+    if(_audio){_audio=null;}
   }
 
   function tryGoogleTTS(){
@@ -1459,9 +1467,9 @@ function speak(hanzi,cardEl,btnEl){
   var voices=window.speechSynthesis.getVoices();
   if(voices.length){doSpeechAPI();}
   else{
-    var _fallbackTimer=setTimeout(tryGoogleTTS,600);
+    _speakFallbackTimer=setTimeout(function(){_speakFallbackTimer=null;tryGoogleTTS();},600);
     window.speechSynthesis.onvoiceschanged=function(){
-      clearTimeout(_fallbackTimer);
+      clearTimeout(_speakFallbackTimer);_speakFallbackTimer=null;
       window.speechSynthesis.onvoiceschanged=null;
       doSpeechAPI();
     };
@@ -2442,7 +2450,7 @@ function renderQ(){
   quizAnswered=false;
   _stopTimer();
   var ch=_getChrono();
-  var timerHtml=ch.on?'<div class="qtimer-wrap"><div class="qtimer-fill" id="qtimer-fill" style="width:100%;background:var(--c1)"></div></div>':'';
+  var timerHtml=ch.on?'<div class="qtimer-row"><span class="qtimer-num" id="qtimer-num">'+ch.secs+'</span><div class="qtimer-track"><div class="qtimer-fill" id="qtimer-fill" style="width:100%;background:var(--c1)"></div></div></div>':'';
   var q=quizQs[quizIdx];
   var distr=getDistr(q,quizLevel);
   var opts=shuffle([q].concat(distr));
@@ -2535,10 +2543,17 @@ function nextQ(){quizIdx++;if(quizIdx>=quizQs.length){showResults();return;}rend
 var _quizTimerInt=null;
 function _stopTimer(){if(_quizTimerInt){clearInterval(_quizTimerInt);_quizTimerInt=null;}}
 function _setTimerBar(left,total){
-  var el=document.getElementById('qtimer-fill');if(!el)return;
+  var fill=document.getElementById('qtimer-fill');
+  var num=document.getElementById('qtimer-num');
+  if(!fill&&!num)return;
   var pct=Math.max(0,Math.round(left/total*100));
-  el.style.width=pct+'%';
-  el.style.background=pct>60?'var(--c1)':pct>30?'#E8933A':'var(--c5)';
+  var color=pct>60?'var(--c1)':pct>30?'#E8933A':'var(--c5)';
+  if(fill){fill.style.width=pct+'%';fill.style.background=color;}
+  if(num){
+    num.textContent=Math.max(0,left);
+    num.style.color=color;
+    num.className='qtimer-num'+(pct<=30?' danger':pct<=60?' warn':'');
+  }
 }
 function _startTimer(secs,onDone){
   _stopTimer();
