@@ -1,4 +1,4 @@
-var APP_VERSION = '1.0';
+var APP_VERSION = '1.0.1';
 
 // ════════════════════════════════════════════════
 // RADICAUX — lookup table caractère → [symbole, signification fr]
@@ -220,4 +220,92 @@ var RADICALS = {
   '药':['艹','plante'],    '打':['扌','main'],     '针':['钅','métal'],
   '健':['亻','personne'],  '康':['广','toit'],     '身':['身','corps'],
   '体':['亻','personne'],  '重':['里','village'],
+};
+
+// ════════════════════════════════════════════════
+// EXEMPLES — phrases d'exemple par mot (hanzi → {zh, py, fr})
+// ════════════════════════════════════════════════
+var EXAMPLES = {
+  // ── Salutations ──────────────────────────────
+  "你好":  {zh:"你好，认识你很高兴！",       py:"Nǐ hǎo, rèn shi nǐ hěn gāo xìng!",    fr:"Bonjour, ravi de te connaître !"},
+  "谢谢":  {zh:"谢谢你帮助我。",             py:"Xiè xie nǐ bāng zhù wǒ.",              fr:"Merci de m'avoir aidé."},
+  "再见":  {zh:"再见，明天见！",             py:"Zài jiàn, míng tiān jiàn!",            fr:"Au revoir, à demain !"},
+  "对不起":{zh:"对不起，我迟到了。",          py:"Duì bu qǐ, wǒ chí dào le.",            fr:"Désolé, je suis en retard."},
+  "不客气":{zh:"不客气，这是我应该做的。",    py:"Bù kè qi, zhè shì wǒ yīng gāi zuò de.",fr:"De rien, c'est normal."},
+  "没关系":{zh:"没关系，不要担心。",          py:"Méi guān xi, bù yào dān xīn.",         fr:"Ce n'est pas grave, ne t'inquiète pas."},
+  // ── Pronoms ──────────────────────────────────
+  "我":    {zh:"我是法国人，我学中文。",       py:"Wǒ shì Fǎ guó rén, wǒ xué Zhōng wén.",fr:"Je suis Français, j'apprends le chinois."},
+  "你":    {zh:"你叫什么名字？",             py:"Nǐ jiào shén me míng zi?",             fr:"Comment tu t'appelles ?"},
+  "他":    {zh:"他是我的好朋友。",            py:"Tā shì wǒ de hǎo péng you.",           fr:"Il est mon bon ami."},
+  "她":    {zh:"她是我的老师。",             py:"Tā shì wǒ de lǎo shī.",               fr:"Elle est mon professeur."},
+  "我们":  {zh:"我们一起去学校。",            py:"Wǒ men yī qǐ qù xué xiào.",           fr:"Nous allons ensemble à l'école."},
+  "你们":  {zh:"你们吃饭了吗？",             py:"Nǐ men chī fàn le ma?",               fr:"Avez-vous mangé ?"},
+  "他们":  {zh:"他们都是我的同学。",          py:"Tā men dōu shì wǒ de tóng xué.",      fr:"Ils sont tous mes camarades de classe."},
+  // ── Famille ──────────────────────────────────
+  "爸爸":  {zh:"我爸爸是医生。",             py:"Wǒ bà ba shì yī shēng.",              fr:"Mon papa est médecin."},
+  "妈妈":  {zh:"妈妈在家做饭。",             py:"Mā ma zài jiā zuò fàn.",              fr:"Maman cuisine à la maison."},
+  "哥哥":  {zh:"我哥哥比我高。",             py:"Wǒ gē ge bǐ wǒ gāo.",                fr:"Mon grand frère est plus grand que moi."},
+  "姐姐":  {zh:"姐姐喜欢唱歌。",             py:"Jiě jie xǐ huān chàng gē.",           fr:"Ma grande sœur aime chanter."},
+  "弟弟":  {zh:"弟弟今年六岁。",             py:"Dì di jīn nián liù suì.",             fr:"Mon petit frère a six ans cette année."},
+  "妹妹":  {zh:"妹妹很可爱。",               py:"Mèi mei hěn kě ài.",                  fr:"Ma petite sœur est très mignonne."},
+  // ── Personnes ────────────────────────────────
+  "老师":  {zh:"老师教我们中文。",            py:"Lǎo shī jiāo wǒ men Zhōng wén.",      fr:"Le professeur nous enseigne le chinois."},
+  "同学":  {zh:"他是我的同学，也是朋友。",    py:"Tā shì wǒ de tóng xué, yě shì péng you.",fr:"Il est mon camarade de classe et aussi mon ami."},
+  "朋友":  {zh:"她是我最好的朋友。",          py:"Tā shì wǒ zuì hǎo de péng you.",      fr:"Elle est ma meilleure amie."},
+  // ── Animaux ──────────────────────────────────
+  "猫":    {zh:"这只猫很可爱。",             py:"Zhè zhī māo hěn kě ài.",              fr:"Ce chat est très mignon."},
+  "狗":    {zh:"我家有一只大狗。",            py:"Wǒ jiā yǒu yī zhī dà gǒu.",          fr:"J'ai un grand chien à la maison."},
+  "鱼":    {zh:"水里有很多鱼。",             py:"Shuǐ lǐ yǒu hěn duō yú.",            fr:"Il y a beaucoup de poissons dans l'eau."},
+  "马":    {zh:"那匹马跑得很快。",            py:"Nà pǐ mǎ pǎo de hěn kuài.",          fr:"Ce cheval court très vite."},
+  // ── Nourriture ───────────────────────────────
+  "苹果":  {zh:"我每天吃一个苹果。",          py:"Wǒ měi tiān chī yī gè píng guǒ.",    fr:"Je mange une pomme chaque jour."},
+  "水":    {zh:"请给我一杯水。",             py:"Qǐng gěi wǒ yī bēi shuǐ.",           fr:"Donnez-moi un verre d'eau, s'il vous plaît."},
+  "米饭":  {zh:"中国人每天吃米饭。",          py:"Zhōng guó rén měi tiān chī mǐ fàn.",  fr:"Les Chinois mangent du riz tous les jours."},
+  "面条":  {zh:"我喜欢吃面条。",             py:"Wǒ xǐ huān chī miàn tiáo.",          fr:"J'aime manger des nouilles."},
+  "好吃":  {zh:"这个菜很好吃！",             py:"Zhè gè cài hěn hǎo chī!",            fr:"Ce plat est délicieux !"},
+  // ── Adjectifs ────────────────────────────────
+  "大":    {zh:"北京是一个很大的城市。",      py:"Běi jīng shì yī gè hěn dà de chéng shì.",fr:"Pékin est une très grande ville."},
+  "小":    {zh:"这个盒子太小了。",            py:"Zhè gè hé zi tài xiǎo le.",          fr:"Cette boîte est trop petite."},
+  "好":    {zh:"你好吗？我很好，谢谢！",      py:"Nǐ hǎo ma? Wǒ hěn hǎo, xiè xie!",   fr:"Comment vas-tu ? Je vais très bien, merci !"},
+  "多":    {zh:"今天来了很多人。",            py:"Jīn tiān lái le hěn duō rén.",       fr:"Beaucoup de gens sont venus aujourd'hui."},
+  "高兴":  {zh:"我很高兴见到你们。",          py:"Wǒ hěn gāo xìng jiàn dào nǐ men.",  fr:"Je suis content de vous voir."},
+  "漂亮":  {zh:"她的裙子很漂亮。",            py:"Tā de qún zi hěn piào liang.",       fr:"Sa robe est très jolie."},
+  "高":    {zh:"这栋楼很高。",               py:"Zhè dòng lóu hěn gāo.",              fr:"Cet immeuble est très haut."},
+  // ── Temps ────────────────────────────────────
+  "今天":  {zh:"今天天气很好，我们去公园吧。",py:"Jīn tiān tiān qì hěn hǎo, wǒ men qù gōng yuán ba.",fr:"Il fait beau aujourd'hui, allons au parc."},
+  "明天":  {zh:"明天我有考试。",             py:"Míng tiān wǒ yǒu kǎo shì.",          fr:"Demain j'ai un examen."},
+  "昨天":  {zh:"昨天我们去看电影了。",        py:"Zuó tiān wǒ men qù kàn diàn yǐng le.",fr:"Hier nous sommes allés voir un film."},
+  "年":    {zh:"今年是哪一年？",             py:"Jīn nián shì nǎ yī nián?",           fr:"Quelle année sommes-nous ?"},
+  "月":    {zh:"这个月有三十天。",            py:"Zhè gè yuè yǒu sān shí tiān.",       fr:"Ce mois a trente jours."},
+  "星期":  {zh:"一个星期有七天。",            py:"Yī gè xīng qī yǒu qī tiān.",        fr:"Une semaine a sept jours."},
+  // ── Verbes ───────────────────────────────────
+  "去":    {zh:"我们去学校上课。",            py:"Wǒ men qù xué xiào shàng kè.",       fr:"Nous allons à l'école en cours."},
+  "来":    {zh:"他从中国来。",               py:"Tā cóng Zhōng guó lái.",             fr:"Il vient de Chine."},
+  "看":    {zh:"我喜欢看书。",               py:"Wǒ xǐ huān kàn shū.",               fr:"J'aime lire des livres."},
+  "吃":    {zh:"你喜欢吃什么？",             py:"Nǐ xǐ huān chī shén me?",           fr:"Qu'est-ce que tu aimes manger ?"},
+  "喝":    {zh:"天热，多喝水。",             py:"Tiān rè, duō hē shuǐ.",              fr:"Il fait chaud, bois beaucoup d'eau."},
+  "说":    {zh:"他能说三种语言。",            py:"Tā néng shuō sān zhǒng yǔ yán.",    fr:"Il peut parler trois langues."},
+  "叫":    {zh:"我叫李明，你呢？",            py:"Wǒ jiào Lǐ Míng, nǐ ne?",           fr:"Je m'appelle Li Ming, et toi ?"},
+  "有":    {zh:"我有两个弟弟。",             py:"Wǒ yǒu liǎng gè dì di.",            fr:"J'ai deux petits frères."},
+  "没有":  {zh:"我没有手机。",               py:"Wǒ méi yǒu shǒu jī.",               fr:"Je n'ai pas de téléphone portable."},
+  "是":    {zh:"这是我的书包。",             py:"Zhè shì wǒ de shū bāo.",            fr:"C'est mon cartable."},
+  "在":    {zh:"我在图书馆学习。",            py:"Wǒ zài tú shū guǎn xué xí.",        fr:"J'étudie à la bibliothèque."},
+  "学":    {zh:"我们每天学新汉字。",          py:"Wǒ men měi tiān xué xīn Hàn zì.",   fr:"Nous apprenons de nouveaux caractères chaque jour."},
+  // ── Questions ────────────────────────────────
+  "什么":  {zh:"这是什么动物？",             py:"Zhè shì shén me dòng wù?",          fr:"Quel est cet animal ?"},
+  "谁":    {zh:"那个人是谁？",               py:"Nà gè rén shì shéi?",               fr:"Qui est cette personne ?"},
+  "多少":  {zh:"这个多少钱？",               py:"Zhè gè duō shao qián?",             fr:"Combien ça coûte ?"},
+  // ── Démonstratifs ────────────────────────────
+  "这":    {zh:"这是我的家。",               py:"Zhè shì wǒ de jiā.",                fr:"Voici ma maison."},
+  "那":    {zh:"那个人是我的老师。",          py:"Nà gè rén shì wǒ de lǎo shī.",     fr:"Cette personne est mon professeur."},
+  // ── Lieu ─────────────────────────────────────
+  "学校":  {zh:"我们的学校很大，有很多学生。",py:"Wǒ men de xué xiào hěn dà, yǒu hěn duō xué shēng.",fr:"Notre école est grande et accueille beaucoup d'élèves."},
+  "家":    {zh:"放学后我回家。",             py:"Fàng xué hòu wǒ huí jiā.",          fr:"Je rentre à la maison après l'école."},
+  "中国":  {zh:"中国有很多名胜古迹。",        py:"Zhōng guó yǒu hěn duō míng shèng gǔ jì.",fr:"La Chine a de nombreux sites historiques."},
+  // ── Divers ───────────────────────────────────
+  "喜欢":  {zh:"我喜欢学中文，也喜欢吃中国菜。",py:"Wǒ xǐ huān xué Zhōng wén, yě xǐ huān chī Zhōng guó cài.",fr:"J'aime apprendre le chinois et manger de la cuisine chinoise."},
+  "汉语":  {zh:"我在学校学汉语。",            py:"Wǒ zài xué xiào xué Hàn yǔ.",      fr:"J'apprends le chinois à l'école."},
+  "书":    {zh:"这本书很有意思。",            py:"Zhè běn shū hěn yǒu yì si.",       fr:"Ce livre est très intéressant."},
+  "人":    {zh:"这里有很多人。",             py:"Zhè lǐ yǒu hěn duō rén.",          fr:"Il y a beaucoup de gens ici."},
+  "朋友":  {zh:"她是我最好的朋友。",          py:"Tā shì wǒ zuì hǎo de péng you.",   fr:"Elle est ma meilleure amie."},
 };

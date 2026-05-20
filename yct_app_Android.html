@@ -390,6 +390,9 @@ body{font-family:'Georgia',serif;-webkit-tap-highlight-color:transparent;color:v
 .quiz-wrap{max-width:480px;margin:0 auto;}
 .qpbar{height:5px;background:var(--c-border);border-radius:3px;margin-bottom:.9rem;overflow:hidden;}
 .qpfill{height:100%;border-radius:3px;background:var(--lc);transition:width .4s ease;}
+/* Quiz chrono timer bar */
+.qtimer-wrap{height:4px;background:var(--c-border);border-radius:2px;margin-top:-7px;margin-bottom:7px;overflow:hidden;}
+.qtimer-fill{height:100%;border-radius:2px;transition:width 1s linear;}
 .qmeta{display:flex;justify-content:space-between;font-size:12px;color:var(--c-muted);margin-bottom:.9rem;align-items:center;}
 .streak{font-size:13px;font-weight:700;color:#F59A3C;min-width:60px;text-align:right;transition:opacity .3s;}
 .streak.hidden{opacity:0;}
@@ -631,7 +634,12 @@ body{font-family:'Georgia',serif;-webkit-tap-highlight-color:transparent;color:v
 .word-sheet-overlay.open .word-sheet{transform:none;}
 .ws-hanzi{font-size:72px;line-height:1.1;margin-bottom:.3rem;letter-spacing:-.02em;}
 .ws-pinyin{font-size:15px;color:var(--c-muted);margin-bottom:.2rem;}
-.ws-fr{font-size:16px;font-weight:700;margin-bottom:1.3rem;color:var(--c-text);}
+.ws-fr{font-size:16px;font-weight:700;margin-bottom:.6rem;color:var(--c-text);}
+/* Example sentence in word sheet */
+.ws-example{background:var(--c-bg);border:1px solid var(--c-border);border-radius:10px;padding:10px 14px;margin-bottom:.8rem;text-align:left;}
+.ws-example-zh{font-size:15px;font-weight:600;color:var(--c-text);margin-bottom:3px;line-height:1.5;}
+.ws-example-py{font-size:11px;color:var(--c-muted);margin-bottom:2px;}
+.ws-example-fr{font-size:11px;color:var(--c-hint);font-style:italic;}
 .ws-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .ws-btns button{
   padding:15px 8px;font-size:15px;font-weight:700;
@@ -958,6 +966,11 @@ body.dark .home-badge-btn{
     <div class="ws-hanzi" id="ws-hanzi"></div>
     <div class="ws-pinyin" id="ws-pinyin"></div>
     <div class="ws-fr" id="ws-fr"></div>
+    <div id="ws-example" class="ws-example" style="display:none">
+      <div class="ws-example-zh" id="ws-example-zh"></div>
+      <div class="ws-example-py" id="ws-example-py"></div>
+      <div class="ws-example-fr" id="ws-example-fr"></div>
+    </div>
     <div id="ws-radicals" style="display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-bottom:.7rem;min-height:1.2em"></div>
     <div style="text-align:center;margin-bottom:.7rem"><span class="ws-srs-badge" id="ws-srs-badge"></span></div>
     <button class="ws-fav-btn" id="ws-fav">⭐ Ajouter aux favoris</button>
@@ -1026,6 +1039,17 @@ body.dark .home-badge-btn{
       <button class="goal-opt" data-goal="0">∞</button>
     </div>
     <div class="modal-sub" style="margin-bottom:.8rem">Mots à pratiquer par jour</div>
+    <div style="font-size:11px;font-weight:700;letter-spacing:.07em;color:var(--c-muted);margin:.7rem 0 .5rem">QUIZ CHRONO ⏱</div>
+    <div class="goal-seg" id="chrono-onoff-seg">
+      <button class="goal-opt" data-chrono-onoff="off">Désactivé</button>
+      <button class="goal-opt" data-chrono-onoff="on">Activé</button>
+    </div>
+    <div class="goal-seg" id="chrono-secs-seg" style="margin-top:5px;display:none">
+      <button class="goal-opt" data-secs="10">10 s</button>
+      <button class="goal-opt" data-secs="15">15 s</button>
+      <button class="goal-opt" data-secs="20">20 s</button>
+    </div>
+    <div class="modal-sub" style="margin-bottom:.8rem">Compte à rebours par question</div>
     <div style="font-size:11px;font-weight:700;letter-spacing:.07em;color:var(--c-muted);margin-bottom:.5rem">DONNÉES</div>
     <div class="modal-sub" id="settings-info" style="margin-bottom:.8rem">Chargement…</div>
     <div class="modal-btns">
@@ -1839,7 +1863,7 @@ function _buildGoalBar(){
 }
 function _updateGoalBtns(){
   var goal=_getGoal();
-  document.querySelectorAll('.goal-opt').forEach(function(b){
+  document.querySelectorAll('[data-goal]').forEach(function(b){
     b.classList.toggle('active',parseInt(b.getAttribute('data-goal'))===goal);
   });
 }
@@ -1916,6 +1940,7 @@ function openSettings(){
   _updateBgBtns();
   _updateSurfBtns();
   _updateGoalBtns();
+  _updateChronoBtns();
   document.getElementById('settings-overlay').classList.add('open');
 }
 function closeSettings(){
@@ -1949,11 +1974,42 @@ document.querySelectorAll('.surf-btn').forEach(function(btn){
     _updateSurfBtns();
   });
 });
-document.querySelectorAll('.goal-opt').forEach(function(btn){
+document.querySelectorAll('[data-goal]').forEach(function(btn){
   btn.addEventListener('click',function(){
     _setGoal(parseInt(btn.getAttribute('data-goal')));
     _updateGoalBtns();
     _buildGoalBar();
+  });
+});
+// Chrono settings
+var CHRONO_KEY='yct-chrono';
+function _getChrono(){try{return JSON.parse(localStorage.getItem(CHRONO_KEY)||'{"on":false,"secs":10}');}catch(e){return{on:false,secs:10};}}
+function _saveChrono(v){try{localStorage.setItem(CHRONO_KEY,JSON.stringify(v));}catch(e){}}
+function _updateChronoBtns(){
+  var ch=_getChrono();
+  document.querySelectorAll('[data-chrono-onoff]').forEach(function(b){
+    b.classList.toggle('active',b.getAttribute('data-chrono-onoff')===(ch.on?'on':'off'));
+  });
+  var secsWrap=document.getElementById('chrono-secs-seg');
+  if(secsWrap)secsWrap.style.display=ch.on?'flex':'none';
+  document.querySelectorAll('[data-secs]').forEach(function(b){
+    b.classList.toggle('active',parseInt(b.getAttribute('data-secs'))===ch.secs);
+  });
+}
+document.querySelectorAll('[data-chrono-onoff]').forEach(function(b){
+  b.addEventListener('click',function(){
+    var ch=_getChrono();
+    ch.on=b.getAttribute('data-chrono-onoff')==='on';
+    _saveChrono(ch);
+    _updateChronoBtns();
+  });
+});
+document.querySelectorAll('[data-secs]').forEach(function(b){
+  b.addEventListener('click',function(){
+    var ch=_getChrono();
+    ch.secs=parseInt(b.getAttribute('data-secs'));
+    _saveChrono(ch);
+    _updateChronoBtns();
   });
 });
 
@@ -2371,6 +2427,9 @@ function getDistr(correct,level){
 
 function renderQ(){
   quizAnswered=false;
+  _stopTimer();
+  var ch=_getChrono();
+  var timerHtml=ch.on?'<div class="qtimer-wrap"><div class="qtimer-fill" id="qtimer-fill" style="width:100%;background:var(--c1)"></div></div>':'';
   var q=quizQs[quizIdx];
   var distr=getDistr(q,quizLevel);
   var opts=shuffle([q].concat(distr));
@@ -2383,6 +2442,7 @@ function renderQ(){
     // Show French word, choose hanzi
     body.innerHTML=
       '<div class="qpbar"><div class="qpfill" style="width:'+pct+'%"></div></div>'
+      +timerHtml
       +'<div class="qmeta">'
         +'<span>Question '+(quizIdx+1)+' / '+quizQs.length+'</span>'
         +'<span class="streak'+(quizStreak<2?' hidden':'')+'">'+streakHtml+'</span>'
@@ -2401,6 +2461,7 @@ function renderQ(){
   } else {
     body.innerHTML=
       '<div class="qpbar"><div class="qpfill" style="width:'+pct+'%"></div></div>'
+      +timerHtml
       +'<div class="qmeta">'
         +'<span>Question '+(quizIdx+1)+' / '+quizQs.length+'</span>'
         +'<span class="streak'+(quizStreak<2?' hidden':'')+'">'+streakHtml+'</span>'
@@ -2426,11 +2487,13 @@ function renderQ(){
     document.getElementById('o'+i).addEventListener('click',function(){answerQ(i,o,q);});
   });
   document.getElementById('qnext').addEventListener('click',nextQ);
+  if(ch.on){_startTimer(ch.secs,function(){_quizTimerExpired();});}
 }
 
 function answerQ(idx,chosen,correct){
   if(quizAnswered)return;
   quizAnswered=true;
+  _stopTimer();
   var isOk=chosen.h===correct.h;
   if(isOk){quizScore++;quizStreak++;}else{quizStreak=0;}
   quizResults.push({word:correct,correct:isOk});
@@ -2455,6 +2518,39 @@ function answerQ(idx,chosen,correct){
   document.getElementById('qnext').style.display='block';
 }
 function nextQ(){quizIdx++;if(quizIdx>=quizQs.length){showResults();return;}renderQ();}
+
+// ── Chrono timer ──
+var _quizTimerInt=null;
+function _stopTimer(){if(_quizTimerInt){clearInterval(_quizTimerInt);_quizTimerInt=null;}}
+function _setTimerBar(left,total){
+  var el=document.getElementById('qtimer-fill');if(!el)return;
+  var pct=Math.max(0,Math.round(left/total*100));
+  el.style.width=pct+'%';
+  el.style.background=pct>60?'var(--c1)':pct>30?'#E8933A':'var(--c5)';
+}
+function _startTimer(secs,onDone){
+  _stopTimer();
+  var left=secs;
+  _setTimerBar(left,secs);
+  _quizTimerInt=setInterval(function(){left--;_setTimerBar(left,secs);if(left<=0){_stopTimer();onDone();}},1000);
+}
+function _quizTimerExpired(){
+  if(quizAnswered)return;
+  quizAnswered=true;quizStreak=0;
+  var q=quizQs[quizIdx];
+  quizResults.push({word:q,correct:false});
+  _srsUpdate(q.h,false);
+  document.querySelectorAll('.qopt').forEach(function(b){
+    b.classList.add('disabled');
+    var isCorrect=quizMode==='reverse'?b.textContent.indexOf(q.h)>=0:b.textContent.trim()===q.fr;
+    if(isCorrect)b.classList.add('correct');
+  });
+  var fb=document.getElementById('qfb');
+  fb.textContent='⏱ Temps écoulé ! — '+(quizMode==='reverse'?q.h+' ('+q.fr+')':q.fr);
+  fb.style.color='var(--c5)';
+  document.getElementById('qlive').textContent='Score : '+quizScore+' / '+(quizIdx+1);
+  document.getElementById('qnext').style.display='block';
+}
 
 function showResults(){
   var total=quizQs.length,pct=Math.round(quizScore/total*100);
@@ -2993,6 +3089,19 @@ function openWordSheet(w,cardEl){
     srsBadge.innerHTML=_SRS_ICONS[sl]
       +'<span style="margin-left:2px">'+(sl>0?_SRS_LABELS[sl]:'Jamais pratiqué')+'</span>';
     srsBadge.style.opacity=sl>0?'1':'.5';
+  }
+  // Exemple
+  var exEl=document.getElementById('ws-example');
+  if(exEl){
+    var ex=typeof EXAMPLES!=='undefined'&&EXAMPLES[w.h];
+    if(ex){
+      document.getElementById('ws-example-zh').textContent='💬 '+ex.zh;
+      document.getElementById('ws-example-py').textContent=ex.py;
+      document.getElementById('ws-example-fr').textContent=ex.fr;
+      exEl.style.display='';
+    } else {
+      exEl.style.display='none';
+    }
   }
   // Radicaux
   var radEl=document.getElementById('ws-radicals');
