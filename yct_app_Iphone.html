@@ -123,6 +123,49 @@ body{font-family:'Georgia',serif;-webkit-tap-highlight-color:transparent;color:v
 .bg-swatch{width:18px;height:18px;border-radius:50%;border:1.5px solid #ccc;display:block;flex-shrink:0;}
 .surf-swatch{width:18px;height:18px;border-radius:4px;border:1.5px solid #ccc;display:block;flex-shrink:0;}
 
+/* Home global search */
+.home-search-wrap{
+  position:relative;padding:.35rem .75rem .5rem;
+}
+.home-search-bar{
+  width:100%;padding:10px 36px 10px 36px;font-size:15px;
+  border:1.5px solid var(--c-border);border-radius:var(--radius-sm);
+  background:var(--c-surface);color:var(--c-text);font-family:inherit;
+  transition:border-color .15s;
+}
+.home-search-bar:focus{outline:none;border-color:var(--c-text);}
+.home-search-icon{
+  position:absolute;left:1.35rem;top:50%;transform:translateY(-50%);
+  font-size:15px;color:var(--c-hint);pointer-events:none;
+}
+.home-search-clear{
+  position:absolute;right:1.35rem;top:50%;transform:translateY(-50%);
+  background:none;border:none;font-size:16px;color:var(--c-hint);
+  cursor:pointer;padding:4px;display:none;
+}
+.home-search-clear.visible{display:block;}
+/* Search results */
+.gsearch-results{display:none;padding:0 .75rem .5rem;flex-direction:column;gap:6px;}
+.gsearch-results.active{display:flex;}
+.gsearch-count{font-size:11px;color:var(--c-muted);padding:.1rem 0 .35rem;font-weight:600;}
+.gsearch-item{
+  background:var(--c-surface);border:1.5px solid var(--c-border);
+  border-radius:var(--radius-sm);padding:.55rem .75rem;
+  display:flex;align-items:center;gap:10px;cursor:pointer;
+  transition:background .1s,transform .1s;-webkit-user-select:none;user-select:none;
+}
+.gsearch-item:active{transform:scale(.985);}
+.gsearch-hanzi{font-size:26px;line-height:1.1;min-width:36px;text-align:center;flex-shrink:0;}
+.gsearch-info{flex:1;min-width:0;}
+.gsearch-pinyin{font-size:11px;color:var(--c-muted);}
+.gsearch-fr{font-size:13px;font-weight:600;color:var(--c-text);}
+.gsearch-cat{font-size:10px;color:var(--c-hint);}
+.gsearch-lvl{font-size:10px;font-weight:700;padding:2px 7px;border-radius:12px;flex-shrink:0;white-space:nowrap;}
+.gsearch-empty{
+  text-align:center;padding:2rem 1rem;color:var(--c-hint);
+  font-size:13px;display:flex;flex-direction:column;align-items:center;gap:6px;
+}
+.gsearch-empty-icon{font-size:28px;}
 .levels-list{padding:0 .75rem;display:flex;flex-direction:column;gap:10px;}
 
 .level-card{
@@ -149,6 +192,40 @@ body{font-family:'Georgia',serif;-webkit-tap-highlight-color:transparent;color:v
 }
 .lc-btn:active{transform:scale(.97);}
 .lc-btn.accent{border-color:var(--lc);color:var(--lc);background:var(--lc-bg);}
+
+/* Daily section (Express / Favoris) */
+.daily-section{padding:.55rem .75rem .2rem;display:flex;gap:8px;}
+.daily-btn{
+  flex:1;background:var(--c-surface);border:1.5px solid var(--c-border);
+  border-radius:var(--radius);padding:.6rem .75rem;
+  display:flex;flex-direction:column;align-items:flex-start;gap:1px;
+  cursor:pointer;font-family:inherit;transition:transform .12s,background .12s;
+  text-align:left;position:relative;
+}
+.daily-btn:active{transform:scale(.97);}
+.daily-btn-icon{font-size:20px;line-height:1.1;}
+.daily-btn-label{font-size:12px;font-weight:700;color:var(--c-text);}
+.daily-btn-sub{font-size:10px;color:var(--c-muted);}
+.daily-btn-badge{
+  position:absolute;top:7px;right:8px;
+  min-width:18px;height:18px;padding:0 4px;
+  border-radius:9px;font-size:10px;font-weight:700;color:#fff;
+  display:none;align-items:center;justify-content:center;
+}
+.daily-btn-badge.show{display:flex;}
+.daily-btn.express .daily-btn-icon{color:var(--c4);}
+.daily-btn.express .daily-btn-badge{background:var(--c4);}
+.daily-btn.favs .daily-btn-icon{color:var(--c5);}
+.daily-btn.favs .daily-btn-badge{background:var(--c5);}
+/* Fav button in word sheet */
+.ws-fav-btn{
+  display:block;width:100%;margin-bottom:.65rem;
+  padding:9px;font-size:13px;font-family:inherit;font-weight:600;
+  background:none;border:1.5px solid var(--c-border);border-radius:var(--radius-sm);
+  color:var(--c-muted);cursor:pointer;transition:all .15s;
+}
+.ws-fav-btn.is-fav{border-color:#E0A020;color:#E0A020;background:rgba(224,160,32,.08);}
+.ws-fav-btn:active{opacity:.7;}
 
 /* ══════════════════════════════════════════════
    TOPBAR
@@ -666,6 +743,26 @@ body{min-height:-webkit-fill-available;}
       </div>
       <button class="home-dark-btn" id="settings-btn" title="Paramètres">⚙️</button>
     </div>
+    <div class="daily-section">
+      <button class="daily-btn express" id="btn-express" onclick="startExpress()">
+        <span class="daily-btn-icon">⚡</span>
+        <span class="daily-btn-label">Révision Express</span>
+        <span class="daily-btn-sub" id="express-sub">Chargement…</span>
+        <span class="daily-btn-badge" id="express-badge"></span>
+      </button>
+      <button class="daily-btn favs" id="btn-favs" onclick="startFavsSession()">
+        <span class="daily-btn-icon">⭐</span>
+        <span class="daily-btn-label">Mots Difficiles</span>
+        <span class="daily-btn-sub" id="favs-sub">Mes favoris</span>
+        <span class="daily-btn-badge" id="favs-badge"></span>
+      </button>
+    </div>
+    <div class="home-search-wrap">
+      <span class="home-search-icon">🔍</span>
+      <input class="home-search-bar" id="home-search" type="search" placeholder="Rechercher dans tous les niveaux…" autocomplete="off"/>
+      <button class="home-search-clear" id="home-search-clear" aria-label="Effacer">✕</button>
+    </div>
+    <div class="gsearch-results" id="gsearch-results"></div>
     <div class="levels-list" id="home-cards"></div>
   </div>
 
@@ -772,6 +869,7 @@ body{min-height:-webkit-fill-available;}
     <div class="ws-pinyin" id="ws-pinyin"></div>
     <div class="ws-fr" id="ws-fr"></div>
     <div id="ws-radicals" style="display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-bottom:1rem;min-height:1.2em"></div>
+    <button class="ws-fav-btn" id="ws-fav">⭐ Ajouter aux favoris</button>
     <div class="ws-btns">
       <button id="ws-listen">🔊 Écouter</button>
       <button class="ws-btn-write" id="ws-write">✏️ Écrire</button>
@@ -1226,6 +1324,11 @@ function show(id){
 function goHome(){
   if(window.speechSynthesis)window.speechSynthesis.cancel();
   show('home');current=quizLevel=flashLevel=sentLevel=dictLevel=assocLevel=null;activeCat='all';
+  var hs=document.getElementById('home-search');
+  if(hs)hs.value='';
+  var hsc=document.getElementById('home-search-clear');
+  if(hsc)hsc.className='home-search-clear';
+  _renderGlobalResults([],'');
   buildHome();
 }
 function inQuizMid(){
@@ -1353,6 +1456,98 @@ function _buildStreakBadge(){
   }
 }
 
+// ════════════════════════════════════════════════
+// FAVORIS (Mots Difficiles)
+// ════════════════════════════════════════════════
+var FAV_KEY='yct-favs';
+function _getFavs(){try{return JSON.parse(localStorage.getItem(FAV_KEY)||'[]');}catch(e){return[];}}
+function _saveFavs(arr){try{localStorage.setItem(FAV_KEY,JSON.stringify(arr));}catch(e){}}
+function _isFav(h){return _getFavs().indexOf(h)>=0;}
+function _toggleFav(h){
+  var favs=_getFavs();
+  var i=favs.indexOf(h);
+  if(i>=0)favs.splice(i,1);else favs.push(h);
+  _saveFavs(favs);
+  return favs.indexOf(h)>=0;
+}
+function _getFavWords(){
+  var favs=_getFavs();
+  var words=[];
+  Object.keys(data).forEach(function(k){
+    data[k].words.forEach(function(w){if(favs.indexOf(w.h)>=0)words.push(w);});
+  });
+  return words;
+}
+
+// ════════════════════════════════════════════════
+// SRS — Répétition Espacée
+// ════════════════════════════════════════════════
+var SRS_KEY='yct-srs';
+function _getSRS(){try{return JSON.parse(localStorage.getItem(SRS_KEY)||'{}');}catch(e){return {};}}
+function _saveSRS(obj){try{localStorage.setItem(SRS_KEY,JSON.stringify(obj));}catch(e){}}
+function _srsUpdate(h,correct){
+  var srs=_getSRS();
+  var e=srs[h]||{interval:1,due:null,reps:0};
+  if(correct){
+    e.reps=(e.reps||0)+1;
+    e.interval=Math.min(Math.round((e.interval||1)*2.5),30);
+  } else {
+    e.interval=1;
+    e.reps=0;
+  }
+  var d=new Date();d.setDate(d.getDate()+e.interval);
+  e.due=d.toISOString().slice(0,10);
+  srs[h]=e;
+  _saveSRS(srs);
+}
+function _srsDueWords(){
+  var srs=_getSRS();
+  var today=new Date().toISOString().slice(0,10);
+  var words=[];
+  Object.keys(data).forEach(function(k){
+    data[k].words.forEach(function(w){
+      var e=srs[w.h];
+      if(e&&e.due&&e.due<=today)words.push(w);
+    });
+  });
+  return words;
+}
+function _srsNewWords(){
+  var srs=_getSRS();
+  var words=[];
+  Object.keys(data).forEach(function(k){
+    data[k].words.forEach(function(w){if(!srs[w.h])words.push(w);});
+  });
+  return words;
+}
+function _srsCount(){
+  var srs=_getSRS();
+  var today=new Date().toISOString().slice(0,10);
+  return Object.keys(srs).filter(function(h){return srs[h].due&&srs[h].due<=today;}).length;
+}
+
+// ════════════════════════════════════════════════
+// SESSIONS SPÉCIALES
+// ════════════════════════════════════════════════
+function startExpress(){
+  var due=_srsDueWords();
+  var newW=shuffle(_srsNewWords()).slice(0,Math.max(0,10-due.length));
+  var pool=shuffle(due.concat(newW)).slice(0,20);
+  if(!pool.length){
+    alert('Aucun mot à réviser pour l\'instant ! Entraîne-toi d\'abord sur les niveaux.');
+    return;
+  }
+  startQuiz('_express','normal',pool);
+}
+function startFavsSession(){
+  var pool=_getFavWords();
+  if(!pool.length){
+    alert('Aucun mot favori. Appuie sur ⭐ dans la fiche d\'un mot pour l\'ajouter.');
+    return;
+  }
+  startQuiz('_favs','normal',pool);
+}
+
 var STORE_KEY='yct-progress';
 function _getProg(){
   try{return JSON.parse(localStorage.getItem(STORE_KEY)||'{}');}catch(e){return {};}
@@ -1442,8 +1637,38 @@ document.querySelectorAll('.surf-btn').forEach(function(btn){
 var _PROG_MODES=['normal','reverse','dictee','assoc','flash','sent'];
 var _PROG_LABELS=['🀄','🔄','🎵','🔗','🃏','📝'];
 
+function _buildDailySection(){
+  var dueCount=_srsDueWords().length;
+  var newCount=_srsNewWords().length;
+  var expBadge=document.getElementById('express-badge');
+  var expSub=document.getElementById('express-sub');
+  if(expBadge&&expSub){
+    if(dueCount>0){
+      expBadge.textContent=dueCount;
+      expBadge.className='daily-btn-badge show';
+      expSub.textContent=dueCount+' mot'+(dueCount>1?'s':'')+' à réviser';
+    } else {
+      expBadge.className='daily-btn-badge';
+      expSub.textContent=newCount>0?newCount+' nouveau'+(newCount>1?'x':'')+' à découvrir':'À jour ✓';
+    }
+  }
+  var favCount=_getFavs().length;
+  var favBadge=document.getElementById('favs-badge');
+  var favSub=document.getElementById('favs-sub');
+  if(favBadge&&favSub){
+    if(favCount>0){
+      favBadge.textContent=favCount;
+      favBadge.className='daily-btn-badge show';
+      favSub.textContent=favCount+' mot'+(favCount>1?'s':'');
+    } else {
+      favBadge.className='daily-btn-badge';
+      favSub.textContent='Aucun favori';
+    }
+  }
+}
 function buildHome(){
   _buildStreakBadge();
+  _buildDailySection();
   var prog=_getProg();
   document.getElementById('home-cards').innerHTML=Object.keys(data).map(function(k){
     var d=data[k];
@@ -1474,6 +1699,80 @@ function buildHome(){
     +'</div>';
   }).join('');
 }
+
+// ════════════════════════════════════════════════
+// RECHERCHE GLOBALE
+// ════════════════════════════════════════════════
+function _globalSearch(q){
+  q=q.toLowerCase().trim();
+  if(!q)return[];
+  var results=[];
+  Object.keys(data).forEach(function(k){
+    data[k].words.forEach(function(w){
+      if(w.h.indexOf(q)>=0||w.p.toLowerCase().indexOf(q)>=0||w.fr.toLowerCase().indexOf(q)>=0||w.c.toLowerCase().indexOf(q)>=0){
+        results.push({word:w,level:k});
+      }
+    });
+  });
+  return results;
+}
+function _renderGlobalResults(results,q){
+  var el=document.getElementById('gsearch-results');
+  var cards=document.getElementById('home-cards');
+  if(!q||!q.trim()){
+    el.className='gsearch-results';
+    cards.style.display='';
+    return;
+  }
+  cards.style.display='none';
+  el.className='gsearch-results active';
+  if(!results.length){
+    el.innerHTML='<div class="gsearch-empty"><div class="gsearch-empty-icon">🔍</div>Aucun résultat pour « '+q+' »</div>';
+    return;
+  }
+  var max=80;
+  var shown=results.slice(0,max);
+  var html='<div class="gsearch-count">'+results.length+' résultat'+(results.length>1?'s':'')+' dans tous les niveaux'+(results.length>max?' ('+max+' affichés)':'')+'</div>';
+  shown.forEach(function(r){
+    var d=data[r.level];
+    html+='<div class="gsearch-item" data-hanzi="'+encodeURIComponent(r.word.h)+'" data-level="'+r.level+'">'
+      +'<div class="gsearch-hanzi '+d.lc+'">'+r.word.h+'</div>'
+      +'<div class="gsearch-info">'
+        +'<div class="gsearch-fr">'+r.word.fr+'</div>'
+        +'<div class="gsearch-pinyin">'+r.word.p+'</div>'
+        +'<div class="gsearch-cat">'+r.word.c+'</div>'
+      +'</div>'
+      +'<span class="gsearch-lvl '+d.lc+'" style="background:var(--lc-bg);color:var(--lc)">'+d.label+'</span>'
+    +'</div>';
+  });
+  el.innerHTML=html;
+  el.querySelectorAll('.gsearch-item').forEach(function(item){
+    item.addEventListener('click',function(){
+      var h=decodeURIComponent(item.getAttribute('data-hanzi'));
+      var lv=item.getAttribute('data-level');
+      var w=(data[lv]&&data[lv].words.find(function(x){return x.h===h;}))||{h:h,p:'',fr:'',c:''};
+      var prevCurrent=current;
+      current=lv;
+      openWordSheet(w,null);
+      current=prevCurrent;
+    });
+  });
+}
+(function(){
+  var inp=document.getElementById('home-search');
+  var clr=document.getElementById('home-search-clear');
+  if(!inp)return;
+  inp.addEventListener('input',function(){
+    clr.className='home-search-clear'+(this.value.length?' visible':'');
+    _renderGlobalResults(_globalSearch(this.value),this.value);
+  });
+  clr.addEventListener('click',function(){
+    inp.value='';
+    clr.className='home-search-clear';
+    _renderGlobalResults([],'');
+    inp.focus();
+  });
+})();
 
 // ════════════════════════════════════════════════
 // VOCAB VIEW
@@ -1697,20 +1996,39 @@ function shuffle(a){return a.slice().sort(function(){return Math.random()-.5;});
 function startQuiz(level,mode,pool){
   quizLevel=level;quizMode=mode||'normal';quizIdx=0;quizScore=0;
   quizAnswered=false;quizResults=[];quizStreak=0;
-  quizQs=shuffle(pool||data[level].words).slice(0,Math.min(15,data[level].words.length));
-  var d=data[level];
-  document.getElementById('quiz-topbar').className='topbar '+d.lc;
-  var modeLabel=quizMode==='reverse'?' — FR→ZH':' — Quiz';
-  document.getElementById('quiz-title').textContent=d.label+modeLabel;
-  document.getElementById('quiz-badge').textContent=quizQs.length+' q.';
-  document.getElementById('quiz-badge').className='topbar-badge';
-  show('quiz-view');
-  document.getElementById('quiz-view').className='view active '+d.lc;
+  var isSpecial=(level==='_express'||level==='_favs');
+  if(isSpecial){
+    quizQs=shuffle(pool||[]).slice(0,20);
+    var specialLabel=level==='_express'?'⚡ Révision Express':'⭐ Mots Difficiles';
+    document.getElementById('quiz-topbar').className='topbar l1';
+    document.getElementById('quiz-title').textContent=specialLabel;
+    document.getElementById('quiz-badge').textContent=quizQs.length+' q.';
+    document.getElementById('quiz-badge').className='topbar-badge';
+    show('quiz-view');
+    document.getElementById('quiz-view').className='view active l1';
+  } else {
+    quizQs=shuffle(pool||data[level].words).slice(0,Math.min(15,data[level].words.length));
+    var d=data[level];
+    document.getElementById('quiz-topbar').className='topbar '+d.lc;
+    var modeLabel=quizMode==='reverse'?' — FR→ZH':' — Quiz';
+    document.getElementById('quiz-title').textContent=d.label+modeLabel;
+    document.getElementById('quiz-badge').textContent=quizQs.length+' q.';
+    document.getElementById('quiz-badge').className='topbar-badge';
+    show('quiz-view');
+    document.getElementById('quiz-view').className='view active '+d.lc;
+  }
   renderQ();
 }
 
 function getDistr(correct,level){
-  return shuffle(data[level].words.filter(function(w){return w.h!==correct.h;})).slice(0,3);
+  var pool;
+  if(level==='_express'||level==='_favs'){
+    pool=[];
+    Object.keys(data).forEach(function(k){pool=pool.concat(data[k].words);});
+  } else {
+    pool=data[level].words;
+  }
+  return shuffle(pool.filter(function(w){return w.h!==correct.h;})).slice(0,3);
 }
 
 function renderQ(){
@@ -1777,6 +2095,7 @@ function answerQ(idx,chosen,correct){
   var isOk=chosen.h===correct.h;
   if(isOk){quizScore++;quizStreak++;}else{quizStreak=0;}
   quizResults.push({word:correct,correct:isOk});
+  _srsUpdate(correct.h,isOk);
 
   document.querySelectorAll('.qopt').forEach(function(b,i){
     b.classList.add('disabled');
@@ -1800,7 +2119,8 @@ function nextQ(){quizIdx++;if(quizIdx>=quizQs.length){showResults();return;}rend
 
 function showResults(){
   var total=quizQs.length,pct=Math.round(quizScore/total*100);
-  _saveProg(quizLevel,quizMode,pct);
+  var isSpecialSession=(quizLevel==='_express'||quizLevel==='_favs');
+  if(!isSpecialSession)_saveProg(quizLevel,quizMode,pct);
   var stars=pct===100?3:pct>=80?3:pct>=60?2:pct>=40?1:0;
   var emoji=pct===100?'🏆':pct>=80?'🌟':pct>=60?'👍':pct>=40?'💪':'📚';
   var msg=pct===100?'Parfait ! Maîtrise totale !':pct>=80?'Excellent !':pct>=60?'Bien joué !':pct>=40?'Continue !':'Révise encore !';
@@ -1819,9 +2139,9 @@ function showResults(){
       +'<div class="rmsg">'+msg+'</div>'
       +'<div class="ractns">'
         +(wrong.length?'<button id="r-wrongs" class="cta">🔁 Erreurs ('+wrong.length+')</button>':'')
-        +'<button id="r-retry">🔀 Nouveau quiz</button>'
-        +'<button id="r-flip">🃏 Flash</button>'
-        +'<button id="r-vocab">📖 Vocabulaire</button>'
+        +'<button id="r-retry">🔀 Rejouer</button>'
+        +(!isSpecialSession?'<button id="r-flip">🃏 Flash</button>':'')
+        +(!isSpecialSession?'<button id="r-vocab">📖 Vocabulaire</button>':'')
         +'<button id="r-home">🏠</button>'
       +'</div>'
     +'</div>'
@@ -1853,9 +2173,15 @@ function showResults(){
       startQuiz(quizLevel,quizMode,wrong.map(function(r){return r.word;}));
     });
   }
-  document.getElementById('r-retry').addEventListener('click',function(){startQuiz(quizLevel,quizMode);});
-  document.getElementById('r-flip').addEventListener('click',function(){startFlash(quizLevel);});
-  document.getElementById('r-vocab').addEventListener('click',function(){showLevel(quizLevel);});
+  document.getElementById('r-retry').addEventListener('click',function(){
+    if(quizLevel==='_express')startExpress();
+    else if(quizLevel==='_favs')startFavsSession();
+    else startQuiz(quizLevel,quizMode);
+  });
+  if(!isSpecialSession){
+    document.getElementById('r-flip').addEventListener('click',function(){startFlash(quizLevel);});
+    document.getElementById('r-vocab').addEventListener('click',function(){showLevel(quizLevel);});
+  }
   document.getElementById('r-home').addEventListener('click',goHome);
   document.querySelectorAll('.rb-h').forEach(function(el){
     el.addEventListener('click',function(){speak(decodeURIComponent(el.getAttribute('data-hanzi')),null,null);});
@@ -2331,6 +2657,11 @@ function openWordSheet(w,cardEl){
       +'</span>';
   }).join('');
   radEl.innerHTML=radHtml;
+  // Fav button
+  var favBtn=document.getElementById('ws-fav');
+  var isFav=_isFav(w.h);
+  favBtn.textContent=isFav?'⭐ Dans mes favoris':'☆ Ajouter aux favoris';
+  favBtn.className='ws-fav-btn'+(isFav?' is-fav':'');
   // Apply current level color
   var sheet=document.getElementById('word-sheet');
   sheet.className='word-sheet '+(current?data[current].lc:'');
@@ -2346,6 +2677,13 @@ document.getElementById('ws-listen').addEventListener('click',function(){
 document.getElementById('ws-write').addEventListener('click',function(){
   closeWordSheet();
   if(_wsWord)openWrite(_wsWord);
+});
+document.getElementById('ws-fav').addEventListener('click',function(){
+  if(!_wsWord)return;
+  var nowFav=_toggleFav(_wsWord.h);
+  this.textContent=nowFav?'⭐ Dans mes favoris':'☆ Ajouter aux favoris';
+  this.className='ws-fav-btn'+(nowFav?' is-fav':'');
+  _buildDailySection();
 });
 document.getElementById('word-sheet-overlay').addEventListener('click',function(e){
   if(e.target===this)closeWordSheet();
