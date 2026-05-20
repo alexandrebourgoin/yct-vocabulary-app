@@ -24,6 +24,8 @@
   --c3:#534AB7; --c3-bg:#EEEDFE;
   --c4:#C45E00; --c4-bg:#FEF0E1;
   --c5:#A32D2D; --c5-bg:#FCEBEB;
+
+  --tone1:#3A7EC8; --tone2:#2A9E60; --tone3:#CC6010; --tone4:#C03030;
 }
 /* Dark mode */
 @media(prefers-color-scheme:dark){:root{
@@ -37,6 +39,7 @@
   --c3:#8E88F0; --c3-bg:#19183A;
   --c4:#F59A3C; --c4-bg:#2E1A00;
   --c5:#E06060; --c5-bg:#2E0F0F;
+  --tone1:#6AAAF2; --tone2:#50D090; --tone3:#F09040; --tone4:#F06060;
 }}
 /* Manual dark override */
 body.dark{
@@ -50,6 +53,7 @@ body.dark{
   --c3:#8E88F0; --c3-bg:#19183A;
   --c4:#F59A3C; --c4-bg:#2E1A00;
   --c5:#E06060; --c5-bg:#2E0F0F;
+  --tone1:#6AAAF2; --tone2:#50D090; --tone3:#F09040; --tone4:#F06060;
 }
 body.light{
   --c-bg:#F7F6F2; --c-surface:#FFFFFF; --c-border:#E8E4DC;
@@ -119,6 +123,31 @@ body{font-family:'Georgia',serif;-webkit-tap-highlight-color:transparent;color:v
 .bg-btn:active,.surf-btn:active{opacity:.7;}
 .bg-swatch,.surf-swatch{width:18px;height:18px;border-radius:4px;border:1.5px solid #ccc;display:block;flex-shrink:0;}
 
+/* Goal bar */
+.goal-wrap{padding:.1rem 1rem .45rem;display:flex;align-items:center;gap:8px;}
+.goal-label{font-size:11px;color:var(--c-muted);font-weight:600;white-space:nowrap;}
+.goal-bar-track{flex:1;height:6px;background:var(--c-border);border-radius:3px;overflow:hidden;}
+.goal-bar-fill{height:100%;border-radius:3px;background:var(--c2);transition:width .4s ease;}
+.goal-pct{font-size:11px;font-weight:700;color:var(--c-muted);white-space:nowrap;min-width:30px;text-align:right;}
+.goal-pct.done{color:var(--c1);}
+/* Goal selector in settings */
+.goal-seg{display:flex;gap:5px;margin-bottom:.4rem;}
+.goal-opt{
+  flex:1;padding:7px 4px;font-size:13px;font-weight:700;
+  border:1.5px solid var(--c-border);border-radius:var(--radius-sm);
+  background:var(--c-bg);color:var(--c-muted);cursor:pointer;
+  font-family:inherit;transition:all .12s;
+}
+.goal-opt.active{background:var(--c-text);color:var(--c-bg);border-color:var(--c-text);}
+.goal-opt:active{opacity:.7;}
+/* SRS icon in vocab card */
+.v-srs{font-size:10px;margin-left:3px;vertical-align:middle;}
+/* SRS badge in word sheet */
+.ws-srs-badge{
+  display:inline-flex;align-items:center;gap:5px;font-size:12px;
+  color:var(--c-muted);margin-bottom:.7rem;
+  padding:3px 10px;border:1px solid var(--c-border);border-radius:20px;
+}
 /* Home global search */
 .home-search-wrap{
   position:relative;padding:.35rem .75rem .5rem;
@@ -704,6 +733,78 @@ body{font-family:'Georgia',serif;-webkit-tap-highlight-color:transparent;color:v
 /* Error shake */
 @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 .write-hw-wrap.shake{animation:shake .25s ease;}
+
+/* ══════════════════════════════════════════════
+   GAMIFICATION — Badges & XP
+══════════════════════════════════════════════ */
+.home-badge-btn{
+  background:linear-gradient(135deg,#f5c842 0%,#e8993a 100%);
+  border:1.5px solid #d4890a;border-radius:var(--radius-sm);
+  padding:5px 11px;font-size:13px;font-weight:800;
+  cursor:pointer;min-height:38px;transition:filter .12s,transform .1s;
+  color:#5a3200;font-family:inherit;white-space:nowrap;
+  box-shadow:0 2px 6px rgba(200,140,10,.30);
+}
+.home-badge-btn:active{filter:brightness(.9);transform:scale(.96);}
+body.dark .home-badge-btn{
+  background:linear-gradient(135deg,#c9a020 0%,#a0620a 100%);
+  border-color:#8a5000;color:#ffe9a0;
+  box-shadow:0 2px 8px rgba(180,120,0,.40);
+}
+/* Badges overlay (bottom sheet) */
+.badges-overlay{
+  position:fixed;inset:0;background:var(--c-overlay);z-index:70;
+  display:flex;align-items:flex-end;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .2s;
+}
+.badges-overlay.open{opacity:1;pointer-events:all;}
+.badges-panel{
+  background:var(--c-surface);border-radius:var(--radius) var(--radius) 0 0;
+  padding:1.2rem 1rem 2.5rem;width:100%;max-width:480px;
+  max-height:90vh;overflow-y:auto;
+  transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);
+}
+.badges-overlay.open .badges-panel{transform:none;}
+.badges-title{font-size:17px;font-weight:700;margin-bottom:.85rem;text-align:center;}
+/* XP section */
+.xp-section{
+  background:var(--c-bg);border-radius:var(--radius-sm);
+  padding:.75rem .85rem;margin-bottom:1rem;
+}
+.xp-level-row{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:.45rem;}
+.xp-level-name{font-size:14px;font-weight:700;}
+.xp-num{font-size:11px;color:var(--c-muted);}
+.xp-bar-track{height:8px;background:var(--c-border);border-radius:4px;overflow:hidden;}
+.xp-bar-fill{
+  height:100%;border-radius:4px;
+  background:linear-gradient(90deg,var(--c2),var(--c3));
+  transition:width .5s cubic-bezier(.4,0,.2,1);
+}
+/* Badge grid */
+.badges-count{font-size:11px;font-weight:700;letter-spacing:.07em;color:var(--c-muted);margin-bottom:.6rem;}
+.badges-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
+.badge-card{
+  background:var(--c-bg);border:1.5px solid var(--c-border);
+  border-radius:var(--radius-sm);padding:.7rem .5rem .6rem;
+  text-align:center;display:flex;flex-direction:column;align-items:center;gap:2px;
+}
+.badge-card.unlocked{border-color:var(--c2);background:var(--c2-bg);}
+.badge-card.locked{opacity:.3;filter:grayscale(1);}
+.badge-icon{font-size:28px;line-height:1.25;}
+.badge-name{font-size:11px;font-weight:700;color:var(--c-text);margin-top:2px;}
+.badge-desc{font-size:10px;color:var(--c-muted);line-height:1.3;}
+.badge-date{font-size:9px;color:var(--c-hint);margin-top:1px;}
+/* Toast */
+.badge-toast{
+  position:fixed;top:1.1rem;left:50%;
+  transform:translateX(-50%) translateY(calc(-100% - 20px));
+  background:var(--c-text);color:var(--c-bg);
+  padding:.6rem 1.1rem;border-radius:var(--radius);
+  font-size:13px;font-weight:700;white-space:nowrap;
+  z-index:200;transition:transform .35s cubic-bezier(.4,0,.2,1);
+  box-shadow:0 4px 20px rgba(0,0,0,.28);pointer-events:none;
+}
+.badge-toast.show{transform:translateX(-50%) translateY(0);}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
 <script src="config.js"></script>
@@ -720,7 +821,17 @@ body{font-family:'Georgia',serif;-webkit-tap-highlight-color:transparent;color:v
         <div class="home-sub">Vocabulaire chinois — 5 niveaux</div>
         <div class="streak-badge" id="streak-badge"></div>
       </div>
-      <button class="home-dark-btn" id="settings-btn" title="Paramètres">⚙️</button>
+      <div style="margin-left:auto;display:flex;gap:6px;align-items:center;">
+        <button class="home-badge-btn" id="badges-btn" title="Trophées &amp; Niveau">🏅</button>
+        <button class="home-dark-btn" id="settings-btn" title="Paramètres">⚙️</button>
+      </div>
+    </div>
+    <div id="goal-bar-wrap" style="display:none">
+      <div class="goal-wrap">
+        <span class="goal-label">🎯 Objectif</span>
+        <div class="goal-bar-track"><div class="goal-bar-fill" id="goal-bar-fill" style="width:0%"></div></div>
+        <span class="goal-pct" id="goal-bar-pct">0</span>
+      </div>
     </div>
     <div class="daily-section">
       <button class="daily-btn express" id="btn-express" onclick="startExpress()">
@@ -847,11 +958,26 @@ body{font-family:'Georgia',serif;-webkit-tap-highlight-color:transparent;color:v
     <div class="ws-hanzi" id="ws-hanzi"></div>
     <div class="ws-pinyin" id="ws-pinyin"></div>
     <div class="ws-fr" id="ws-fr"></div>
-    <div id="ws-radicals" style="display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-bottom:1rem;min-height:1.2em"></div>
+    <div id="ws-radicals" style="display:flex;justify-content:center;flex-wrap:wrap;gap:8px;margin-bottom:.7rem;min-height:1.2em"></div>
+    <div style="text-align:center;margin-bottom:.7rem"><span class="ws-srs-badge" id="ws-srs-badge"></span></div>
     <button class="ws-fav-btn" id="ws-fav">⭐ Ajouter aux favoris</button>
     <div class="ws-btns">
       <button id="ws-listen">🔊 Écouter</button>
       <button class="ws-btn-write" id="ws-write">✏️ Écrire</button>
+    </div>
+  </div>
+</div>
+
+<!-- Badge toast -->
+<div class="badge-toast" id="badge-toast"></div>
+
+<!-- Badges overlay -->
+<div class="badges-overlay" id="badges-overlay">
+  <div class="badges-panel">
+    <div class="badges-title">🏅 Progression &amp; Trophées</div>
+    <div id="badges-content"></div>
+    <div class="modal-btns" style="margin-top:.6rem">
+      <button class="modal-btn-stay" id="badges-close">Fermer</button>
     </div>
   </div>
 </div>
@@ -891,6 +1017,15 @@ body{font-family:'Georgia',serif;-webkit-tap-highlight-color:transparent;color:v
       <button class="surf-btn" data-surf="poudre"><span class="surf-swatch" style="background:#FFF0F5"></span>Poudré</button>
       <button class="surf-btn" data-surf="pierre"><span class="surf-swatch" style="background:#F4F4F2"></span>Pierre</button>
     </div>
+    <div style="font-size:11px;font-weight:700;letter-spacing:.07em;color:var(--c-muted);margin:.7rem 0 .5rem">OBJECTIF QUOTIDIEN</div>
+    <div class="goal-seg" id="goal-seg">
+      <button class="goal-opt" data-goal="5">5</button>
+      <button class="goal-opt" data-goal="10">10</button>
+      <button class="goal-opt" data-goal="15">15</button>
+      <button class="goal-opt" data-goal="20">20</button>
+      <button class="goal-opt" data-goal="0">∞</button>
+    </div>
+    <div class="modal-sub" style="margin-bottom:.8rem">Mots à pratiquer par jour</div>
     <div style="font-size:11px;font-weight:700;letter-spacing:.07em;color:var(--c-muted);margin-bottom:.5rem">DONNÉES</div>
     <div class="modal-sub" id="settings-info" style="margin-bottom:.8rem">Chargement…</div>
     <div class="modal-btns">
@@ -1468,6 +1603,8 @@ function _saveSRS(obj){try{localStorage.setItem(SRS_KEY,JSON.stringify(obj));}ca
 function _srsUpdate(h,correct){
   var srs=_getSRS();
   var e=srs[h]||{interval:1,due:null,reps:0};
+  var today=new Date().toISOString().slice(0,10);
+  e.last=today;
   if(correct){
     e.reps=(e.reps||0)+1;
     e.interval=Math.min(Math.round((e.interval||1)*2.5),30);
@@ -1504,6 +1641,207 @@ function _srsCount(){
   var srs=_getSRS();
   var today=new Date().toISOString().slice(0,10);
   return Object.keys(srs).filter(function(h){return srs[h].due&&srs[h].due<=today;}).length;
+}
+
+// ════════════════════════════════════════════════
+// GAMIFICATION — XP & BADGES
+// ════════════════════════════════════════════════
+var _XP_THRESHOLDS=[0,30,80,160,280,440,660,950,1320,1780,2400];
+var _XP_NAMES=['🎋 Novice','📖 Apprenti','✏️ Étudiant','📝 Lettré','🎓 Diplômé','🏮 Expert','🌸 Érudit','🐉 Maître','🌟 Grand Maître','⛩️ Sage','🀄 Légendaire'];
+function _computeXP(){
+  var srs=_getSRS();
+  var keys=Object.keys(srs);
+  var total=keys.length;
+  var mastered=keys.filter(function(h){return srs[h].interval>=15;}).length;
+  var streak=_getStreak().count;
+  var xp=total*2+mastered*8+streak;
+  var lvl=0;
+  for(var i=0;i<_XP_THRESHOLDS.length;i++){if(xp>=_XP_THRESHOLDS[i])lvl=i;}
+  var isMax=lvl>=_XP_NAMES.length-1;
+  var cur=_XP_THRESHOLDS[lvl]||0;
+  var next=_XP_THRESHOLDS[Math.min(lvl+1,_XP_THRESHOLDS.length-1)];
+  var pct=isMax?100:Math.round((xp-cur)/(next-cur)*100);
+  return{xp:xp,level:lvl+1,name:_XP_NAMES[lvl],pct:pct,next:next,isMax:isMax};
+}
+function _buildXPBtn(){
+  var btn=document.getElementById('badges-btn');
+  if(!btn)return;
+  var r=_computeXP();
+  btn.textContent='🏅 Lv.'+r.level;
+}
+
+var BADGES_KEY='yct-badges';
+function _getBadgesData(){try{return JSON.parse(localStorage.getItem(BADGES_KEY)||'{}');}catch(e){return{};}}
+function _saveBadgesData(o){try{localStorage.setItem(BADGES_KEY,JSON.stringify(o));}catch(e){}}
+
+var _BADGES=[
+  {id:'b_first', icon:'🌱', name:'Premiers Pas',    desc:'Pratiquer son 1er mot'},
+  {id:'b_50',    icon:'🌿', name:'En Chemin',        desc:'50 mots pratiqués'},
+  {id:'b_100',   icon:'🌲', name:'Assidu',           desc:'100 mots pratiqués'},
+  {id:'b_mast',  icon:'🌳', name:'Maître des Mots',  desc:'30 mots maîtrisés (🌳)'},
+  {id:'b_str7',  icon:'🔥', name:'Semaine de Feu',   desc:'7 jours consécutifs'},
+  {id:'b_str30', icon:'🏆', name:'Invincible',       desc:'30 jours consécutifs'},
+  {id:'b_perf',  icon:'💯', name:'Sans Faute',       desc:'100% à un quiz'},
+  {id:'b_lvl',   icon:'🎓', name:'Niveau Complété',  desc:'6/6 modes à 100% sur un niveau'},
+  {id:'b_fav',   icon:'⭐', name:'Collectionneur',   desc:'10 mots en favoris'},
+  {id:'b_expl',  icon:'🗺️', name:'Grand Voyageur',   desc:'Pratiquer les 5 niveaux'},
+];
+
+function _buildBadgeCtx(){
+  var srs=_getSRS();
+  var srsKeys=Object.keys(srs);
+  var prog=_getProg();
+  var modes=['normal','reverse','dictee','assoc','flash','sent'];
+  return{
+    srsTotal:srsKeys.length,
+    srsMastered:srsKeys.filter(function(h){return srs[h].interval>=15;}).length,
+    streak:_getStreak().count,
+    favCount:_getFavs().length,
+    hasPerfect:Object.keys(prog).some(function(k){
+      return Object.keys(prog[k]||{}).some(function(m){return prog[k][m]===100;});
+    }),
+    hasCompletedLevel:Object.keys(prog).some(function(k){
+      if(!data[k])return false;
+      return modes.every(function(m){return (prog[k]||{})[m]===100;});
+    }),
+    levelsPlayed:Object.keys(prog).filter(function(k){
+      return data[k]&&Object.keys(prog[k]||{}).length>0;
+    }).length
+  };
+}
+var _BADGE_CHECKS=[
+  function(c){return c.srsTotal>=1;},
+  function(c){return c.srsTotal>=50;},
+  function(c){return c.srsTotal>=100;},
+  function(c){return c.srsMastered>=30;},
+  function(c){return c.streak>=7;},
+  function(c){return c.streak>=30;},
+  function(c){return c.hasPerfect;},
+  function(c){return c.hasCompletedLevel;},
+  function(c){return c.favCount>=10;},
+  function(c){return c.levelsPlayed>=5;}
+];
+function _checkBadges(showToast){
+  var bd=_getBadgesData();
+  var ctx=_buildBadgeCtx();
+  var today=new Date().toISOString().slice(0,10);
+  var newOnes=[];
+  _BADGES.forEach(function(b,i){
+    if(!bd[b.id]&&_BADGE_CHECKS[i](ctx)){bd[b.id]=today;newOnes.push(b);}
+  });
+  if(newOnes.length)_saveBadgesData(bd);
+  if(showToast&&newOnes.length){
+    newOnes.forEach(function(b,i){setTimeout(function(){_showBadgeToast(b);},i*2200);});
+  }
+  return newOnes;
+}
+function _showBadgeToast(badge){
+  var el=document.getElementById('badge-toast');
+  if(!el)return;
+  el.textContent='🏅 '+badge.icon+' '+badge.name+' débloqué !';
+  el.classList.add('show');
+  setTimeout(function(){el.classList.remove('show');},2600);
+}
+function _renderBadges(){
+  var bd=_getBadgesData();
+  var xp=_computeXP();
+  var unlocked=Object.keys(bd).length;
+  var html=
+    '<div class="xp-section">'
+      +'<div class="xp-level-row">'
+        +'<span class="xp-level-name">'+xp.name+'</span>'
+        +'<span class="xp-num">'+(xp.isMax?'MAX — '+xp.xp+' XP':xp.xp+' / '+xp.next+' XP')+'</span>'
+      +'</div>'
+      +'<div class="xp-bar-track"><div class="xp-bar-fill" style="width:'+xp.pct+'%"></div></div>'
+    +'</div>'
+    +'<div class="badges-count">TROPHÉES — '+unlocked+'/'+_BADGES.length+'</div>'
+    +'<div class="badges-grid">'
+    +_BADGES.map(function(b){
+      var date=bd[b.id];
+      return '<div class="badge-card '+(date?'unlocked':'locked')+'">'
+        +'<div class="badge-icon">'+b.icon+'</div>'
+        +'<div class="badge-name">'+b.name+'</div>'
+        +'<div class="badge-desc">'+b.desc+'</div>'
+        +(date?'<div class="badge-date">'+date+'</div>':'')
+      +'</div>';
+    }).join('')
+    +'</div>';
+  document.getElementById('badges-content').innerHTML=html;
+}
+function openBadges(){
+  _checkBadges(false);
+  _renderBadges();
+  document.getElementById('badges-overlay').classList.add('open');
+}
+function closeBadges(){
+  document.getElementById('badges-overlay').classList.remove('open');
+}
+document.getElementById('badges-btn').addEventListener('click',openBadges);
+document.getElementById('badges-close').addEventListener('click',closeBadges);
+document.getElementById('badges-overlay').addEventListener('click',function(e){
+  if(e.target===this)closeBadges();
+});
+
+// ════════════════════════════════════════════════
+// COULEUR DES TONS
+// ════════════════════════════════════════════════
+function _pinyinHtml(p){
+  if(!p)return p||'';
+  return p.split(' ').map(function(syl){
+    var t=0;
+    if(/[āēīōūǖ]/.test(syl))t=1;
+    else if(/[áéíóúǘ]/.test(syl))t=2;
+    else if(/[ǎěǐǒǔǚ]/.test(syl))t=3;
+    else if(/[àèìòùǜ]/.test(syl))t=4;
+    return t?'<span style="color:var(--tone'+t+')">'+syl+'</span>':syl;
+  }).join(' ');
+}
+
+// ════════════════════════════════════════════════
+// NIVEAU DE MAÎTRISE SRS
+// ════════════════════════════════════════════════
+function _srsLevel(h){
+  var e=_getSRS()[h];
+  if(!e)return 0;
+  if(e.interval<=1)return 1;
+  if(e.interval<=5)return 2;
+  if(e.interval<=14)return 3;
+  return 4;
+}
+var _SRS_ICONS=['','🌱','🌿','🌲','🌳'];
+var _SRS_LABELS=['Jamais pratiqué','Débutant','En apprentissage','Avancé','Maîtrisé'];
+
+// ════════════════════════════════════════════════
+// OBJECTIF QUOTIDIEN
+// ════════════════════════════════════════════════
+var GOAL_KEY='yct-goal';
+function _getGoal(){var g=parseInt(localStorage.getItem(GOAL_KEY)||'10');return isNaN(g)?10:g;}
+function _setGoal(n){try{localStorage.setItem(GOAL_KEY,String(n));}catch(e){}}
+function _todayProgress(){
+  var srs=_getSRS();
+  var today=new Date().toISOString().slice(0,10);
+  return Object.keys(srs).filter(function(h){return srs[h].last===today;}).length;
+}
+function _buildGoalBar(){
+  var wrap=document.getElementById('goal-bar-wrap');
+  if(!wrap)return;
+  var goal=_getGoal();
+  if(!goal){wrap.style.display='none';return;}
+  wrap.style.display='';
+  var done=_todayProgress();
+  var pct=Math.min(100,Math.round(done/goal*100));
+  var isDone=done>=goal;
+  document.getElementById('goal-bar-fill').style.width=pct+'%';
+  document.getElementById('goal-bar-fill').style.background=isDone?'var(--c1)':'var(--c2)';
+  var pctEl=document.getElementById('goal-bar-pct');
+  pctEl.textContent=done+'/'+goal+(isDone?' ✓':'');
+  pctEl.className='goal-pct'+(isDone?' done':'');
+}
+function _updateGoalBtns(){
+  var goal=_getGoal();
+  document.querySelectorAll('.goal-opt').forEach(function(b){
+    b.classList.toggle('active',parseInt(b.getAttribute('data-goal'))===goal);
+  });
 }
 
 // ════════════════════════════════════════════════
@@ -1577,6 +1915,7 @@ function openSettings(){
   _updateThemeBtns();
   _updateBgBtns();
   _updateSurfBtns();
+  _updateGoalBtns();
   document.getElementById('settings-overlay').classList.add('open');
 }
 function closeSettings(){
@@ -1608,6 +1947,13 @@ document.querySelectorAll('.surf-btn').forEach(function(btn){
   btn.addEventListener('click',function(){
     _applySurf(btn.dataset.surf);
     _updateSurfBtns();
+  });
+});
+document.querySelectorAll('.goal-opt').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    _setGoal(parseInt(btn.getAttribute('data-goal')));
+    _updateGoalBtns();
+    _buildGoalBar();
   });
 });
 
@@ -1650,6 +1996,9 @@ function _buildDailySection(){
 }
 function buildHome(){
   _buildStreakBadge();
+  _buildGoalBar();
+  _buildXPBtn();
+  _checkBadges(true);
   _buildDailySection();
   var prog=_getProg();
   document.getElementById('home-cards').innerHTML=Object.keys(data).map(function(k){
@@ -1717,14 +2066,18 @@ function _renderGlobalResults(results,q){
   var html='<div class="gsearch-count">'+results.length+' résultat'+(results.length>1?'s':'')+' dans tous les niveaux'+(results.length>max?' ('+max+' affichés)':'')+'</div>';
   shown.forEach(function(r){
     var d=data[r.level];
+    var sl=_srsLevel(r.word.h);
     html+='<div class="gsearch-item" data-hanzi="'+encodeURIComponent(r.word.h)+'" data-level="'+r.level+'">'
       +'<div class="gsearch-hanzi '+d.lc+'">'+r.word.h+'</div>'
       +'<div class="gsearch-info">'
         +'<div class="gsearch-fr">'+r.word.fr+'</div>'
-        +'<div class="gsearch-pinyin">'+r.word.p+'</div>'
+        +'<div class="gsearch-pinyin">'+_pinyinHtml(r.word.p)+'</div>'
         +'<div class="gsearch-cat">'+r.word.c+'</div>'
       +'</div>'
-      +'<span class="gsearch-lvl '+d.lc+'" style="background:var(--lc-bg);color:var(--lc)">'+d.label+'</span>'
+      +'<div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0">'
+        +'<span class="gsearch-lvl '+d.lc+'" style="background:var(--lc-bg);color:var(--lc)">'+d.label+'</span>'
+        +(sl>0?'<span style="font-size:12px">'+_SRS_ICONS[sl]+'</span>':'')
+      +'</div>'
     +'</div>';
   });
   el.innerHTML=html;
@@ -1822,11 +2175,12 @@ function renderVocab(words){
   if(!words.length){grid.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="empty-icon">🔍</div><div style="font-size:13px;color:var(--c-hint)">Aucun résultat</div></div>';return;}
   var html='';
   words.forEach(function(w){
+    var sl=_srsLevel(w.h);
     html+='<div class="vocab-card" data-hanzi="'+encodeURIComponent(w.h)+'">'
       +'<div class="vc-top"><span class="v-hanzi'+(sc?' '+sc:'')+'">'+w.h+'</span><span class="v-sound">🔊</span></div>'
-      +'<div class="v-pinyin'+(pinyinHidden?' hidden':'')+'">'+w.p+'</div>'
+      +'<div class="v-pinyin'+(pinyinHidden?' hidden':'')+'">'+_pinyinHtml(w.p)+'</div>'
       +'<div class="v-fr">'+w.fr+'</div>'
-      +'<div class="v-cat">'+w.c+'</div>'
+      +'<div class="v-cat">'+w.c+(sl>0?'<span class="v-srs">'+_SRS_ICONS[sl]+'</span>':'')+'</div>'
     +'</div>';
   });
   grid.innerHTML=html;
@@ -1882,7 +2236,7 @@ function renderFlash(){
         +'<div class="flash-face back">'
           +'<div class="flash-face-label">Traduction</div>'
           +'<div class="flash-fr">'+w.fr+'</div>'
-          +'<div class="flash-pinyin">'+w.p+'</div>'
+          +'<div class="flash-pinyin">'+_pinyinHtml(w.p)+'</div>'
           +'<div class="flash-cat">'+w.c+'</div>'
         +'</div>'
       +'</div>'
@@ -1917,6 +2271,7 @@ function showFlashResults(){
   var total=flashQs.length;
   var pct=Math.round(ok/total*100);
   _saveProg(flashLevel,'flash',pct);
+  _checkBadges(true);
   var wrongs=flashQs.filter(function(_,i){return !flashResults[i];});
   var body=document.getElementById('flash-body');
   body.innerHTML=
@@ -2054,7 +2409,7 @@ function renderQ(){
       +'<div class="qcard">'
         +'<div class="q-hanzi">'+q.h+'</div>'
         +'<button class="q-sound-btn" id="q-snd">🔊 Écouter</button>'
-        +'<div class="q-pinyin">'+q.p+'</div>'
+        +'<div class="q-pinyin">'+_pinyinHtml(q.p)+'</div>'
         +'<div class="q-lbl">Quelle est la traduction ?</div>'
       +'</div>'
       +'<div class="qopts" id="qopts">'
@@ -2105,6 +2460,7 @@ function showResults(){
   var total=quizQs.length,pct=Math.round(quizScore/total*100);
   var isSpecialSession=(quizLevel==='_express'||quizLevel==='_favs');
   if(!isSpecialSession)_saveProg(quizLevel,quizMode,pct);
+  _checkBadges(true);
   var stars=pct===100?3:pct>=80?3:pct>=60?2:pct>=40?1:0;
   var emoji=pct===100?'🏆':pct>=80?'🌟':pct>=60?'👍':pct>=40?'💪':'📚';
   var msg=pct===100?'Parfait ! Maîtrise totale !':pct>=80?'Excellent !':pct>=60?'Bien joué !':pct>=40?'Continue !':'Révise encore !';
@@ -2628,8 +2984,16 @@ var _wsWord=null,_wsCard=null;
 function openWordSheet(w,cardEl){
   _wsWord=w;_wsCard=cardEl;
   document.getElementById('ws-hanzi').textContent=w.h;
-  document.getElementById('ws-pinyin').textContent=w.p;
+  document.getElementById('ws-pinyin').innerHTML=_pinyinHtml(w.p);
   document.getElementById('ws-fr').textContent=w.fr;
+  // SRS badge
+  var srsBadge=document.getElementById('ws-srs-badge');
+  if(srsBadge){
+    var sl=_srsLevel(w.h);
+    srsBadge.innerHTML=_SRS_ICONS[sl]
+      +'<span style="margin-left:2px">'+(sl>0?_SRS_LABELS[sl]:'Jamais pratiqué')+'</span>';
+    srsBadge.style.opacity=sl>0?'1':'.5';
+  }
   // Radicaux
   var radEl=document.getElementById('ws-radicals');
   var chars=w.h.split('');
@@ -2905,6 +3269,7 @@ buildHome();
 function handleAndroidBack(){
   // Overlays en premier
   if(document.getElementById('stats-overlay').classList.contains('open')){closeStats();return;}
+  if(document.getElementById('badges-overlay').classList.contains('open')){closeBadges();return;}
   if(document.getElementById('settings-overlay').classList.contains('open')){closeSettings();return;}
   if(document.getElementById('word-sheet-overlay').classList.contains('open')){closeWordSheet();return;}
   if(document.getElementById('modal-overlay').classList.contains('open')){closeModal();return;}
