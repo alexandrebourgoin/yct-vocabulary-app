@@ -785,6 +785,34 @@ body.dark .home-badge-btn{
   border-color:#8a5000;color:#ffe9a0;
   box-shadow:0 2px 8px rgba(180,120,0,.40);
 }
+/* Express level picker (bottom sheet) */
+.express-overlay{
+  position:fixed;inset:0;background:var(--c-overlay);z-index:70;
+  display:flex;align-items:flex-end;justify-content:center;
+  opacity:0;pointer-events:none;transition:opacity .2s;
+}
+.express-overlay.open{opacity:1;pointer-events:all;}
+.express-panel{
+  background:var(--c-surface);border-radius:var(--radius) var(--radius) 0 0;
+  padding:1.2rem 1rem 2.5rem;width:100%;max-width:480px;
+  max-height:82vh;overflow-y:auto;
+  transform:translateY(100%);transition:transform .3s cubic-bezier(.4,0,.2,1);
+}
+.express-overlay.open .express-panel{transform:none;}
+.express-picker-title{font-size:17px;font-weight:800;color:var(--c-text);margin-bottom:.2rem;text-align:center;}
+.express-picker-sub{font-size:13px;color:var(--c-muted);margin-bottom:1rem;text-align:center;}
+.express-lvl-btn{
+  display:flex;align-items:center;gap:12px;width:100%;
+  padding:12px 14px;margin-bottom:8px;
+  background:var(--c-bg);border:1.5px solid var(--c-border);border-radius:12px;
+  cursor:pointer;font-family:inherit;text-align:left;transition:background .12s;
+}
+.express-lvl-btn:active{filter:brightness(.94);}
+.express-lvl-icon{font-size:22px;flex-shrink:0;}
+.express-lvl-name{flex:1;font-size:15px;font-weight:700;color:var(--c-text);}
+.express-lvl-count{font-size:12px;font-weight:700;padding:3px 9px;border-radius:20px;
+  background:var(--lc-bg,rgba(0,0,0,.06));color:var(--lc,var(--c-muted));}
+.express-lvl-btn.l-all .express-lvl-count{background:var(--c1-bg);color:var(--c1);}
 .badges-overlay{
   position:fixed;inset:0;background:var(--c-overlay);z-index:70;
   display:flex;align-items:flex-end;justify-content:center;
@@ -999,6 +1027,18 @@ body.dark .home-badge-btn{
     <div class="ws-btns">
       <button id="ws-listen">🔊 Écouter</button>
       <button class="ws-btn-write" id="ws-write">✏️ Écrire</button>
+    </div>
+  </div>
+</div>
+
+<!-- Express level picker -->
+<div class="express-overlay" id="express-overlay">
+  <div class="express-panel">
+    <div class="express-picker-title">⚡ Révision Express</div>
+    <div class="express-picker-sub">Choisir le niveau à réviser</div>
+    <div id="express-picker-list"></div>
+    <div class="modal-btns" style="margin-top:.6rem">
+      <button class="modal-btn-stay" id="express-picker-cancel">Annuler</button>
     </div>
   </div>
 </div>
@@ -1665,11 +1705,12 @@ function _srsUpdate(h,correct){
   srs[h]=e;
   _saveSRS(srs);
 }
-function _srsDueWords(){
+function _srsDueWords(levelId){
   var srs=_getSRS();
   var today=new Date().toISOString().slice(0,10);
   var words=[];
-  Object.keys(data).forEach(function(k){
+  var keys=levelId?[levelId]:Object.keys(data);
+  keys.forEach(function(k){
     data[k].words.forEach(function(w){
       var e=srs[w.h];
       if(e&&e.due&&e.due<=today)words.push(w);
@@ -1677,10 +1718,11 @@ function _srsDueWords(){
   });
   return words;
 }
-function _srsNewWords(){
+function _srsNewWords(levelId){
   var srs=_getSRS();
   var words=[];
-  Object.keys(data).forEach(function(k){
+  var keys=levelId?[levelId]:Object.keys(data);
+  keys.forEach(function(k){
     data[k].words.forEach(function(w){if(!srs[w.h])words.push(w);});
   });
   return words;
@@ -1896,15 +1938,54 @@ function _updateGoalBtns(){
 // SESSIONS SPÉCIALES
 // ════════════════════════════════════════════════
 function startExpress(){
-  var due=_srsDueWords();
-  var newW=shuffle(_srsNewWords()).slice(0,Math.max(0,10-due.length));
+  _showExpressPicker();
+}
+function _showExpressPicker(){
+  var list=document.getElementById('express-picker-list');
+  var html='';
+  var allDue=_srsDueWords();var allNew=_srsNewWords();
+  var allTotal=allDue.length+Math.min(Math.max(0,10-allDue.length),allNew.length);
+  html+='<button class="express-lvl-btn l-all" data-lvl="all">'
+    +'<span class="express-lvl-icon">🌐</span>'
+    +'<span class="express-lvl-name">Tous les niveaux</span>'
+    +'<span class="express-lvl-count">'+allTotal+' mot'+(allTotal>1?'s':'')+'</span>'
+    +'</button>';
+  Object.keys(data).forEach(function(k){
+    var d=data[k];
+    var due=_srsDueWords(k);var newW=_srsNewWords(k);
+    var total=due.length+Math.min(Math.max(0,10-due.length),newW.length);
+    html+='<button class="express-lvl-btn '+d.lc+'" data-lvl="'+k+'">'
+      +'<span class="express-lvl-icon">'+d.icon+'</span>'
+      +'<span class="express-lvl-name">'+d.label+'</span>'
+      +'<span class="express-lvl-count">'+total+' mot'+(total>1?'s':'')+'</span>'
+      +'</button>';
+  });
+  list.innerHTML=html;
+  list.querySelectorAll('[data-lvl]').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      _startExpressForLevel(btn.getAttribute('data-lvl')==='all'?null:btn.getAttribute('data-lvl'));
+    });
+  });
+  document.getElementById('express-overlay').classList.add('open');
+}
+function _startExpressForLevel(levelId){
+  document.getElementById('express-overlay').classList.remove('open');
+  var due=_srsDueWords(levelId);
+  var newW=shuffle(_srsNewWords(levelId)).slice(0,Math.max(0,10-due.length));
   var pool=shuffle(due.concat(newW)).slice(0,20);
   if(!pool.length){
-    alert('Aucun mot à réviser pour l\'instant ! Entraîne-toi d\'abord sur les niveaux.');
+    var lvlName=levelId?data[levelId].label:'tous les niveaux';
+    alert('Aucun mot à réviser pour '+lvlName+' ! Entraîne-toi d\'abord.');
     return;
   }
   startQuiz('_express','normal',pool);
 }
+document.getElementById('express-picker-cancel').addEventListener('click',function(){
+  document.getElementById('express-overlay').classList.remove('open');
+});
+document.getElementById('express-overlay').addEventListener('click',function(e){
+  if(e.target===this)this.classList.remove('open');
+});
 function startFavsSession(){
   var pool=_getFavWords();
   if(!pool.length){
@@ -2338,6 +2419,7 @@ function renderFlash(){
   document.getElementById('fl-pass').addEventListener('click',function(){flashNext(true);});
 }
 function flashNext(pass){
+  if(pass)_playSuccess();
   flashResults.push(pass);
   flashIdx++;
   if(flashIdx>=flashQs.length){showFlashResults();return;}
@@ -2515,7 +2597,7 @@ function answerQ(idx,chosen,correct){
   quizAnswered=true;
   _stopTimer();
   var isOk=chosen.h===correct.h;
-  if(isOk){quizScore++;quizStreak++;}else{quizStreak=0;}
+  if(isOk){quizScore++;quizStreak++;_playSuccess();}else{quizStreak=0;}
   quizResults.push({word:correct,correct:isOk});
   _srsUpdate(correct.h,isOk);
 
@@ -2539,6 +2621,20 @@ function answerQ(idx,chosen,correct){
 }
 function nextQ(){quizIdx++;if(quizIdx>=quizQs.length){showResults();return;}renderQ();}
 
+// ── Son de succès ──
+function _playSuccess(){
+  try{
+    var ctx=new(window.AudioContext||window.webkitAudioContext)();
+    [[659,0,0.12],[784,0.1,0.2]].forEach(function(n){
+      var o=ctx.createOscillator(),g=ctx.createGain();
+      o.connect(g);g.connect(ctx.destination);
+      o.type='sine';o.frequency.value=n[0];
+      g.gain.setValueAtTime(0.22,ctx.currentTime+n[1]);
+      g.gain.exponentialRampToValueAtTime(0.001,ctx.currentTime+n[1]+n[2]);
+      o.start(ctx.currentTime+n[1]);o.stop(ctx.currentTime+n[1]+n[2]);
+    });
+  }catch(e){}
+}
 // ── Chrono timer ──
 var _quizTimerInt=null;
 function _stopTimer(){if(_quizTimerInt){clearInterval(_quizTimerInt);_quizTimerInt=null;}}
