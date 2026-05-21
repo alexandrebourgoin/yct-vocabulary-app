@@ -425,12 +425,12 @@ body{font-family:'Georgia',serif;-webkit-tap-highlight-color:transparent;color:v
 .q-pinyin{font-size:14px;color:var(--c-muted);}
 .q-lbl{font-size:12px;color:var(--c-hint);margin-top:4px;}
 
-.qopts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:.7rem;}
+.qopts{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-bottom:.5rem;}
 .qopt{
-  padding:13px 10px;font-size:14px;
+  padding:10px 8px;font-size:14px;
   border:1.5px solid var(--c-border);border-radius:var(--radius-sm);
   background:var(--c-surface);color:var(--c-text);cursor:pointer;
-  text-align:center;line-height:1.3;min-height:50px;
+  text-align:center;line-height:1.3;min-height:46px;
   transition:background .1s,border-color .1s,transform .1s;font-family:inherit;
 }
 .qopt:active:not(.disabled){transform:scale(.97);}
@@ -438,12 +438,12 @@ body{font-family:'Georgia',serif;-webkit-tap-highlight-color:transparent;color:v
 .qopt.wrong{background:var(--c5-bg);border-color:var(--c5);color:var(--c5);}
 .qopt.disabled{cursor:default;}
 
-.qfb{font-size:14px;font-weight:600;margin-bottom:.7rem;text-align:center;min-height:20px;}
+.qfb{font-size:14px;font-weight:600;margin-bottom:.4rem;text-align:center;min-height:18px;}
 .qnext{
-  width:100%;padding:13px;font-size:15px;font-weight:700;
+  width:100%;padding:11px;font-size:15px;font-weight:700;
   border:none;border-radius:var(--radius-sm);
   background:var(--c-text);color:var(--c-bg);cursor:pointer;
-  min-height:50px;font-family:inherit;transition:transform .1s,opacity .12s;
+  min-height:46px;font-family:inherit;transition:transform .1s,opacity .12s;
 }
 .qnext:active{transform:scale(.98);}
 
@@ -466,16 +466,16 @@ body{font-family:'Georgia',serif;-webkit-tap-highlight-color:transparent;color:v
    DICTÉE
 ══════════════════════════════════════════════ */
 .dict-listen-btn{
-  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
-  width:112px;height:112px;border-radius:50%;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  width:80px;height:80px;border-radius:50%;
   border:2.5px solid var(--lc);background:var(--lc-bg);color:var(--lc);
-  cursor:pointer;margin:.2rem auto .8rem;font-family:inherit;
+  cursor:pointer;margin:.1rem auto .4rem;font-family:inherit;
   transition:transform .12s,background .15s,color .15s;
 }
 .dict-listen-btn:active{transform:scale(.93);}
 .dict-listen-btn.playing{background:var(--lc);color:#fff;}
-.dict-snd-icon{font-size:38px;line-height:1;}
-.dict-snd-lbl{font-size:12px;font-weight:700;}
+.dict-snd-icon{font-size:26px;line-height:1;}
+.dict-snd-lbl{font-size:11px;font-weight:700;}
 
 /* ══════════════════════════════════════════════
    ASSOCIATION
@@ -2559,7 +2559,6 @@ function renderQ(){
       +'</div>'
       +'<div class="qcard">'
         +'<div class="q-fr-prompt">'+q.fr+'</div>'
-        +'<div class="q-pinyin" style="font-style:italic;font-size:13px;color:var(--c-hint)">'+q.c+'</div>'
         +'<div class="q-lbl">Quel est le hanzi ?</div>'
       +'</div>'
       +'<div class="qopts" id="qopts">'
@@ -2791,10 +2790,10 @@ function renderDict(){
       +'<span class="streak'+(dictStreak<2?' hidden':'')+'">'+streakHtml+'</span>'
       +'<span id="dlive">Score : '+dictScore+' / '+dictIdx+'</span>'
     +'</div>'
-    +'<div class="qcard">'
+    +'<div class="qcard" style="padding:.75rem 1rem .6rem">'
       +'<button class="dict-listen-btn" id="dict-snd"><span class="dict-snd-icon">🔊</span><span class="dict-snd-lbl">Écouter</span></button>'
       +'<div class="q-lbl">Quel est ce mot ?</div>'
-      +'<div id="dict-reveal" style="min-height:44px;margin-top:.4rem"></div>'
+      +'<div id="dict-reveal" style="margin-top:.3rem;min-height:36px"></div>'
     +'</div>'
     +'<div class="qopts" id="dopts">'
       +opts.map(function(o,i){return '<button class="qopt" id="do'+i+'" style="font-size:22px">'+o.h+'</button>';}).join('')
