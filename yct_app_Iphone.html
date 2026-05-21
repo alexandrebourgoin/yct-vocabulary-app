@@ -334,7 +334,8 @@ body{font-family:'Georgia',serif;-webkit-tap-highlight-color:transparent;color:v
 .v-hanzi{font-size:26px;line-height:1.25;color:var(--c-text);}
 .v-hanzi.big{font-size:32px;}
 .v-hanzi.small{font-size:20px;}
-.v-sound{font-size:15px;opacity:.55;margin-top:3px;flex-shrink:0;}
+.v-sound{font-size:15px;opacity:.55;margin-top:3px;flex-shrink:0;cursor:pointer;transition:opacity .12s,transform .1s;}
+.v-sound:active{transform:scale(.8);opacity:1;}
 .vocab-card.speaking .v-sound{opacity:1;}
 .v-pinyin{font-size:11px;color:var(--c-muted);transition:opacity .2s;}
 .v-pinyin.hidden{opacity:0;}
@@ -1038,7 +1039,7 @@ body.dark .home-badge-btn{
     <div class="express-picker-sub">Choisir le niveau à réviser</div>
     <div id="express-picker-list"></div>
     <div class="modal-btns" style="margin-top:.6rem">
-      <button class="modal-btn-stay" id="express-picker-cancel">Annuler</button>
+      <button class="modal-btn-stay" id="express-picker-cancel">Fermer</button>
     </div>
   </div>
 </div>
@@ -2343,10 +2344,15 @@ function renderVocab(words){
   });
   grid.innerHTML=html;
   grid.querySelectorAll('.vocab-card').forEach(function(card){
-    card.addEventListener('click',function(){
+    card.addEventListener('click',function(e){
       var hanzi=decodeURIComponent(card.getAttribute('data-hanzi'));
       var w=filtered.find(function(x){return x.h===hanzi;})||{h:hanzi,p:'',fr:'',c:''};
-      openWordSheet(w,card);
+      if(e.target.classList.contains('v-sound')){
+        e.stopPropagation();
+        speak(hanzi,card,null);
+      } else {
+        openWordSheet(w,card);
+      }
     });
   });
 }
