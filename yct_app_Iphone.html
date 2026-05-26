@@ -803,6 +803,9 @@ body.dark .home-badge-btn{
 .express-overlay.open .express-panel{transform:none;}
 .express-picker-title{font-size:17px;font-weight:800;color:var(--c-text);margin-bottom:.2rem;text-align:center;}
 .express-picker-sub{font-size:13px;color:var(--c-muted);margin-bottom:1rem;text-align:center;}
+.express-back-btn{background:none;border:none;color:var(--c-muted);font-size:13px;font-weight:600;cursor:pointer;padding:0 0 .5rem;text-align:left;font-family:inherit;display:none;}
+.express-back-btn:active{color:var(--c-text);}
+.express-filter-desc{font-size:11px;font-weight:400;color:var(--c-muted);display:block;margin-top:1px;}
 .express-lvl-btn{
   display:flex;align-items:center;gap:12px;width:100%;
   padding:12px 14px;margin-bottom:8px;
@@ -1036,8 +1039,9 @@ body.dark .home-badge-btn{
 <!-- Express level picker -->
 <div class="express-overlay" id="express-overlay">
   <div class="express-panel">
-    <div class="express-picker-title">⚡ Révision Express</div>
-    <div class="express-picker-sub">Choisir le niveau à réviser</div>
+    <button class="express-back-btn" id="express-picker-back">← Retour</button>
+    <div class="express-picker-title" id="express-picker-title">⚡ Révision Express</div>
+    <div class="express-picker-sub" id="express-picker-sub">Choisir le niveau à réviser</div>
     <div id="express-picker-list"></div>
     <div class="modal-btns" style="margin-top:.6rem">
       <button class="modal-btn-stay" id="express-picker-cancel">Fermer</button>
@@ -1939,10 +1943,15 @@ function _updateGoalBtns(){
 // ════════════════════════════════════════════════
 // SESSIONS SPÉCIALES
 // ════════════════════════════════════════════════
-function startExpress(){
-  _showExpressPicker();
-}
+var _expressSelectedLevel=null;
+
+function startExpress(){_showExpressPicker();}
+
 function _showExpressPicker(){
+  _expressSelectedLevel=null;
+  document.getElementById('express-picker-title').textContent='⚡ Révision Express';
+  document.getElementById('express-picker-sub').textContent='Choisir le niveau à réviser';
+  document.getElementById('express-picker-back').style.display='none';
   var list=document.getElementById('express-picker-list');
   var html='';
   var allDue=_srsDueWords();var allNew=_srsNewWords();
@@ -1965,23 +1974,117 @@ function _showExpressPicker(){
   list.innerHTML=html;
   list.querySelectorAll('[data-lvl]').forEach(function(btn){
     btn.addEventListener('click',function(){
-      _startExpressForLevel(btn.getAttribute('data-lvl')==='all'?null:btn.getAttribute('data-lvl'));
+      _showExpressFilterStep(btn.getAttribute('data-lvl')==='all'?null:btn.getAttribute('data-lvl'));
     });
   });
   document.getElementById('express-overlay').classList.add('open');
 }
-function _startExpressForLevel(levelId){
+
+function _expressWordCount(levelId,filter){
+  var keys=levelId?[levelId]:Object.keys(data);
+  var srs=_getSRS();
+  var today=new Date().toISOString().slice(0,10);
+  var count=0;
+  keys.forEach(function(k){
+    data[k].words.forEach(function(w){
+      var sl=_srsLevel(w.h);
+      var e=srs[w.h];
+      if(filter==='srs'){
+        if((e&&e.due&&e.due<=today)||!e)count++;
+      } else if(filter==='new'){
+        if(sl===0)count++;
+      } else if(filter==='learning'){
+        if(sl===1||sl===2)count++;
+      } else if(filter==='advanced'){
+        if(sl===3)count++;
+      } else if(filter==='mastered'){
+        if(sl===4)count++;
+      }
+    });
+  });
+  return count;
+}
+
+function _getWordsByFilter(levelId,filter){
+  var keys=levelId?[levelId]:Object.keys(data);
+  var srs=_getSRS();
+  var today=new Date().toISOString().slice(0,10);
+  var words=[];
+  keys.forEach(function(k){
+    data[k].words.forEach(function(w){
+      var sl=_srsLevel(w.h);
+      var e=srs[w.h];
+      if(filter==='srs'){
+        if((e&&e.due&&e.due<=today)||!e)words.push(w);
+      } else if(filter==='new'){
+        if(sl===0)words.push(w);
+      } else if(filter==='learning'){
+        if(sl===1||sl===2)words.push(w);
+      } else if(filter==='advanced'){
+        if(sl===3)words.push(w);
+      } else if(filter==='mastered'){
+        if(sl===4)words.push(w);
+      }
+    });
+  });
+  return words;
+}
+
+function _showExpressFilterStep(levelId){
+  _expressSelectedLevel=levelId;
+  var lvlName=levelId?(data[levelId].icon+' '+data[levelId].label):'🌐 Tous les niveaux';
+  document.getElementById('express-picker-title').textContent=lvlName;
+  document.getElementById('express-picker-sub').textContent='Choisir les mots à réviser';
+  document.getElementById('express-picker-back').style.display='block';
+  var filters=[
+    {key:'srs',     icon:'⚡',label:'SRS du jour',      desc:'Mots dus + jamais vus'},
+    {key:'new',     icon:'🌱',label:'Jamais vus',        desc:'Aucune pratique encore'},
+    {key:'learning',icon:'🌿',label:'En apprentissage',  desc:'Débutant & intermédiaire'},
+    {key:'advanced',icon:'🌲',label:'Avancés',           desc:'Bonne maîtrise'},
+    {key:'mastered',icon:'🌳',label:'Maîtrisés',         desc:'Révision de maintien'}
+  ];
+  var html='';
+  filters.forEach(function(f){
+    var n=_expressWordCount(levelId,f.key);
+    var disabled=n===0?' disabled':'';
+    var opacity=n===0?' style="opacity:.4"':'';
+    html+='<button class="express-lvl-btn" data-filter="'+f.key+'"'+disabled+opacity+'>'
+      +'<span class="express-lvl-icon">'+f.icon+'</span>'
+      +'<span class="express-lvl-name">'+f.label
+        +'<span class="express-filter-desc">'+f.desc+'</span>'
+      +'</span>'
+      +'<span class="express-lvl-count">'+n+' mot'+(n>1?'s':'')+'</span>'
+      +'</button>';
+  });
+  document.getElementById('express-picker-list').innerHTML=html;
+  document.getElementById('express-picker-list').querySelectorAll('[data-filter]').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      _startExpressWithFilter(levelId,btn.getAttribute('data-filter'));
+    });
+  });
+}
+
+function _startExpressWithFilter(levelId,filter){
   document.getElementById('express-overlay').classList.remove('open');
-  var due=_srsDueWords(levelId);
-  var newW=shuffle(_srsNewWords(levelId)).slice(0,Math.max(0,10-due.length));
-  var pool=shuffle(due.concat(newW)).slice(0,20);
+  var pool;
+  if(filter==='srs'){
+    var due=_srsDueWords(levelId);
+    var newW=shuffle(_srsNewWords(levelId)).slice(0,Math.max(0,10-due.length));
+    pool=shuffle(due.concat(newW)).slice(0,20);
+  } else {
+    pool=shuffle(_getWordsByFilter(levelId,filter)).slice(0,20);
+  }
   if(!pool.length){
     var lvlName=levelId?data[levelId].label:'tous les niveaux';
-    alert('Aucun mot à réviser pour '+lvlName+' ! Entraîne-toi d\'abord.');
+    alert('Aucun mot dans cette catégorie pour '+lvlName+' !');
     return;
   }
   startQuiz('_express','normal',pool);
 }
+
+document.getElementById('express-picker-back').addEventListener('click',function(){
+  _showExpressPicker();
+});
 document.getElementById('express-picker-cancel').addEventListener('click',function(){
   document.getElementById('express-overlay').classList.remove('open');
 });
@@ -2685,6 +2788,7 @@ function showResults(){
   var total=quizQs.length,pct=Math.round(quizScore/total*100);
   var isSpecialSession=(quizLevel==='_express'||quizLevel==='_favs');
   if(!isSpecialSession)_saveProg(quizLevel,quizMode,pct);
+  else _markToday();
   _checkBadges(true);
   var stars=pct===100?3:pct>=80?3:pct>=60?2:pct>=40?1:0;
   var emoji=pct===100?'🏆':pct>=80?'🌟':pct>=60?'👍':pct>=40?'💪':'📚';
