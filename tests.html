@@ -1,0 +1,946 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>YCT Vocab — Tests</title>
+<script src="config.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: #0d1117; color: #e6edf3;
+    margin: 0; padding: 1.5rem;
+    min-height: 100vh;
+  }
+  h1 { font-size: 1.3rem; font-weight: 700; margin: 0 0 .35rem; }
+  .subtitle { font-size: .8rem; color: #7d8590; margin-bottom: 1.5rem; }
+  #summary {
+    display: flex; gap: 1rem; margin-bottom: 1.5rem;
+    padding: .9rem 1.1rem; border-radius: 10px;
+    background: #161b22; border: 1px solid #30363d;
+    font-size: .85rem;
+  }
+  .sum-pass { color: #3fb950; font-weight: 700; }
+  .sum-fail { color: #f85149; font-weight: 700; }
+  .sum-total { color: #7d8590; }
+  .progress-bar {
+    height: 5px; border-radius: 3px;
+    background: #21262d; margin-bottom: 1.5rem; overflow: hidden;
+  }
+  .progress-fill { height: 100%; border-radius: 3px; transition: width .4s; }
+
+  .suite {
+    margin-bottom: 1.2rem;
+    border: 1px solid #30363d; border-radius: 10px;
+    overflow: hidden;
+  }
+  .suite-header {
+    padding: .6rem .9rem; font-size: .78rem; font-weight: 700;
+    letter-spacing: .06em; text-transform: uppercase;
+    background: #161b22; color: #7d8590;
+    border-bottom: 1px solid #30363d;
+    display: flex; align-items: center; gap: .5rem;
+  }
+  .suite-header .s-icon { font-size: 1rem; }
+  .suite-header .s-count {
+    margin-left: auto; font-size: .72rem; font-weight: 400;
+    background: #21262d; padding: .15rem .5rem; border-radius: 20px;
+  }
+  .test-row {
+    display: flex; align-items: flex-start; gap: .65rem;
+    padding: .45rem .9rem;
+    font-size: .8rem; line-height: 1.45;
+    border-bottom: 1px solid #21262d;
+  }
+  .test-row:last-child { border-bottom: none; }
+  .test-row.pass { }
+  .test-row.fail { background: rgba(248,81,73,.06); }
+  .dot {
+    flex-shrink: 0; width: 8px; height: 8px;
+    border-radius: 50%; margin-top: .35rem;
+  }
+  .pass .dot { background: #3fb950; }
+  .fail .dot { background: #f85149; }
+  .test-name { color: #cdd9e5; flex: 1; }
+  .test-err {
+    font-size: .74rem; color: #f85149;
+    margin-top: .2rem; font-family: ui-monospace, monospace;
+    white-space: pre-wrap; word-break: break-all;
+  }
+  .all-pass-banner {
+    text-align: center; padding: 2rem;
+    font-size: 2rem; display: none;
+  }
+</style>
+</head>
+<body>
+<h1>🀄 YCT Vocab — Tests unitaires</h1>
+<div class="subtitle" id="run-info"></div>
+<div id="summary"></div>
+<div class="progress-bar"><div class="progress-fill" id="prog-fill"></div></div>
+<div id="all-pass-banner" class="all-pass-banner">✅ Tous les tests passent !</div>
+<div id="output"></div>
+
+<script>
+// ════════════════════════════════════════════════════════════════
+// MOCK localStorage (isolé, ne touche pas au vrai localStorage)
+// ════════════════════════════════════════════════════════════════
+var _store = {};
+var _ls = {
+  getItem:    function(k)    { return _store.hasOwnProperty(k) ? _store[k] : null; },
+  setItem:    function(k, v) { _store[k] = String(v); },
+  removeItem: function(k)    { delete _store[k]; },
+  clear:      function()     { _store = {}; }
+};
+function _resetStore() { _store = {}; }
+
+// ════════════════════════════════════════════════════════════════
+// NORMALISATION DES DONNÉES (même logique que l'app)
+// ════════════════════════════════════════════════════════════════
+var _rawData = {};
+Object.keys(data).forEach(function(k) {
+  _rawData[k] = {
+    label: data[k].label,
+    lc:    data[k].lc,
+    icon:  data[k].icon,
+    desc:  data[k].desc,
+    words: data[k].words.map(function(a) {
+      return Array.isArray(a) ? { h: a[0], p: a[1], fr: a[2], c: a[3] } : a;
+    })
+  };
+});
+// Remplace data par la version normalisée pour les tests
+var data = _rawData;
+
+// ════════════════════════════════════════════════════════════════
+// FONCTIONS PURES RÉPLIQUÉES (sans dépendance DOM)
+// ════════════════════════════════════════════════════════════════
+
+function shuffle(a) {
+  return a.slice().sort(function() { return Math.random() - .5; });
+}
+
+function _pinyinHtml(p) {
+  if (!p) return p || '';
+  return p.split(' ').map(function(syl) {
+    var t = 0;
+    if (/[āēīōūǖ]/.test(syl)) t = 1;
+    else if (/[áéíóúǘ]/.test(syl)) t = 2;
+    else if (/[ǎěǐǒǔǚ]/.test(syl)) t = 3;
+    else if (/[àèìòùǜ]/.test(syl)) t = 4;
+    return t ? '<span style="color:var(--tone' + t + ')">' + syl + '</span>' : syl;
+  }).join(' ');
+}
+
+// SRS
+var SRS_KEY = 'yct-srs';
+function _getSRS()          { try { return JSON.parse(_ls.getItem(SRS_KEY) || '{}'); } catch(e) { return {}; } }
+function _saveSRS(obj)      { try { _ls.setItem(SRS_KEY, JSON.stringify(obj)); } catch(e) {} }
+
+function _srsLevel(h) {
+  var e = _getSRS()[h];
+  if (!e)           return 0;
+  if (e.interval <= 1)  return 1;
+  if (e.interval <= 5)  return 2;
+  if (e.interval <= 14) return 3;
+  return 4;
+}
+
+function _srsUpdate(h, correct) {
+  var srs = _getSRS();
+  var e = srs[h] || { interval: 1, due: null, reps: 0 };
+  var today = new Date().toISOString().slice(0, 10);
+  e.last = today;
+  if (correct) {
+    e.reps = (e.reps || 0) + 1;
+    e.interval = Math.min(Math.round((e.interval || 1) * 2.5), 30);
+  } else {
+    e.interval = 1;
+    e.reps = 0;
+  }
+  var d = new Date(); d.setDate(d.getDate() + e.interval);
+  e.due = d.toISOString().slice(0, 10);
+  srs[h] = e; _saveSRS(srs);
+}
+
+function _srsDueWords(levelId) {
+  var srs = _getSRS();
+  var today = new Date().toISOString().slice(0, 10);
+  var words = [];
+  var keys = levelId ? [levelId] : Object.keys(data);
+  keys.forEach(function(k) {
+    data[k].words.forEach(function(w) {
+      var e = srs[w.h];
+      if (e && e.due && e.due <= today) words.push(w);
+    });
+  });
+  return words;
+}
+
+function _srsNewWords(levelId) {
+  var srs = _getSRS();
+  var words = [];
+  var keys = levelId ? [levelId] : Object.keys(data);
+  keys.forEach(function(k) {
+    data[k].words.forEach(function(w) { if (!srs[w.h]) words.push(w); });
+  });
+  return words;
+}
+
+// Streak — accepte un _today optionnel pour faciliter les tests de date
+var STREAK_KEY = 'yct-streak';
+function _getStreak() {
+  try { return JSON.parse(_ls.getItem(STREAK_KEY) || '{"count":0,"last":""}'); }
+  catch(e) { return { count: 0, last: '' }; }
+}
+function _markToday(_today) {
+  var today = _today || new Date().toISOString().slice(0, 10);
+  var s = _getStreak();
+  if (s.last === today) return;
+  var dObj = new Date(today + 'T12:00:00Z');
+  dObj.setDate(dObj.getDate() - 1);
+  var yest = dObj.toISOString().slice(0, 10);
+  s.count = (s.last === yest) ? s.count + 1 : 1;
+  s.last = today;
+  try { _ls.setItem(STREAK_KEY, JSON.stringify(s)); } catch(e) {}
+}
+
+// Express word count
+function _expressWordCount(levelId, filter) {
+  var keys = levelId ? [levelId] : Object.keys(data);
+  var srs = _getSRS();
+  var today = new Date().toISOString().slice(0, 10);
+  var count = 0;
+  keys.forEach(function(k) {
+    data[k].words.forEach(function(w) {
+      var sl = _srsLevel(w.h);
+      var e = srs[w.h];
+      if (filter === 'srs')      { if ((e && e.due && e.due <= today) || !e) count++; }
+      else if (filter === 'new') { if (sl === 0) count++; }
+      else if (filter === 'learning') { if (sl === 1 || sl === 2) count++; }
+      else if (filter === 'advanced') { if (sl === 3) count++; }
+      else if (filter === 'mastered') { if (sl === 4) count++; }
+    });
+  });
+  return count;
+}
+
+function _getWordsByFilter(levelId, filter) {
+  var keys = levelId ? [levelId] : Object.keys(data);
+  var srs = _getSRS();
+  var today = new Date().toISOString().slice(0, 10);
+  var words = [];
+  keys.forEach(function(k) {
+    data[k].words.forEach(function(w) {
+      var sl = _srsLevel(w.h);
+      var e = srs[w.h];
+      if (filter === 'srs')      { if ((e && e.due && e.due <= today) || !e) words.push(w); }
+      else if (filter === 'new') { if (sl === 0) words.push(w); }
+      else if (filter === 'learning') { if (sl === 1 || sl === 2) words.push(w); }
+      else if (filter === 'advanced') { if (sl === 3) words.push(w); }
+      else if (filter === 'mastered') { if (sl === 4) words.push(w); }
+    });
+  });
+  return words;
+}
+
+// XP (version sans localStorage pour simplifier)
+var _XP_THRESHOLDS = [0, 30, 80, 160, 280, 440, 660, 950, 1320, 1780, 2400];
+function _computeXP(srsObj, streakCount) {
+  var srs = srsObj || _getSRS();
+  var keys = Object.keys(srs);
+  var total    = keys.length;
+  var mastered = keys.filter(function(h) { return srs[h].interval >= 15; }).length;
+  var streak   = (streakCount !== undefined) ? streakCount : _getStreak().count;
+  var xp = total * 2 + mastered * 8 + streak;
+  var lvl = 0;
+  for (var i = 0; i < _XP_THRESHOLDS.length; i++) { if (xp >= _XP_THRESHOLDS[i]) lvl = i; }
+  var isMax = lvl >= 10;
+  var cur  = _XP_THRESHOLDS[lvl] || 0;
+  var next = _XP_THRESHOLDS[Math.min(lvl + 1, _XP_THRESHOLDS.length - 1)];
+  var pct  = isMax ? 100 : Math.round((xp - cur) / (next - cur) * 100);
+  return { xp: xp, level: lvl + 1, pct: pct, isMax: isMax };
+}
+
+// ════════════════════════════════════════════════════════════════
+// MINI TEST RUNNER
+// ════════════════════════════════════════════════════════════════
+var _suites  = [];
+var _current = null;
+
+function describe(name, icon, fn) {
+  _current = { name: name, icon: icon, tests: [] };
+  _suites.push(_current);
+  fn();
+  _current = null;
+}
+
+function it(name, fn) {
+  var result = { name: name, ok: true, err: null };
+  try { fn(); }
+  catch (e) { result.ok = false; result.err = e.message || String(e); }
+  if (_current) _current.tests.push(result);
+}
+
+function expect(val) {
+  var self = {
+    toBe: function(exp) {
+      if (val !== exp)
+        throw new Error('Attendu ' + JSON.stringify(exp) + ', obtenu ' + JSON.stringify(val));
+    },
+    toEqual: function(exp) {
+      var a = JSON.stringify(val), b = JSON.stringify(exp);
+      if (a !== b) throw new Error('Attendu ' + b + ', obtenu ' + a);
+    },
+    toBeGreaterThan: function(n) {
+      if (!(val > n)) throw new Error(JSON.stringify(val) + ' ≤ ' + n);
+    },
+    toBeLessThanOrEqual: function(n) {
+      if (!(val <= n)) throw new Error(JSON.stringify(val) + ' > ' + n);
+    },
+    toBeGreaterThanOrEqual: function(n) {
+      if (!(val >= n)) throw new Error(JSON.stringify(val) + ' < ' + n);
+    },
+    toContain: function(s) {
+      var has = typeof val === 'string' ? val.includes(s) : val.indexOf(s) >= 0;
+      if (!has) throw new Error(JSON.stringify(val) + ' ne contient pas ' + JSON.stringify(s));
+    },
+    toBeTrue:  function() { if (val !== true)  throw new Error('Attendu true, obtenu '  + val); },
+    toBeFalse: function() { if (val !== false) throw new Error('Attendu false, obtenu ' + val); },
+    not: {
+      toContain: function(s) {
+        var has = typeof val === 'string' ? val.includes(s) : val.indexOf(s) >= 0;
+        if (has) throw new Error(JSON.stringify(val) + ' contient ' + JSON.stringify(s) + ' (non voulu)');
+      },
+      toBe: function(exp) {
+        if (val === exp) throw new Error('Valeur inattendue: ' + JSON.stringify(val));
+      }
+    }
+  };
+  return self;
+}
+
+// ════════════════════════════════════════════════════════════════
+// SUITES DE TESTS
+// ════════════════════════════════════════════════════════════════
+
+// ── 1. Intégrité des données ──────────────────────────────────
+describe('Données — Structure', '📦', function() {
+
+  it('Les 5 niveaux YCT existent dans data', function() {
+    ['yct1','yct2','yct3','yct4','yct5'].forEach(function(k) {
+      if (!data[k]) throw new Error('Niveau manquant : ' + k);
+    });
+  });
+
+  it('Chaque niveau possède un label, icon, lc, desc', function() {
+    Object.keys(data).forEach(function(k) {
+      var d = data[k];
+      ['label','icon','lc','desc'].forEach(function(f) {
+        if (!d[f]) throw new Error(k + '.' + f + ' est vide');
+      });
+    });
+  });
+
+  it('Chaque mot possède les champs h, p, fr, c après normalisation', function() {
+    Object.keys(data).forEach(function(k) {
+      data[k].words.forEach(function(w, i) {
+        ['h','p','fr','c'].forEach(function(f) {
+          if (w[f] === undefined)
+            throw new Error(k + '[' + i + '].' + f + ' manquant (hanzi=' + w.h + ')');
+        });
+      });
+    });
+  });
+
+  it('Chaque niveau a au moins 10 mots', function() {
+    Object.keys(data).forEach(function(k) {
+      var n = data[k].words.length;
+      if (n < 10) throw new Error(k + ' n\'a que ' + n + ' mots');
+    });
+  });
+
+  it('Pas de doublon de hanzi au sein d\'un même niveau', function() {
+    Object.keys(data).forEach(function(k) {
+      var seen = {};
+      data[k].words.forEach(function(w) {
+        if (seen[w.h]) throw new Error('Doublon dans ' + k + ' : ' + w.h);
+        seen[w.h] = true;
+      });
+    });
+  });
+
+  it('Les hanzi ne sont pas vides et font au moins 1 caractère', function() {
+    Object.keys(data).forEach(function(k) {
+      data[k].words.forEach(function(w) {
+        if (!w.h || w.h.length === 0)
+          throw new Error(k + ' : hanzi vide');
+      });
+    });
+  });
+
+  it('Les traductions françaises ne sont pas vides', function() {
+    Object.keys(data).forEach(function(k) {
+      data[k].words.forEach(function(w) {
+        if (!w.fr || w.fr.trim().length === 0)
+          throw new Error(k + '/' + w.h + ' : traduction vide');
+      });
+    });
+  });
+});
+
+// ── 2. Intégrité des EXAMPLES ─────────────────────────────────
+describe('Données — EXAMPLES', '📖', function() {
+
+  it('EXAMPLES est défini et non vide', function() {
+    if (typeof EXAMPLES !== 'object' || EXAMPLES === null)
+      throw new Error('EXAMPLES n\'est pas un objet');
+    if (Object.keys(EXAMPLES).length === 0)
+      throw new Error('EXAMPLES est vide');
+  });
+
+  it('Chaque entrée EXAMPLES possède zh, py, fr', function() {
+    Object.keys(EXAMPLES).forEach(function(h) {
+      var e = EXAMPLES[h];
+      ['zh','py','fr'].forEach(function(f) {
+        if (!e[f] || e[f].trim().length === 0)
+          throw new Error('EXAMPLES[' + h + '].' + f + ' est vide');
+      });
+    });
+  });
+
+  it('Les clés EXAMPLES correspondent à des hanzi existants dans data', function() {
+    var allHanzi = {};
+    Object.keys(data).forEach(function(k) {
+      data[k].words.forEach(function(w) { allHanzi[w.h] = true; });
+    });
+    var orphans = Object.keys(EXAMPLES).filter(function(h) { return !allHanzi[h]; });
+    if (orphans.length)
+      throw new Error('Clés EXAMPLES sans hanzi dans data : ' + orphans.join(', '));
+  });
+
+  it('Au moins 70 % des mots YCT1 ont un exemple', function() {
+    var words = data['yct1'].words;
+    var covered = words.filter(function(w) { return !!EXAMPLES[w.h]; }).length;
+    var pct = covered / words.length * 100;
+    if (pct < 70) throw new Error('Couverture YCT1 : ' + pct.toFixed(1) + '% < 70%');
+  });
+
+  it('Au moins 70 % des mots YCT2 ont un exemple', function() {
+    var words = data['yct2'].words;
+    var covered = words.filter(function(w) { return !!EXAMPLES[w.h]; }).length;
+    var pct = covered / words.length * 100;
+    if (pct < 70) throw new Error('Couverture YCT2 : ' + pct.toFixed(1) + '% < 70%');
+  });
+
+  it('Au moins 60 % des mots YCT3-5 ont un exemple', function() {
+    ['yct3','yct4','yct5'].forEach(function(k) {
+      var words = data[k].words;
+      var covered = words.filter(function(w) { return !!EXAMPLES[w.h]; }).length;
+      var pct = covered / words.length * 100;
+      if (pct < 60) throw new Error('Couverture ' + k + ' : ' + pct.toFixed(1) + '% < 60%');
+    });
+  });
+});
+
+// ── 3. Pinyin ─────────────────────────────────────────────────
+describe('_pinyinHtml — Colorisation des tons', '🎨', function() {
+
+  it('Ton 1 (ā) → span --tone1', function() {
+    var r = _pinyinHtml('māo');
+    expect(r).toContain('--tone1');
+    expect(r).toContain('māo');
+  });
+
+  it('Ton 2 (á) → span --tone2', function() {
+    var r = _pinyinHtml('máo');
+    expect(r).toContain('--tone2');
+  });
+
+  it('Ton 3 (ǎ) → span --tone3', function() {
+    var r = _pinyinHtml('měi');
+    expect(r).toContain('--tone3');
+  });
+
+  it('Ton 4 (à) → span --tone4', function() {
+    var r = _pinyinHtml('hàn');
+    expect(r).toContain('--tone4');
+  });
+
+  it('Ton neutre → pas de span', function() {
+    var r = _pinyinHtml('ma');
+    expect(r).toBe('ma');
+    expect(r).not.toContain('<span');
+  });
+
+  it('Plusieurs syllabes → plusieurs spans', function() {
+    var r = _pinyinHtml('nǐ hǎo');
+    var count = (r.match(/<span/g) || []).length;
+    expect(count).toBe(2);
+  });
+
+  it('Chaîne vide → chaîne vide', function() {
+    expect(_pinyinHtml('')).toBe('');
+  });
+
+  it('null/undefined → chaîne vide', function() {
+    expect(_pinyinHtml(null)).toBe('');
+    expect(_pinyinHtml(undefined)).toBe('');
+  });
+
+  it('ǖ (ton 1, ü) → --tone1', function() {
+    expect(_pinyinHtml('lǖ')).toContain('--tone1');
+  });
+
+  it('ǘ (ton 2, ü) → --tone2', function() {
+    expect(_pinyinHtml('lǘ')).toContain('--tone2');
+  });
+});
+
+// ── 4. Shuffle ────────────────────────────────────────────────
+describe('shuffle — Mélange de tableau', '🔀', function() {
+
+  it('Conserve le même nombre d\'éléments', function() {
+    var a = [1, 2, 3, 4, 5];
+    expect(shuffle(a).length).toBe(5);
+  });
+
+  it('Contient les mêmes éléments', function() {
+    var a = [10, 20, 30, 40, 50];
+    var s = shuffle(a);
+    a.forEach(function(v) {
+      if (s.indexOf(v) < 0) throw new Error(v + ' manquant après shuffle');
+    });
+  });
+
+  it('Ne mute pas le tableau original', function() {
+    var a = [1, 2, 3];
+    var orig = a.slice();
+    shuffle(a);
+    expect(a).toEqual(orig);
+  });
+
+  it('Tableau vide → tableau vide', function() {
+    expect(shuffle([]).length).toBe(0);
+  });
+
+  it('Tableau d\'un élément → tableau d\'un élément', function() {
+    expect(shuffle([42])).toEqual([42]);
+  });
+
+  it('Sur 50 itérations, produit au moins 2 ordres différents (distribution)', function() {
+    var a = [1, 2, 3, 4];
+    var ref = JSON.stringify(a);
+    var diff = 0;
+    for (var i = 0; i < 50; i++) {
+      if (JSON.stringify(shuffle(a)) !== ref) diff++;
+    }
+    if (diff < 1) throw new Error('shuffle semble ne rien mélanger (0 variation sur 50 tirages)');
+  });
+});
+
+// ── 5. SRS — Niveaux de maîtrise ──────────────────────────────
+describe('_srsLevel — Niveaux SRS', '🌱', function() {
+
+  it('Mot inconnu → niveau 0 (jamais pratiqué)', function() {
+    _resetStore();
+    expect(_srsLevel('你好')).toBe(0);
+  });
+
+  it('interval=1 → niveau 1 (débutant)', function() {
+    _resetStore();
+    var srs = { '你': { interval: 1, due: '2099-01-01', reps: 1 } };
+    _saveSRS(srs);
+    expect(_srsLevel('你')).toBe(1);
+  });
+
+  it('interval=3 → niveau 2 (en apprentissage)', function() {
+    _resetStore();
+    _saveSRS({ '好': { interval: 3, due: '2099-01-01', reps: 2 } });
+    expect(_srsLevel('好')).toBe(2);
+  });
+
+  it('interval=5 → niveau 2 (borne supérieure)', function() {
+    _resetStore();
+    _saveSRS({ '好': { interval: 5, due: '2099-01-01', reps: 3 } });
+    expect(_srsLevel('好')).toBe(2);
+  });
+
+  it('interval=6 → niveau 3 (avancé)', function() {
+    _resetStore();
+    _saveSRS({ '我': { interval: 6, due: '2099-01-01', reps: 4 } });
+    expect(_srsLevel('我')).toBe(3);
+  });
+
+  it('interval=14 → niveau 3 (borne supérieure)', function() {
+    _resetStore();
+    _saveSRS({ '我': { interval: 14, due: '2099-01-01', reps: 5 } });
+    expect(_srsLevel('我')).toBe(3);
+  });
+
+  it('interval=15 → niveau 4 (maîtrisé)', function() {
+    _resetStore();
+    _saveSRS({ '中': { interval: 15, due: '2099-01-01', reps: 6 } });
+    expect(_srsLevel('中')).toBe(4);
+  });
+
+  it('interval=30 → niveau 4 (maîtrisé)', function() {
+    _resetStore();
+    _saveSRS({ '中': { interval: 30, due: '2099-01-01', reps: 10 } });
+    expect(_srsLevel('中')).toBe(4);
+  });
+});
+
+// ── 6. SRS — Mise à jour ──────────────────────────────────────
+describe('_srsUpdate — Logique d\'espacement', '📈', function() {
+
+  it('Bonne réponse sur nouveau mot : interval ≥ 2', function() {
+    _resetStore();
+    _srsUpdate('猫', true);
+    var e = _getSRS()['猫'];
+    expect(e.interval).toBeGreaterThanOrEqual(2);
+  });
+
+  it('Bonne réponse : interval augmente', function() {
+    _resetStore();
+    _saveSRS({ '狗': { interval: 4, due: null, reps: 2 } });
+    _srsUpdate('狗', true);
+    var e = _getSRS()['狗'];
+    expect(e.interval).toBeGreaterThan(4);
+  });
+
+  it('Mauvaise réponse : interval revient à 1', function() {
+    _resetStore();
+    _saveSRS({ '鸟': { interval: 10, due: null, reps: 5 } });
+    _srsUpdate('鸟', false);
+    var e = _getSRS()['鸟'];
+    expect(e.interval).toBe(1);
+  });
+
+  it('Mauvaise réponse : reps repart à 0', function() {
+    _resetStore();
+    _saveSRS({ '鱼': { interval: 8, due: null, reps: 4 } });
+    _srsUpdate('鱼', false);
+    expect(_getSRS()['鱼'].reps).toBe(0);
+  });
+
+  it('Bonne réponse : reps s\'incrémente', function() {
+    _resetStore();
+    _saveSRS({ '马': { interval: 2, due: null, reps: 3 } });
+    _srsUpdate('马', true);
+    expect(_getSRS()['马'].reps).toBe(4);
+  });
+
+  it('interval plafonné à 30 (bonne réponse répétée)', function() {
+    _resetStore();
+    _saveSRS({ '水': { interval: 20, due: null, reps: 8 } });
+    _srsUpdate('水', true);
+    expect(_getSRS()['水'].interval).toBeLessThanOrEqual(30);
+  });
+
+  it('due est une date future après bonne réponse', function() {
+    _resetStore();
+    _srsUpdate('火', true);
+    var e = _getSRS()['火'];
+    var today = new Date().toISOString().slice(0, 10);
+    if (e.due <= today) throw new Error('due=' + e.due + ' n\'est pas dans le futur');
+  });
+
+  it('last est la date d\'aujourd\'hui', function() {
+    _resetStore();
+    _srsUpdate('土', true);
+    var today = new Date().toISOString().slice(0, 10);
+    expect(_getSRS()['土'].last).toBe(today);
+  });
+});
+
+// ── 7. Streak ─────────────────────────────────────────────────
+describe('_markToday / _getStreak — Série quotidienne', '🔥', function() {
+
+  it('Utilisateur neuf → streak 0', function() {
+    _resetStore();
+    expect(_getStreak().count).toBe(0);
+  });
+
+  it('Première connexion → streak 1', function() {
+    _resetStore();
+    _markToday('2026-05-20');
+    expect(_getStreak().count).toBe(1);
+  });
+
+  it('Même jour → idempotent (streak reste 1)', function() {
+    _resetStore();
+    _markToday('2026-05-20');
+    _markToday('2026-05-20');
+    expect(_getStreak().count).toBe(1);
+  });
+
+  it('Jours consécutifs → streak s\'incrémente', function() {
+    _resetStore();
+    _markToday('2026-05-20');
+    _markToday('2026-05-21');
+    expect(_getStreak().count).toBe(2);
+  });
+
+  it('Trois jours consécutifs → streak 3', function() {
+    _resetStore();
+    _markToday('2026-05-20');
+    _markToday('2026-05-21');
+    _markToday('2026-05-22');
+    expect(_getStreak().count).toBe(3);
+  });
+
+  it('Trou d\'un jour → streak repart à 1', function() {
+    _resetStore();
+    _markToday('2026-05-20');
+    _markToday('2026-05-22'); // J+2, pas J+1
+    expect(_getStreak().count).toBe(1);
+  });
+
+  it('last est la dernière date utilisée', function() {
+    _resetStore();
+    _markToday('2026-05-25');
+    expect(_getStreak().last).toBe('2026-05-25');
+  });
+});
+
+// ── 8. Express — Filtrage par type de mot ─────────────────────
+describe('_expressWordCount / _getWordsByFilter — Filtres SRS', '⚡', function() {
+
+  it('Filtre "new" : tous les mots sans entrée SRS', function() {
+    _resetStore();
+    // Enregistrer quelques mots seulement dans SRS
+    var srs = {};
+    data['yct1'].words.slice(0, 3).forEach(function(w) {
+      srs[w.h] = { interval: 2, due: '2099-01-01', reps: 1 };
+    });
+    _saveSRS(srs);
+    var total = data['yct1'].words.length;
+    var n = _expressWordCount('yct1', 'new');
+    expect(n).toBe(total - 3);
+  });
+
+  it('Filtre "new" : compte = longueur du tableau retourné', function() {
+    _resetStore();
+    var n     = _expressWordCount('yct1', 'new');
+    var words = _getWordsByFilter('yct1', 'new');
+    expect(words.length).toBe(n);
+  });
+
+  it('Filtre "mastered" sur SRS vide → 0', function() {
+    _resetStore();
+    expect(_expressWordCount('yct1', 'mastered')).toBe(0);
+  });
+
+  it('Filtre "mastered" après mise à jour → compte correct', function() {
+    _resetStore();
+    var srs = {};
+    data['yct1'].words.slice(0, 5).forEach(function(w) {
+      srs[w.h] = { interval: 20, due: '2099-01-01', reps: 8 };
+    });
+    _saveSRS(srs);
+    expect(_expressWordCount('yct1', 'mastered')).toBe(5);
+  });
+
+  it('Filtre "learning" : seulement interval 1–5', function() {
+    _resetStore();
+    var srs = {};
+    srs[data['yct1'].words[0].h] = { interval: 2, due: '2099-01-01', reps: 1 }; // learning
+    srs[data['yct1'].words[1].h] = { interval: 8, due: '2099-01-01', reps: 4 }; // advanced
+    srs[data['yct1'].words[2].h] = { interval: 20, due: '2099-01-01', reps: 8 }; // mastered
+    _saveSRS(srs);
+    expect(_expressWordCount('yct1', 'learning')).toBe(1);
+  });
+
+  it('levelId null → tous les niveaux inclus', function() {
+    _resetStore();
+    var all   = _expressWordCount(null, 'new');
+    var total = 0;
+    Object.keys(data).forEach(function(k) { total += data[k].words.length; });
+    expect(all).toBe(total);
+  });
+
+  it('Les mots retournés ont les champs h, p, fr, c', function() {
+    _resetStore();
+    var words = _getWordsByFilter('yct1', 'new');
+    if (!words.length) throw new Error('Aucun mot retourné');
+    var w = words[0];
+    ['h','p','fr','c'].forEach(function(f) {
+      if (w[f] === undefined) throw new Error('Champ manquant : ' + f);
+    });
+  });
+});
+
+// ── 9. SRS — Mots dus et nouveaux ────────────────────────────
+describe('_srsDueWords / _srsNewWords — Sélection SRS', '📅', function() {
+
+  it('SRS vide → aucun mot dû', function() {
+    _resetStore();
+    expect(_srsDueWords().length).toBe(0);
+  });
+
+  it('SRS vide → tous les mots sont nouveaux', function() {
+    _resetStore();
+    var total = 0;
+    Object.keys(data).forEach(function(k) { total += data[k].words.length; });
+    expect(_srsNewWords().length).toBe(total);
+  });
+
+  it('Mot avec due = today → compte comme dû', function() {
+    _resetStore();
+    var today = new Date().toISOString().slice(0, 10);
+    var h = data['yct1'].words[0].h;
+    _saveSRS({ [h]: { interval: 3, due: today, reps: 2 } });
+    expect(_srsDueWords('yct1').length).toBe(1);
+  });
+
+  it('Mot avec due = futur → ne compte pas comme dû', function() {
+    _resetStore();
+    var h = data['yct1'].words[0].h;
+    _saveSRS({ [h]: { interval: 3, due: '2099-01-01', reps: 2 } });
+    expect(_srsDueWords('yct1').length).toBe(0);
+  });
+
+  it('Après enregistrement, le mot n\'est plus nouveau', function() {
+    _resetStore();
+    var h = data['yct1'].words[0].h;
+    _srsUpdate(h, true);
+    var newWords = _srsNewWords('yct1');
+    var found = newWords.some(function(w) { return w.h === h; });
+    if (found) throw new Error(h + ' devrait être sorti des mots nouveaux');
+  });
+
+  it('levelId restreint la recherche au bon niveau', function() {
+    _resetStore();
+    var yct1Words = _srsNewWords('yct1');
+    var yct2Words = _srsNewWords('yct2');
+    var overlap = yct1Words.filter(function(w) {
+      return yct2Words.some(function(w2) { return w2.h === w.h; });
+    });
+    if (overlap.length > 0)
+      throw new Error('Des mots sont communs à yct1 et yct2 (' + overlap[0].h + ')');
+  });
+});
+
+// ── 10. XP ───────────────────────────────────────────────────
+describe('_computeXP — Calcul d\'expérience', '🎓', function() {
+
+  it('SRS vide + streak 0 → XP 0, niveau 1', function() {
+    var r = _computeXP({}, 0);
+    expect(r.xp).toBe(0);
+    expect(r.level).toBe(1);
+  });
+
+  it('10 mots pratiqués (interval ≤ 14) → XP = 20', function() {
+    var srs = {};
+    for (var i = 0; i < 10; i++) srs['h' + i] = { interval: 5 };
+    var r = _computeXP(srs, 0);
+    expect(r.xp).toBe(20);
+  });
+
+  it('Mot maîtrisé (interval ≥ 15) → +8 XP en plus des +2 de base', function() {
+    var srs = { 'a': { interval: 15 } }; // 2 + 8 = 10
+    var r = _computeXP(srs, 0);
+    expect(r.xp).toBe(10);
+  });
+
+  it('La série (streak) contribue à l\'XP (1 XP par jour)', function() {
+    var r5  = _computeXP({}, 5);
+    var r10 = _computeXP({}, 10);
+    expect(r10.xp - r5.xp).toBe(5);
+  });
+
+  it('XP croît avec le nombre de mots et la maîtrise', function() {
+    var srs1 = { 'a': { interval: 2 } };
+    var srs2 = { 'a': { interval: 2 }, 'b': { interval: 20 } };
+    var r1 = _computeXP(srs1, 0);
+    var r2 = _computeXP(srs2, 0);
+    expect(r2.xp).toBeGreaterThan(r1.xp);
+  });
+
+  it('pct est entre 0 et 100', function() {
+    for (var xpVal = 0; xpVal <= 2400; xpVal += 100) {
+      var srs = {};
+      for (var i = 0; i < xpVal / 2; i++) srs['k' + i] = { interval: 2 };
+      var r = _computeXP(srs, 0);
+      if (r.pct < 0 || r.pct > 100)
+        throw new Error('pct=' + r.pct + ' hors [0,100] pour xp≈' + xpVal);
+    }
+  });
+
+  it('Niveau max (≥ 2400 XP) → isMax=true, pct=100', function() {
+    var srs = {};
+    for (var i = 0; i < 200; i++) srs['k' + i] = { interval: 20 };
+    var r = _computeXP(srs, 0);
+    if (!r.isMax) throw new Error('Attendu isMax=true pour ' + r.xp + ' XP');
+    expect(r.pct).toBe(100);
+  });
+});
+
+// ════════════════════════════════════════════════════════════════
+// RENDU DES RÉSULTATS
+// ════════════════════════════════════════════════════════════════
+(function renderResults() {
+  var totalPass = 0, totalFail = 0;
+  _suites.forEach(function(s) {
+    s.tests.forEach(function(t) { t.ok ? totalPass++ : totalFail++; });
+  });
+  var total = totalPass + totalFail;
+
+  // Summary
+  var sumEl = document.getElementById('summary');
+  sumEl.innerHTML =
+    '<span class="sum-pass">✓ ' + totalPass + ' passés</span>' +
+    '<span class="sum-fail">' + (totalFail > 0 ? '✗ ' + totalFail + ' échoués' : '0 échoué') + '</span>' +
+    '<span class="sum-total">sur ' + total + ' tests</span>';
+
+  // Progress bar
+  var fill = document.getElementById('prog-fill');
+  fill.style.width = (totalPass / total * 100).toFixed(1) + '%';
+  fill.style.background = totalFail === 0 ? '#3fb950' : '#f85149';
+
+  // Run info
+  document.getElementById('run-info').textContent =
+    'Exécuté le ' + new Date().toLocaleString('fr-FR');
+
+  // All pass banner
+  if (totalFail === 0) {
+    document.getElementById('all-pass-banner').style.display = 'block';
+  }
+
+  // Suites
+  var out = document.getElementById('output');
+  _suites.forEach(function(s) {
+    var sPass = s.tests.filter(function(t) { return t.ok; }).length;
+    var sFail = s.tests.length - sPass;
+
+    var suiteEl = document.createElement('div');
+    suiteEl.className = 'suite';
+
+    var header = document.createElement('div');
+    header.className = 'suite-header';
+    header.innerHTML =
+      '<span class="s-icon">' + s.icon + '</span>' +
+      s.name +
+      '<span class="s-count">' + sPass + '/' + s.tests.length + '</span>';
+    suiteEl.appendChild(header);
+
+    s.tests.forEach(function(t) {
+      var row = document.createElement('div');
+      row.className = 'test-row ' + (t.ok ? 'pass' : 'fail');
+      row.innerHTML =
+        '<div class="dot"></div>' +
+        '<div>' +
+          '<div class="test-name">' + t.name + '</div>' +
+          (t.ok ? '' : '<div class="test-err">' + t.err + '</div>') +
+        '</div>';
+      suiteEl.appendChild(row);
+    });
+
+    out.appendChild(suiteEl);
+  });
+})();
+</script>
+</body>
+</html>
