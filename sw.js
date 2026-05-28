@@ -1,4 +1,4 @@
-const CACHE = 'yct-vocab-v21';
+const CACHE = 'yct-vocab-v22';
 const ASSETS = [
   './yct_app_Android.html',
   './yct_app_Iphone.html',
@@ -10,7 +10,9 @@ const ASSETS = [
 
 self.addEventListener('install', e => {
   e.waitUntil(
-    caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting())
+    caches.open(CACHE)
+      .then(c => c.addAll(ASSETS))
+      .then(() => self.skipWaiting())
   );
 });
 
@@ -23,7 +25,6 @@ self.addEventListener('activate', e => {
 });
 
 self.addEventListener('fetch', e => {
-  // TTS Google : toujours réseau (nécessite internet de toute façon)
   if (e.request.url.includes('translate.google')) return;
   e.respondWith(
     caches.match(e.request).then(cached => cached || fetch(e.request).then(res => {

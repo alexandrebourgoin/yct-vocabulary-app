@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>YCT Vocab — Tests</title>
+<script src="data.js"></script>
 <script src="config.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; }
@@ -420,27 +421,34 @@ describe('Données — EXAMPLES', '📖', function() {
       throw new Error('Clés EXAMPLES sans hanzi dans data : ' + orphans.join(', '));
   });
 
-  it('Au moins 70 % des mots YCT1 ont un exemple', function() {
+  it('100 % des mots YCT1 ont un exemple', function() {
     var words = data['yct1'].words;
-    var covered = words.filter(function(w) { return !!EXAMPLES[w.h]; }).length;
-    var pct = covered / words.length * 100;
-    if (pct < 70) throw new Error('Couverture YCT1 : ' + pct.toFixed(1) + '% < 70%');
+    var missing = words.filter(function(w) { return !EXAMPLES[w.h]; }).map(function(w){ return w.h; });
+    if (missing.length) throw new Error('YCT1 manquants : ' + missing.join(', '));
   });
 
-  it('Au moins 70 % des mots YCT2 ont un exemple', function() {
+  it('100 % des mots YCT2 ont un exemple', function() {
     var words = data['yct2'].words;
-    var covered = words.filter(function(w) { return !!EXAMPLES[w.h]; }).length;
-    var pct = covered / words.length * 100;
-    if (pct < 70) throw new Error('Couverture YCT2 : ' + pct.toFixed(1) + '% < 70%');
+    var missing = words.filter(function(w) { return !EXAMPLES[w.h]; }).map(function(w){ return w.h; });
+    if (missing.length) throw new Error('YCT2 manquants : ' + missing.join(', '));
   });
 
-  it('Au moins 60 % des mots YCT3-5 ont un exemple', function() {
-    ['yct3','yct4','yct5'].forEach(function(k) {
-      var words = data[k].words;
-      var covered = words.filter(function(w) { return !!EXAMPLES[w.h]; }).length;
-      var pct = covered / words.length * 100;
-      if (pct < 60) throw new Error('Couverture ' + k + ' : ' + pct.toFixed(1) + '% < 60%');
-    });
+  it('100 % des mots YCT3 ont un exemple', function() {
+    var words = data['yct3'].words;
+    var missing = words.filter(function(w) { return !EXAMPLES[w.h]; }).map(function(w){ return w.h; });
+    if (missing.length) throw new Error('YCT3 manquants : ' + missing.join(', '));
+  });
+
+  it('100 % des mots YCT4 ont un exemple', function() {
+    var words = data['yct4'].words;
+    var missing = words.filter(function(w) { return !EXAMPLES[w.h]; }).map(function(w){ return w.h; });
+    if (missing.length) throw new Error('YCT4 manquants : ' + missing.join(', '));
+  });
+
+  it('100 % des mots YCT5 ont un exemple', function() {
+    var words = data['yct5'].words;
+    var missing = words.filter(function(w) { return !EXAMPLES[w.h]; }).map(function(w){ return w.h; });
+    if (missing.length) throw new Error('YCT5 manquants : ' + missing.join(', '));
   });
 });
 
@@ -871,7 +879,7 @@ describe('_computeXP — Calcul d\'expérience', '🎓', function() {
 
   it('Niveau max (≥ 2400 XP) → isMax=true, pct=100', function() {
     var srs = {};
-    for (var i = 0; i < 200; i++) srs['k' + i] = { interval: 20 };
+    for (var i = 0; i < 300; i++) srs['k' + i] = { interval: 20 };
     var r = _computeXP(srs, 0);
     if (!r.isMax) throw new Error('Attendu isMax=true pour ' + r.xp + ' XP');
     expect(r.pct).toBe(100);
