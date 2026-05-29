@@ -2,6 +2,7 @@ const CACHE = 'yct-vocab-v22';
 const ASSETS = [
   './yct_app_Android.html',
   './yct_app_Iphone.html',
+  './data.js',
   './config.js',
   './icon.svg',
   './manifest.json',
