@@ -24,6 +24,7 @@ while ($listener.IsListening) {
         }
         $bytes = [System.IO.File]::ReadAllBytes($file)
         $res.ContentType = $mime
+        $res.Headers.Add("Cache-Control", "no-cache, no-store, must-revalidate")
         $res.ContentLength64 = [long]$bytes.LongLength
         $res.OutputStream.Write($bytes, 0, $bytes.Length)
     } else {

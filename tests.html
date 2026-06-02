@@ -4,8 +4,12 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>YCT Vocab — Tests</title>
-<script src="data.js"></script>
-<script src="config.js"></script>
+<script>
+// Cache-bust: force le rechargement des scripts à chaque ouverture
+var _v = Date.now();
+document.write('<script src="data.js?v=' + _v + '"><\/script>');
+document.write('<script src="config.js?v=' + _v + '"><\/script>');
+</script>
 <style>
   *, *::before, *::after { box-sizing: border-box; }
   body {
@@ -370,6 +374,21 @@ describe('Données — Structure', '📦', function() {
         seen[w.h] = true;
       });
     });
+  });
+
+  it('Pas de doublon de hanzi entre niveaux différents', function() {
+    var seen = {}; // hanzi → premier niveau rencontré
+    var dups = [];
+    Object.keys(data).forEach(function(k) {
+      data[k].words.forEach(function(w) {
+        if (seen[w.h] && seen[w.h] !== k) {
+          dups.push(w.h + ' (' + seen[w.h] + ' & ' + k + ')');
+        } else {
+          seen[w.h] = k;
+        }
+      });
+    });
+    if (dups.length) throw new Error('Doublons inter-niveaux : ' + dups.join(', '));
   });
 
   it('Les hanzi ne sont pas vides et font au moins 1 caractère', function() {
