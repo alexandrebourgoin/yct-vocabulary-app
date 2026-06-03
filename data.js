@@ -333,3 +333,69 @@ yct5:{label:"YCT 5",lc:"l5",icon:"🔴",desc:"Avancé",words:[
 Object.keys(data).forEach(function(k){
   data[k].words=data[k].words.map(function(a){return{h:a[0],p:a[1],fr:a[2],c:a[3]};});
 });
+
+// ════════════════════════════════════════════════
+// SENTENCE DATA
+// ════════════════════════════════════════════════
+var sentences={
+yct1:[
+["我___苹果。","吃","Je mange une pomme."],
+["___是我的老师。","他","Il est mon professeur."],
+["这是我的___。","书","C'est mon livre."],
+["今天我___学校。","去","Aujourd'hui je vais à l'école."],
+["我___一只猫。","有","J'ai un chat."],
+["你叫___名字？","什么","Tu t'appelles comment ?"],
+["他是我的好___。","朋友","Il est mon bon ami."],
+["我___水。","喝","Je bois de l'eau."],
+["我的___很漂亮。","妈妈","Ma maman est très belle."],
+["这只___很大。","狗","Ce chien est grand."]
+],
+yct2:[
+["我很___中国音乐。","喜欢","J'aime beaucoup la musique chinoise."],
+["他___看电影。","想","Il veut regarder un film."],
+["今天___很好，很暖和。","天气","Aujourd'hui le temps est beau, il fait chaud."],
+["她每天在___工作。","医院","Elle travaille à l'hôpital tous les jours."],
+["我们一起___歌吧！","唱","Chantons ensemble !"],
+["我每天早上喝___。","牛奶","Je bois du lait chaque matin."],
+["这件衣服很___，我买不起。","贵","Ce vêtement est très cher, je ne peux pas me le permettre."],
+["他骑___去学校。","自行车","Il va à l'école en vélo."],
+["我的朋友___喜欢足球。","也","Mon ami aime aussi le football."],
+["我们___去学校。","一起","Nous allons ensemble à l'école."]
+],
+yct3:[
+["他___了，需要吃药。","生病","Il est tombé malade, il doit prendre ses médicaments."],
+["我们___一起去旅行。","决定","Nous avons décidé de voyager ensemble."],
+["___他很累，他还是完成了工作。","虽然","Bien qu'il soit fatigué, il a quand même terminé le travail."],
+["旅行前要先办好___。","护照","Avant de voyager, il faut obtenir son passeport."],
+["飞机___的时间是早上八点。","出发","L'heure de départ de l'avion est huit heures du matin."],
+["这个___非常美丽，很多人来旅游。","城市","Cette ville est très belle, beaucoup de gens viennent y voyager."],
+["___你努力学习，就会进步。","如果","Si tu étudies sérieusement, tu progresseras."],
+["我想更多___中国文化。","了解","Je veux en savoir plus sur la culture chinoise."],
+["为了___，我们应该多运动。","健康","Pour être en bonne santé, nous devrions faire plus d'exercice."],
+["今年___天气很热，我们去游泳吧。","夏天","Cet été le temps est très chaud, allons nager."]
+],
+yct4:[
+["他在台上做了精彩的___。","演讲","Il a fait un discours brillant sur scène."],
+["保护___是我们共同的责任。","环境","Protéger l'environnement est notre responsabilité commune."],
+["___是人类追求的重要目标。","和平","La paix est un objectif important que l'humanité poursuit."],
+["他用___的态度面对生活中的困难。","乐观","Il fait face aux difficultés de la vie avec une attitude optimiste."],
+["___是社会进步的重要基础。","平等","L'égalité est une base importante du progrès social."],
+["他花了很多时间___这个问题。","研究","Il a passé beaucoup de temps à étudier ce problème."],
+["___正在改变我们的生活方式。","人工智能","L'intelligence artificielle est en train de changer nos modes de vie."],
+["只有___，才能实现目标。","坚持","Ce n'est qu'en persévérant qu'on peut atteindre ses objectifs."],
+["每个人都有___表达自己想法的权利。","自由","Chacun a le droit de s'exprimer librement."],
+["做好这份工作需要___和细心。","耐心","Bien faire ce travail nécessite de la patience et de la minutie."]
+],
+yct5:[
+["哲学家们试图探寻事物的___。","本质","Les philosophes cherchent à sonder l'essence des choses."],
+["___是将感情投射到他人处境的能力。","共情","L'empathie est la capacité de se mettre à la place d'autrui."],
+["维护___对于民主社会至关重要。","透明度","Maintenir la transparence est essentiel dans une société démocratiques."],
+["保护___是应对气候变化的核心目标。","生物多样性","Protéger la biodiversité est l'objectif central pour faire face aux changements climatiques."],
+["___将彻底革新信息安全领域。","量子计算","L'informatique quantique va révolutionner le domaine de la sécurité informatique."],
+["他总是能控制自己的___，保持冷静。","情绪","Il arrive toujours à contrôler ses émotions et à rester calme."],
+["___技术让人们足不出户体验世界。","虚拟现实","La technologie de réalité virtuelle permet aux gens de découvrir le monde sans quitter leur domicile."],
+["___是通过间接比较表达深层含义的修辞手法。","隐喻","La métaphore est une figure de style qui exprime un sens profond par comparaison indirecte."],
+["应对___需要全球合作与可持续发展。","沙漠化","Faire face à la désertification nécessite une coopération mondiale et un développement durable."],
+["经济___加剧了社会矛盾与不稳定。","不平等","Les inégalités économiques aggravent les contradictions sociales et l'instabilité."]
+]
+};

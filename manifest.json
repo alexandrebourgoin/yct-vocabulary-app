@@ -2,7 +2,7 @@
   "name": "YCT Vocab — Chinois",
   "short_name": "YCT Vocab",
   "description": "Apprentissage du vocabulaire chinois — 5 niveaux YCT",
-  "start_url": "./yct_app_Android.html",
+  "start_url": "./yct_app.html",
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#F7F6F2",

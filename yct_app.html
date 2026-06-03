@@ -124,8 +124,7 @@ body{font-family:'Georgia',serif;-webkit-tap-highlight-color:transparent;color:v
 }
 .bg-btn.active,.surf-btn.active{border-color:var(--c-text);color:var(--c-text);}
 .bg-btn:active,.surf-btn:active{opacity:.7;}
-.bg-swatch{width:18px;height:18px;border-radius:50%;border:1.5px solid #ccc;display:block;flex-shrink:0;}
-.surf-swatch{width:18px;height:18px;border-radius:4px;border:1.5px solid #ccc;display:block;flex-shrink:0;}
+.bg-swatch,.surf-swatch{width:18px;height:18px;border-radius:4px;border:1.5px solid #ccc;display:block;flex-shrink:0;}
 
 /* Goal bar */
 .goal-wrap{padding:.1rem 1rem .45rem;display:flex;align-items:center;gap:8px;}
@@ -292,7 +291,7 @@ body{font-family:'Georgia',serif;-webkit-tap-highlight-color:transparent;color:v
 .vocab-body{padding:.8rem .75rem 0;}
 .search-wrap{position:relative;margin-bottom:.5rem;}
 .search-bar{
-  width:100%;padding:10px 36px 10px 12px;font-size:16px; /* 16px min évite le zoom iOS au focus */
+  width:100%;padding:10px 36px 10px 12px;font-size:15px;
   border:1.5px solid var(--c-border);border-radius:var(--radius-sm);
   background:var(--c-surface);color:var(--c-text);font-family:inherit;
   transition:border-color .15s;
@@ -617,23 +616,6 @@ body{font-family:'Georgia',serif;-webkit-tap-highlight-color:transparent;color:v
 }
 
 /* ══════════════════════════════════════════════
-   IOS — safe areas & compatibilité
-══════════════════════════════════════════════ */
-html{height:-webkit-fill-available;}
-body{min-height:-webkit-fill-available;}
-
-/* Notch / Dynamic Island : padding haut des barres */
-.home-header{padding-top:calc(1.4rem + env(safe-area-inset-top,0px));}
-.topbar{padding-top:calc(.65rem + env(safe-area-inset-top,0px));}
-.write-topbar{padding-top:calc(.65rem + env(safe-area-inset-top,0px));}
-
-/* Home indicator (bas d'écran) */
-.app{padding-bottom:max(2.5rem, env(safe-area-inset-bottom,0px));}
-.modal{padding-bottom:max(2rem, env(safe-area-inset-bottom,0px));}
-.word-sheet{padding-bottom:max(2.2rem, env(safe-area-inset-bottom,0px));}
-.write-body{padding-bottom:max(1.5rem, env(safe-area-inset-bottom,0px));}
-
-/* ══════════════════════════════════════════════
    LEVEL COLORS  (--lc / --lc-bg per context)
 ══════════════════════════════════════════════ */
 .l1{--lc:var(--c1);--lc-bg:var(--c1-bg);}
@@ -818,6 +800,7 @@ body.dark .home-badge-btn{
 .express-lvl-count{font-size:12px;font-weight:700;padding:3px 9px;border-radius:20px;
   background:var(--lc-bg,rgba(0,0,0,.06));color:var(--lc,var(--c-muted));}
 .express-lvl-btn.l-all .express-lvl-count{background:var(--c1-bg);color:var(--c1);}
+/* Badges overlay (bottom sheet) */
 .badges-overlay{
   position:fixed;inset:0;background:var(--c-overlay);z-index:70;
   display:flex;align-items:flex-end;justify-content:center;
@@ -832,6 +815,7 @@ body.dark .home-badge-btn{
 }
 .badges-overlay.open .badges-panel{transform:none;}
 .badges-title{font-size:17px;font-weight:700;margin-bottom:.85rem;text-align:center;}
+/* XP section */
 .xp-section{
   background:var(--c-bg);border-radius:var(--radius-sm);
   padding:.75rem .85rem;margin-bottom:1rem;
@@ -845,6 +829,7 @@ body.dark .home-badge-btn{
   background:linear-gradient(90deg,var(--c2),var(--c3));
   transition:width .5s cubic-bezier(.4,0,.2,1);
 }
+/* Badge grid */
 .badges-count{font-size:11px;font-weight:700;letter-spacing:.07em;color:var(--c-muted);margin-bottom:.6rem;}
 .badges-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;}
 .badge-card{
@@ -858,6 +843,7 @@ body.dark .home-badge-btn{
 .badge-name{font-size:11px;font-weight:700;color:var(--c-text);margin-top:2px;}
 .badge-desc{font-size:10px;color:var(--c-muted);line-height:1.3;}
 .badge-date{font-size:9px;color:var(--c-hint);margin-top:1px;}
+/* Toast */
 .badge-toast{
   position:fixed;top:1.1rem;left:50%;
   transform:translateX(-50%) translateY(calc(-100% - 20px));
@@ -1151,8 +1137,6 @@ body.dark .home-badge-btn{
 <script>
 
 // ════════════════════════════════════════════════
-
-// ════════════════════════════════════════════════
 // STATE
 // ════════════════════════════════════════════════
 var current=null, filtered=[], activeCat='all';
@@ -1291,6 +1275,7 @@ function show(id){
 function goHome(){
   if(window.speechSynthesis)window.speechSynthesis.cancel();
   show('home');current=quizLevel=flashLevel=sentLevel=dictLevel=assocLevel=null;activeCat='all';
+  // Reset global search
   var hs=document.getElementById('home-search');
   if(hs)hs.value='';
   var hsc=document.getElementById('home-search-clear');
@@ -1795,11 +1780,11 @@ function _showExpressFilterStep(levelId){
   document.getElementById('express-picker-sub').textContent='Choisir les mots à réviser';
   document.getElementById('express-picker-back').style.display='block';
   var filters=[
-    {key:'srs',     icon:'⚡',label:'SRS du jour',      desc:'Mots dus + jamais vus'},
-    {key:'new',     icon:'🌱',label:'Jamais vus',        desc:'Aucune pratique encore'},
-    {key:'learning',icon:'🌿',label:'En apprentissage',  desc:'Débutant & intermédiaire'},
-    {key:'advanced',icon:'🌲',label:'Avancés',           desc:'Bonne maîtrise'},
-    {key:'mastered',icon:'🌳',label:'Maîtrisés',         desc:'Révision de maintien'}
+    {key:'srs',  icon:'⚡', label:'SRS du jour',      desc:'Mots dus + jamais vus'},
+    {key:'new',  icon:'🌱', label:'Jamais vus',        desc:'Aucune pratique encore'},
+    {key:'learning',icon:'🌿',label:'En apprentissage',desc:'Débutant & intermédiaire'},
+    {key:'advanced',icon:'🌲',label:'Avancés',         desc:'Bonne maîtrise'},
+    {key:'mastered',icon:'🌳',label:'Maîtrisés',       desc:'Révision de maintien'}
   ];
   var html='';
   filters.forEach(function(f){
@@ -1988,6 +1973,7 @@ var _PROG_MODES=['normal','reverse','dictee','assoc','flash','sent'];
 var _PROG_LABELS=['🀄','🔄','🎵','🔗','🃏','📝'];
 
 function _buildDailySection(){
+  // Express badge
   var dueCount=_srsDueWords().length;
   var newCount=_srsNewWords().length;
   var expBadge=document.getElementById('express-badge');
@@ -2002,6 +1988,7 @@ function _buildDailySection(){
       expSub.textContent=newCount>0?newCount+' nouveau'+(newCount>1?'x':'')+' à découvrir':'À jour ✓';
     }
   }
+  // Favs badge
   var favCount=_getFavs().length;
   var favBadge=document.getElementById('favs-badge');
   var favSub=document.getElementById('favs-sub');
@@ -2080,7 +2067,7 @@ function _renderGlobalResults(results,q){
   cards.style.display='none';
   el.className='gsearch-results active';
   if(!results.length){
-    el.innerHTML='<div class="gsearch-empty"><div class="gsearch-empty-icon">🔍</div>Aucun résultat pour « '+q+' »</div>';
+    el.innerHTML='<div class="gsearch-empty"><div class="gsearch-empty-icon">🔍</div>Aucun résultat pour « '+q+' »</div>';
     return;
   }
   var max=80;
@@ -2109,8 +2096,9 @@ function _renderGlobalResults(results,q){
       var lv=item.getAttribute('data-level');
       var w=(data[lv]&&data[lv].words.find(function(x){return x.h===h;}))||{h:h,p:'',fr:'',c:''};
       var prevCurrent=current;
-      current=lv;
+      current=lv; // set level for sheet color
       openWordSheet(w,null);
+      // restore current if not in a vocab view
       current=prevCurrent;
     });
   });
@@ -2450,6 +2438,7 @@ function renderQ(){
       +'<button class="qnext" id="qnext" style="display:none">'+(isLast?'Voir les résultats →':'Suivant →')+'</button>';
     var sndBtn=document.getElementById('q-snd');
     sndBtn.addEventListener('click',function(){speak(q.h,null,this);});
+    speak(q.h,null,sndBtn);
   }
 
   opts.forEach(function(o,i){
@@ -2488,6 +2477,7 @@ function answerQ(idx,chosen,correct){
 }
 function nextQ(){quizIdx++;if(quizIdx>=quizQs.length){showResults();return;}renderQ();}
 
+// ── Chrono timer ──
 // ── Son de succès ──
 function _playSuccess(){
   try{
@@ -2502,7 +2492,6 @@ function _playSuccess(){
     });
   }catch(e){}
 }
-// ── Chrono timer ──
 var _quizTimerInt=null;
 function _stopTimer(){if(_quizTimerInt){clearInterval(_quizTimerInt);_quizTimerInt=null;}}
 function _setTimerBar(left,total){
@@ -2666,7 +2655,7 @@ function renderDict(){
 
   var sndBtn=document.getElementById('dict-snd');
   sndBtn.addEventListener('click',function(){speak(q.h,null,this);});
-  // iOS : pas d'auto-lecture, l'utilisateur tape le bouton manuellement
+  speak(q.h,null,sndBtn); // auto-lecture à l'affichage
 
   opts.forEach(function(o,i){
     document.getElementById('do'+i).addEventListener('click',function(){_answerDict(i,o,q,opts);});
@@ -2681,10 +2670,12 @@ function _answerDict(idx,chosen,correct,opts){
   if(isOk){dictScore++;dictStreak++;}else{dictStreak=0;}
   dictResults.push({word:correct,chosen:chosen,correct:isOk});
 
+  // Révèle pinyin + français dans la carte
   document.getElementById('dict-reveal').innerHTML=
     '<div style="font-size:15px;color:var(--c-muted)">'+correct.p+'</div>'
     +'<div style="font-size:14px;font-weight:700;margin-top:3px">'+correct.fr+'</div>';
 
+  // Révèle le pinyin sous chaque option + colorie
   document.querySelectorAll('.qopt').forEach(function(b,i){
     b.classList.add('disabled');
     b.innerHTML=opts[i].h+'<div style="font-size:11px;color:var(--c-hint)">'+opts[i].p+'</div>';
@@ -3131,6 +3122,7 @@ document.getElementById('ws-fav').addEventListener('click',function(){
   var nowFav=_toggleFav(_wsWord.h);
   this.textContent=nowFav?'⭐ Dans mes favoris':'☆ Ajouter aux favoris';
   this.className='ws-fav-btn'+(nowFav?' is-fav':'');
+  // Update badge on next home visit
   _buildDailySection();
 });
 document.getElementById('word-sheet-overlay').addEventListener('click',function(e){
@@ -3361,35 +3353,41 @@ window.addEventListener('resize',function(){
 // IOS AUDIO UNLOCK
 // ════════════════════════════════════════════════
 // iOS bloque tout audio sans geste utilisateur préalable.
-// On déverrouille le contexte audio au premier toucher.
-(function(){
-  function unlock(){
-    try{
-      var ctx=new(window.AudioContext||window.webkitAudioContext)();
-      var buf=ctx.createBuffer(1,1,22050);
-      var src=ctx.createBufferSource();
-      src.buffer=buf;src.connect(ctx.destination);src.start(0);
-      setTimeout(function(){ctx.close();},200);
-    }catch(e){}
-  }
-  document.addEventListener('touchend',function onTouch(){
-    unlock();
-    document.removeEventListener('touchend',onTouch);
-  });
-})();
+if(/iPad|iPhone|iPod/.test(navigator.userAgent)){
+  (function(){
+    function unlock(){
+      try{
+        var ctx=new(window.AudioContext||window.webkitAudioContext)();
+        var buf=ctx.createBuffer(1,1,22050);
+        var src=ctx.createBufferSource();
+        src.buffer=buf;src.connect(ctx.destination);src.start(0);
+        setTimeout(function(){ctx.close();},200);
+      }catch(e){}
+    }
+    document.addEventListener('touchend',function onTouch(){
+      unlock();
+      document.removeEventListener('touchend',onTouch);
+    });
+  })();
+}
 
 // ════════════════════════════════════════════════
 // INIT
 // ════════════════════════════════════════════════
 buildHome();
 
-// ── Bouton retour Android ────────────────────────
+// ── Bouton retour (Android hardware back / iOS swipe) ─
 function handleAndroidBack(){
+  // Overlays en premier
+  if(document.getElementById('express-overlay').classList.contains('open')){document.getElementById('express-overlay').classList.remove('open');return;}
   if(document.getElementById('stats-overlay').classList.contains('open')){closeStats();return;}
+  if(document.getElementById('badges-overlay').classList.contains('open')){closeBadges();return;}
   if(document.getElementById('settings-overlay').classList.contains('open')){closeSettings();return;}
   if(document.getElementById('word-sheet-overlay').classList.contains('open')){closeWordSheet();return;}
   if(document.getElementById('modal-overlay').classList.contains('open')){closeModal();return;}
+  // Write view
   if(document.getElementById('write-view').classList.contains('active')){closeWrite();return;}
+  // Vues avec confirmation si session en cours
   if(document.getElementById('quiz-view').classList.contains('active')){
     if(inQuizMid())openModal(goHome);else goHome();return;
   }
@@ -3399,6 +3397,7 @@ function handleAndroidBack(){
   if(document.getElementById('sent-view').classList.contains('active')){
     if(inSentMid())openModal(goHome);else goHome();return;
   }
+  // Toutes les autres vues → accueil
   goHome();
 }
 history.pushState({inApp:true},'');

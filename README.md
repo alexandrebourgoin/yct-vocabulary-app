@@ -80,10 +80,10 @@ Les boutons en haut à droite :
 
 ```
 yct-vocabulary-app/
-├── index.html              # Redirection automatique iOS ↔ Android
-├── yct_app_Android.html    # Version principale (Android & desktop)
-├── yct_app_Iphone.html     # Version optimisée iOS (Safari/PWA)
-├── config.js               # Version, radicaux (RADICALS), phrases d'exemple (EXAMPLES)
+├── index.html              # Redirection vers yct_app.html
+├── yct_app.html            # App unifiée Android + iOS
+├── data.js                 # Vocabulaire (730 mots), sentences
+├── config.js               # Version, phrases d'exemple (EXAMPLES)
 ├── manifest.json           # Configuration PWA
 ├── sw.js                   # Service Worker (cache hors-ligne)
 ├── icon.svg                # Icône de l'application

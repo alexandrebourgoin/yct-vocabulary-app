@@ -1,7 +1,6 @@
 const CACHE = 'yct-vocab-v25';
 const ASSETS = [
-  './yct_app_Android.html',
-  './yct_app_Iphone.html',
+  './yct_app.html',
   './data.js',
   './config.js',
   './icon.svg',
