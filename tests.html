@@ -905,6 +905,107 @@ describe('_computeXP — Calcul d\'expérience', '🎓', function() {
   });
 });
 
+// ── 11. Sentences ────────────────────────────────────────────
+describe('Données — Sentences', '✍️', function() {
+
+  it('sentences est défini et couvre les 5 niveaux', function() {
+    if (typeof sentences === 'undefined') throw new Error('sentences non défini');
+    ['yct1','yct2','yct3','yct4','yct5'].forEach(function(k) {
+      if (!sentences[k] || !sentences[k].length)
+        throw new Error('sentences.' + k + ' manquant ou vide');
+    });
+  });
+
+  it('Chaque phrase a le format [template, réponse, traduction]', function() {
+    Object.keys(sentences).forEach(function(k) {
+      sentences[k].forEach(function(s, i) {
+        if (!Array.isArray(s) || s.length !== 3)
+          throw new Error(k + '[' + i + '] : attendu [template, réponse, fr], obtenu ' + JSON.stringify(s));
+        if (typeof s[0] !== 'string' || s[0].indexOf('___') < 0)
+          throw new Error(k + '[' + i + '] : template doit contenir "___"');
+        if (typeof s[1] !== 'string' || s[1].length === 0)
+          throw new Error(k + '[' + i + '] : réponse vide');
+        if (typeof s[2] !== 'string' || s[2].length === 0)
+          throw new Error(k + '[' + i + '] : traduction vide');
+      });
+    });
+  });
+
+  it('La réponse de chaque phrase existe dans le vocabulaire du niveau', function() {
+    Object.keys(sentences).forEach(function(k) {
+      var hanziSet = {};
+      data[k].words.forEach(function(w) { hanziSet[w.h] = true; });
+      var orphans = sentences[k]
+        .filter(function(s) { return !hanziSet[s[1]]; })
+        .map(function(s) { return '"' + s[1] + '"'; });
+      if (orphans.length)
+        throw new Error(k + ' : réponses absentes du vocabulaire → ' + orphans.join(', '));
+    });
+  });
+
+  it('Chaque niveau a au moins 5 phrases', function() {
+    Object.keys(sentences).forEach(function(k) {
+      if (sentences[k].length < 5)
+        throw new Error(k + ' : seulement ' + sentences[k].length + ' phrase(s), minimum 5 attendu');
+    });
+  });
+
+  it('Pas de phrase en double dans un même niveau', function() {
+    Object.keys(sentences).forEach(function(k) {
+      var seen = {};
+      sentences[k].forEach(function(s) {
+        if (seen[s[0]]) throw new Error(k + ' : template dupliqué → ' + s[0]);
+        seen[s[0]] = true;
+      });
+    });
+  });
+});
+
+// ── 12. Intégrité globale ─────────────────────────────────────
+describe('Intégrité globale', '🔗', function() {
+
+  it('APP_VERSION est défini et suit le format X.Y.Z', function() {
+    if (typeof APP_VERSION === 'undefined') throw new Error('APP_VERSION non défini');
+    if (!/^\d+\.\d+\.\d+$/.test(APP_VERSION))
+      throw new Error('APP_VERSION mal formaté : ' + APP_VERSION);
+  });
+
+  it('Tous les niveaux ont un compte de mots cohérent (≥ 50)', function() {
+    Object.keys(data).forEach(function(k) {
+      var n = data[k].words.length;
+      if (n < 50) throw new Error(k + ' : seulement ' + n + ' mots (minimum 50)');
+    });
+  });
+
+  it('Chaque mot a un pinyin valide (contient au moins une lettre)', function() {
+    Object.keys(data).forEach(function(k) {
+      data[k].words.forEach(function(w) {
+        if (!w.p || !/[a-züāáǎàēéěèīíǐìōóǒòūúǔùǖǘǚǜ]/i.test(w.p))
+          throw new Error(k + '/' + w.h + ' : pinyin suspect → "' + w.p + '"');
+      });
+    });
+  });
+
+  it('Chaque mot a une catégorie non vide', function() {
+    Object.keys(data).forEach(function(k) {
+      data[k].words.forEach(function(w) {
+        if (!w.c || w.c.trim().length === 0)
+          throw new Error(k + '/' + w.h + ' : catégorie vide');
+      });
+    });
+  });
+
+  it('Les EXAMPLES ont des phrases zh non vides et comportant des caractères chinois', function() {
+    var failed = [];
+    Object.keys(EXAMPLES).forEach(function(h) {
+      var e = EXAMPLES[h];
+      if (!e.zh || !/[一-鿿]/.test(e.zh))
+        failed.push(h);
+    });
+    if (failed.length) throw new Error('EXAMPLES sans hanzi dans zh : ' + failed.slice(0,5).join(', '));
+  });
+});
+
 // ════════════════════════════════════════════════════════════════
 // RENDU DES RÉSULTATS
 // ════════════════════════════════════════════════════════════════
