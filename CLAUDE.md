@@ -4,63 +4,77 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**`yct_app_v8.html`** — a French-interface Chinese vocabulary learning app targeting the YCT (Youth Chinese Test) standard levels. Single self-contained HTML file; open directly in a browser.
+**YCT Vocab** — a French-interface Chinese vocabulary learning PWA targeting the YCT (Youth Chinese Test) levels 1–5. Runs offline (service worker); one external dependency, [HanziWriter](https://hanziwriter.org/) 3.5 from CDN, for stroke-order animation. TTS needs internet (SpeechSynthesis primary, Google TTS fallback).
 
-One external dependency: [HanziWriter](https://hanziwriter.org/) loaded from CDN (`hanzi-writer@3.5`) for stroke-order animation and handwriting practice. Everything else works offline except TTS.
+## Files
 
-## Architecture
-
-All code (~1560 lines) lives in one file, organized by comment blocks (`// ════...`):
-
-| Section | What it does |
+| File | Role |
 |---|---|
-| **TOKENS / BASE** | CSS custom properties for light/dark themes; `body.dark` / `body.light` override auto |
-| **HOME** | Level selection cards, dark-mode toggle |
-| **TOPBAR** | Sticky nav bar shared by Vocab, Flash, Quiz views |
-| **VOCAB** | Browse/search with category pills and pinyin/size toggles |
-| **FLASH CARDS** | Flip cards with pass/fail self-assessment and dot progress |
-| **QUIZ** | Multiple-choice (hanzi→FR `normal`, FR→hanzi `reverse`), streak, star-rating results |
-| **MODAL** | "Quit?" confirmation sheet (used when leaving Flash/Quiz mid-session) |
-| **WORD ACTION SHEET** | Bottom sheet on vocab-card tap: listen or open Write |
-| **WRITE VIEW** | Full-screen HanziWriter canvas; stroke-by-stroke quiz with hints and multi-char nav |
-| **NAVIGATION / INIT** | `show(id)`, `goHome()`, `buildHome()`, data normalization on load |
+| `index.html` | Redirects to `yct_app.html` |
+| `yct_app.html` | The whole app (~3200 lines): CSS + HTML + JS |
+| `data.js` | Single data source: `data` (vocabulary, 5 levels) + `sentences` |
+| `config.js` | `APP_VERSION` + `EXAMPLES` (one example sentence per word) |
+| `tests.html` | Self-running test suite (85 tests) — open in browser |
+| `sw.js` | Service worker; bump `CACHE` name (`yct-vocab-vNN`) on every release |
+| `manifest.json` | PWA manifest, `start_url: './yct_app.html'` |
+| `serve.ps1` | Local HTTP server on port 7788 with `Cache-Control: no-cache` |
+| `wiki/` | Technical documentation (architecture, modes, storage, deployment…) |
+| `backup/` | Archived pre-merge Android/iOS variants — do not edit |
+
+`.claude/launch.json` defines the `yct-tests` server (serve.ps1, port 7788) for browser preview.
+
+## Running & testing
+
+- Serve locally: launch config `yct-tests` (or `powershell -File serve.ps1`), then open `http://localhost:7788/yct_app.html`.
+- **Tests are mandatory after any data or logic change**: open `http://localhost:7788/tests.html` and check "85 passés / 0 échoué" (count grows as suites are added). Suites cover data structure, cross-level duplicates, EXAMPLES coverage (must be 100 % per level), pinyin tone colorization, shuffle, SRS logic, streak, filters, XP/badges, sentences.
+- `data.js` is loaded with a cache-buster (`data.js?v=Date.now()`) in both `yct_app.html` and `tests.html`; `config.js` is loaded normally in the app.
+
+## Architecture (yct_app.html)
+
+Organized by `// ════` comment blocks. CSS sections: TOKENS (light/dark custom properties), HOME, TOPBAR, VOCAB, FLASH CARDS, QUIZ, SENTENCES, DICTÉE, ASSOCIATION, RESULTS, STATS, MODAL, LEVEL COLORS, WORD ACTION SHEET, WRITE VIEW, GAMIFICATION. JS sections: STATE, THEME, AUDIO, NAVIGATION, STATS, LOCAL STORAGE, STREAK, FAVORIS, SRS, GAMIFICATION (XP & badges), OBJECTIF QUOTIDIEN, SESSIONS SPÉCIALES (Révision Express, Mots Difficiles), SETTINGS, HOME, RECHERCHE GLOBALE, VOCAB VIEW, FLASH CARDS, QUIZ, DICTÉE, ASSOCIATION, SENTENCE COMPLETION, WORD ACTION SHEET, WRITE VIEW (HanziWriter), IOS AUDIO UNLOCK, INIT.
+
+### 6 training modes
+
+Flash cards, Quiz (normal hanzi→FR / reverse FR→hanzi, optional chrono), Dictée (audio→hanzi), Association (pair matching), Sentences (fill-in-the-blank from `sentences`), Écriture (HanziWriter stroke quiz).
 
 ### Data format
 
-Words are declared as compact arrays in the `data` object and normalized at startup:
-
 ```js
-// Source (in HTML)
+// data.js source
 ["你好","nǐ hǎo","Bonjour","Salutations"]
-
-// After normalization (line ~812)
-{ h: "你好", p: "nǐ hǎo", fr: "Bonjour", c: "Salutations" }
+// normalized at load (end of data.js)
+{ h:"你好", p:"nǐ hǎo", fr:"Bonjour", c:"Salutations" }
 ```
 
-`data` is keyed by level id (`yct1`…`yct5`). Each level has `label`, `lc` (CSS level-color class `l1`–`l5`), `icon`, `desc`, and `words[]`.
+`data` is keyed `yct1`…`yct5`; each level has `label`, `lc` (`l1`–`l5` CSS class), `icon`, `desc`, `words[]`. `sentences` is keyed the same way: `["phrase with ___","answer word","French translation"]`.
 
-### Level color system
+`EXAMPLES` (config.js) is keyed by hanzi: `{zh, py, fr}`. **Every word in data.js must have an EXAMPLES entry** (tested per level), and hanzi must be unique within a level AND across levels (tested).
 
-Level colors are applied via `--lc` / `--lc-bg` CSS variables. Adding class `l1`–`l5` to a container sets those variables for all descendants. The five accent colors (`--c1`–`--c5`) are defined in TOKENS and differ between light and dark themes.
+### localStorage keys
 
-### Key global state
+`yct-theme`, `yct-bg`, `yct-surf` (appearance) · `yct-progress` (quiz/flash stats) · `yct-streak` · `yct-favs` (Mots Difficiles) · `yct-srs` (spaced repetition: interval/reps/due per hanzi) · `yct-badges` (XP + badges) · `yct-goal` (daily goal) · `yct-chrono`.
 
-```js
-current         // active level id for Vocab view
-filtered[]      // current Vocab search/filter results
-quizLevel, quizQs[], quizIdx, quizScore, quizMode  // 'normal' | 'reverse'
-flashLevel, flashQs[], flashIdx, flashResults[]
-_writeChars[], _writeCharIdx, _hanziWriter          // Write view
-darkManual      // null=auto | 'dark' | 'light'
-```
+### SRS logic
 
-### TTS
+`_srsUpdate`: good answer → interval grows (capped at 30 days), bad answer → interval back to 1, reps to 0. `_srsLevel`: 0=new, 1=interval 1, 2=2–5, 3=6–14, 4=15+ (mastered). `_markToday(dateOverride)` accepts a simulated date for streak testing.
 
-Primary: Google Translate TTS endpoint (requires internet). Fallback: `SpeechSynthesis` API with zh-CN voice selection.
+## Release checklist
 
-## Working with this file
+1. Update `APP_VERSION` in `config.js` **and** the version line in `README.md` (keep them identical).
+2. Bump `CACHE` in `sw.js` (`yct-vocab-vNN` → vNN+1) so clients pick up new assets.
+3. Run `tests.html` — everything must pass.
 
-- **Add vocabulary**: extend the array in the relevant `yct*` key; format is `["hanzi","pinyin","French","Category"]`.
-- **Add a level**: add a new key to `data` with `label`, `lc` (`l1`–`l5`), `icon`, `desc`, `words[]`; the home screen builds itself from `Object.keys(data)`.
-- **Theme changes**: edit custom properties in the TOKENS section; both light and dark variants must be updated.
-- **Write view**: depends on HanziWriter CDN — characters not in its dataset will trigger `onLoadCharDataError`.
+## Adding vocabulary
+
+1. Append `["hanzi","pīn yīn","French","Category"]` to the level's `words[]` in `data.js` (pinyin with tone marks, space-separated syllables; reuse existing category names).
+2. Add the matching `EXAMPLES["hanzi"] = {zh, py, fr}` entry in `config.js` (py capitalized sentence-style).
+3. Watch for cross-level duplicates — the test suite fails on any hanzi present in two levels.
+4. If relevant, add fill-in-the-blank items to `sentences`.
+
+Vocabulary status vs. official YCT syllabus: YCT1 150/~150 ✅, YCT2 150/~150 ✅, YCT3 312/~300 ✅, YCT4 600/~600 ✅, YCT5 900/~900 ✅ (as of v1.2.0, 2112 words total). All five levels now meet their syllabus targets.
+
+## Conventions
+
+- Windows 11 / PowerShell 5.1 environment — no Bash, no `&&` chaining.
+- French UI and French-first communication with the user; keep replies concise.
+- Propose a short plan and wait for user validation ("vas y") before large tasks.

@@ -1,4 +1,4 @@
-const CACHE = 'yct-vocab-v25';
+﻿const CACHE = 'yct-vocab-v27';
 const ASSETS = [
   './yct_app.html',
   './data.js',
@@ -35,3 +35,4 @@ self.addEventListener('fetch', e => {
     }))
   );
 });
+

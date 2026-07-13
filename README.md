@@ -2,7 +2,7 @@
 
 Application web progressive (PWA) pour l'apprentissage du vocabulaire chinois, basée sur les niveaux du **YCT (Youth Chinese Test)**. Interface entièrement en français.
 
-> **Version 1.0.1** · Mai 2026
+> **Version 1.2.0** · Juillet 2026
 
 ---
 
@@ -82,7 +82,7 @@ Les boutons en haut à droite :
 yct-vocabulary-app/
 ├── index.html              # Redirection vers yct_app.html
 ├── yct_app.html            # App unifiée Android + iOS
-├── data.js                 # Vocabulaire (730 mots), sentences
+├── data.js                 # Vocabulaire (2112 mots), sentences
 ├── config.js               # Version, phrases d'exemple (EXAMPLES)
 ├── manifest.json           # Configuration PWA
 ├── sw.js                   # Service Worker (cache hors-ligne)
