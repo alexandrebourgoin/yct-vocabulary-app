@@ -1,4 +1,4 @@
-﻿const CACHE = 'yct-vocab-v27';
+﻿const CACHE = 'yct-vocab-v29';
 const ASSETS = [
   './yct_app.html',
   './data.js',
@@ -14,6 +14,10 @@ self.addEventListener('install', e => {
       .then(c => c.addAll(ASSETS))
       .then(() => self.skipWaiting())
   );
+});
+
+self.addEventListener('message', e => {
+  if (e.data === 'skipWaiting') self.skipWaiting();
 });
 
 self.addEventListener('activate', e => {

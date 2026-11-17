@@ -75,7 +75,7 @@ body.light{
 ══════════════════════════════════════════════ */
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;background:var(--c-bg);}
-body{font-family:'Georgia',serif;-webkit-tap-highlight-color:transparent;color:var(--c-text);transition:background .25s,color .25s;}
+body{font-family:'Georgia','Segoe UI','Roboto','Helvetica Neue',Arial,'Noto Sans','PingFang SC','Microsoft YaHei',serif;-webkit-tap-highlight-color:transparent;color:var(--c-text);transition:background .25s,color .25s;}
 
 .app{min-height:100vh;max-width:640px;margin:0 auto;padding:0 0 2.5rem;}
 
@@ -1106,8 +1106,10 @@ body.dark .home-badge-btn{
     <div class="modal-sub" style="margin-bottom:.8rem">Compte à rebours par question</div>
     <div style="font-size:11px;font-weight:700;letter-spacing:.07em;color:var(--c-muted);margin-bottom:.5rem">DONNÉES</div>
     <div class="modal-sub" id="settings-info" style="margin-bottom:.8rem">Chargement…</div>
+    <div class="modal-sub" id="update-status" style="margin-bottom:.8rem;display:none"></div>
     <div class="modal-btns">
       <button id="settings-stats">📊 Statistiques détaillées</button>
+      <button id="settings-update">🔄 Rechercher une mise à jour</button>
       <button id="settings-clear" style="background:var(--c5-bg);color:var(--c5);border-color:var(--c5)">🗑️ Effacer toutes les données</button>
       <button class="modal-btn-stay" id="settings-close">Fermer</button>
     </div>
@@ -1240,26 +1242,46 @@ function speak(hanzi,cardEl,btnEl){
     a.play().catch(done);
   }
 
-  function doSpeechAPI(){
+  function findZhVoice(){
+    return window.speechSynthesis.getVoices().find(function(x){
+      return /^zh/i.test((x.lang||'').replace('_','-'));
+    });
+  }
+
+  function doSpeechAPI(v){
     var u=new SpeechSynthesisUtterance(hanzi);
     u.lang='zh-CN';u.rate=0.85;
-    var voices=window.speechSynthesis.getVoices();
-    var v=voices.find(function(x){return x.lang.startsWith('zh');});
-    if(v)u.voice=v;
-    u.onend=done;
-    u.onerror=function(){tryGoogleTTS();};
-    window.speechSynthesis.speak(u);
+    u.voice=v;
+    var started=false,fell=false;
+    function fallback(){if(fell)return;fell=true;clearTimeout(t);tryGoogleTTS();}
+    // Si rien ne démarre en 1,5 s (voix muette / moteur bloqué) → Google TTS
+    var t=setTimeout(function(){if(!started){window.speechSynthesis.cancel();fallback();}},1500);
+    u.onstart=function(){started=true;clearTimeout(t);};
+    u.onend=function(){clearTimeout(t);done();};
+    u.onerror=function(ev){
+      clearTimeout(t);
+      // 'canceled'/'interrupted' = arrêt volontaire (nouvelle lecture), pas une panne
+      if(ev&&(ev.error==='canceled'||ev.error==='interrupted'))return;
+      fallback();
+    };
+    // Petit délai après cancel() : évite le blocage de la file dans Chrome/Android
+    setTimeout(function(){window.speechSynthesis.speak(u);},60);
   }
 
   if(!window.speechSynthesis){tryGoogleTTS();return;}
-  var voices=window.speechSynthesis.getVoices();
-  if(voices.length){doSpeechAPI();}
+  var zh=findZhVoice();
+  if(zh){doSpeechAPI(zh);}
+  else if(window.speechSynthesis.getVoices().length){
+    // Voix présentes mais aucune chinoise : la lecture serait muette → Google TTS
+    tryGoogleTTS();
+  }
   else{
     _speakFallbackTimer=setTimeout(function(){_speakFallbackTimer=null;tryGoogleTTS();},600);
     window.speechSynthesis.onvoiceschanged=function(){
       clearTimeout(_speakFallbackTimer);_speakFallbackTimer=null;
       window.speechSynthesis.onvoiceschanged=null;
-      doSpeechAPI();
+      var z=findZhVoice();
+      if(z)doSpeechAPI(z);else tryGoogleTTS();
     };
   }
 }
@@ -2182,19 +2204,40 @@ function renderVocab(words){
   var sc=sizeClasses[hanziSize];
   var grid=document.getElementById('vocab-grid');
   if(!words.length){grid.innerHTML='<div class="empty" style="grid-column:1/-1"><div class="empty-icon">🔍</div><div style="font-size:13px;color:var(--c-hint)">Aucun résultat</div></div>';return;}
-  var html='';
-  words.forEach(function(w){
+  // Rendu progressif par lots : évite de créer 900 tuiles d'un coup (lent sur mobile)
+  var BATCH=60,pos=0;
+  grid.innerHTML='';
+  function cardHtml(w){
     var sl=_srsLevel(w.h);
-    html+='<div class="vocab-card" data-hanzi="'+encodeURIComponent(w.h)+'">'
+    return '<div class="vocab-card" data-hanzi="'+encodeURIComponent(w.h)+'">'
       +'<div class="vc-top"><span class="v-hanzi'+(sc?' '+sc:'')+'">'+w.h+'</span><span class="v-sound">🔊</span></div>'
       +'<div class="v-pinyin'+(pinyinHidden?' hidden':'')+'">'+_pinyinHtml(w.p)+'</div>'
       +'<div class="v-fr">'+w.fr+'</div>'
       +'<div class="v-cat">'+w.c+(sl>0?'<span class="v-srs">'+_SRS_ICONS[sl]+'</span>':'')+'</div>'
     +'</div>';
-  });
-  grid.innerHTML=html;
-  grid.querySelectorAll('.vocab-card').forEach(function(card){
-    card.addEventListener('click',function(e){
+  }
+  function appendBatch(){
+    var old=document.getElementById('vocab-sentinel');
+    if(old)old.remove();
+    var html='';
+    words.slice(pos,pos+BATCH).forEach(function(w){html+=cardHtml(w);});
+    pos+=BATCH;
+    grid.insertAdjacentHTML('beforeend',html);
+    if(pos<words.length){
+      grid.insertAdjacentHTML('beforeend','<div id="vocab-sentinel" style="grid-column:1/-1;height:1px"></div>');
+    }
+  }
+  _vocabMore=function(){
+    var s=document.getElementById('vocab-sentinel');
+    if(s&&s.offsetParent!==null&&s.getBoundingClientRect().top<window.innerHeight+800)appendBatch();
+  };
+  appendBatch();
+  _vocabMore();
+  if(!grid._delegated){
+    grid._delegated=true;
+    grid.addEventListener('click',function(e){
+      var card=e.target.closest('.vocab-card');
+      if(!card)return;
       var hanzi=decodeURIComponent(card.getAttribute('data-hanzi'));
       var w=filtered.find(function(x){return x.h===hanzi;})||{h:hanzi,p:'',fr:'',c:''};
       if(e.target.classList.contains('v-sound')){
@@ -2204,8 +2247,10 @@ function renderVocab(words){
         openWordSheet(w,card);
       }
     });
-  });
+  }
 }
+var _vocabMore=null;
+window.addEventListener('scroll',function(){if(_vocabMore)_vocabMore();},{passive:true});
 document.getElementById('search').addEventListener('input',function(){
   document.getElementById('search-clear').classList.toggle('visible',this.value.length>0);
   applyFilter();
@@ -3087,7 +3132,7 @@ function openWordSheet(w,cardEl){
   var radEl=document.getElementById('ws-radicals');
   var chars=w.h.split('');
   var radHtml=chars.map(function(ch){
-    var r=RADICALS&&RADICALS[ch];
+    var r=typeof RADICALS!=='undefined'&&RADICALS[ch];
     if(!r)return '';
     return '<span style="font-size:11px;color:var(--c-muted);background:var(--c-bg);border:1px solid var(--c-border);border-radius:6px;padding:2px 7px;white-space:nowrap">'
       +'<span style="font-size:13px;color:var(--c-text)">'+ch+'</span>'
@@ -3410,6 +3455,52 @@ window.addEventListener('popstate',function(){
 if('serviceWorker' in navigator){
   navigator.serviceWorker.register('./sw.js').catch(function(){});
 }
+
+// ════════════════════════════════════════════════
+// MISE À JOUR DE L'APP (Paramètres)
+// ════════════════════════════════════════════════
+function _updMsg(t,color){
+  var el=document.getElementById('update-status');
+  el.style.display='block';el.style.color=color||'';el.textContent=t;
+}
+function _updReload(){
+  _updMsg('✓ Mise à jour installée, rechargement…','var(--c1)');
+  setTimeout(function(){location.reload();},700);
+}
+document.getElementById('settings-update').addEventListener('click',function(){
+  var btn=this;
+  if(!('serviceWorker' in navigator)){_updMsg('Mise à jour automatique non disponible sur ce navigateur.','var(--c5)');return;}
+  if(!navigator.onLine){_updMsg('Pas de connexion internet : impossible de vérifier.','var(--c5)');return;}
+  btn.disabled=true;_updMsg('Recherche en cours…');
+  var finished=false;
+  function end(){btn.disabled=false;}
+  navigator.serviceWorker.getRegistration().then(function(reg){
+    if(!reg){
+      // Aucun service worker : on recharge simplement depuis le réseau
+      _updReload();return;
+    }
+    // Nouvelle version déjà téléchargée et en attente
+    if(reg.waiting){reg.waiting.postMessage('skipWaiting');_updReload();return;}
+    reg.addEventListener('updatefound',function(){
+      var nw=reg.installing;if(!nw)return;
+      _updMsg('Nouvelle version trouvée, téléchargement…');
+      nw.addEventListener('statechange',function(){
+        if(nw.state==='installed'||nw.state==='activated'){
+          if(finished)return;finished=true;_updReload();
+        }
+      });
+    });
+    return reg.update().then(function(){
+      setTimeout(function(){
+        if(!finished&&!reg.installing&&!reg.waiting){
+          _updMsg('✓ L\'app est déjà à jour (v'+APP_VERSION+').','var(--c1)');end();
+        }
+      },1500);
+    });
+  }).catch(function(){
+    _updMsg('Échec de la vérification. Réessaie plus tard.','var(--c5)');end();
+  });
+});
 </script>
 </body>
 </html>
