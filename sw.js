@@ -1,4 +1,4 @@
-﻿const CACHE = 'yct-vocab-v29';
+﻿const CACHE = 'yct-vocab-v30';
 const ASSETS = [
   './yct_app.html',
   './data.js',
@@ -11,7 +11,13 @@ const ASSETS = [
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE)
-      .then(c => c.addAll(ASSETS))
+      // cache:'reload' contourne le cache HTTP (GitHub Pages = 10 min) → fichiers vraiment à jour
+      .then(c => Promise.all(ASSETS.map(u =>
+        fetch(new Request(u, { cache: 'reload' })).then(r => {
+          if (!r.ok) throw new Error(u);
+          return c.put(u, r);
+        })
+      )))
       .then(() => self.skipWaiting())
   );
 });

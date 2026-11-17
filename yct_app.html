@@ -3463,43 +3463,47 @@ function _updMsg(t,color){
   var el=document.getElementById('update-status');
   el.style.display='block';el.style.color=color||'';el.textContent=t;
 }
-function _updReload(){
-  _updMsg('✓ Mise à jour installée, rechargement…','var(--c1)');
-  setTimeout(function(){location.reload();},700);
+// Purge SW + caches puis recharge depuis le réseau (la progression localStorage est conservée)
+function _updApply(){
+  var p=[];
+  if('serviceWorker' in navigator)p.push(navigator.serviceWorker.getRegistrations().then(function(rs){return Promise.all(rs.map(function(r){return r.unregister();}));}));
+  if(window.caches)p.push(caches.keys().then(function(ks){return Promise.all(ks.map(function(k){return caches.delete(k);}));}));
+  Promise.all(p).catch(function(){}).then(function(){
+    setTimeout(function(){location.replace('./yct_app.html?u='+Date.now());},600);
+  });
 }
-document.getElementById('settings-update').addEventListener('click',function(){
-  var btn=this;
-  if(!('serviceWorker' in navigator)){_updMsg('Mise à jour automatique non disponible sur ce navigateur.','var(--c5)');return;}
+function _updCheck(force){
+  var btn=document.getElementById('settings-update');
   if(!navigator.onLine){_updMsg('Pas de connexion internet : impossible de vérifier.','var(--c5)');return;}
   btn.disabled=true;_updMsg('Recherche en cours…');
-  var finished=false;
-  function end(){btn.disabled=false;}
-  navigator.serviceWorker.getRegistration().then(function(reg){
-    if(!reg){
-      // Aucun service worker : on recharge simplement depuis le réseau
-      _updReload();return;
+  var nc={cache:'no-store'},q='?v='+Date.now();
+  // On lit la version publiée directement sur le serveur (sans aucun cache)
+  Promise.all([
+    fetch('./config.js'+q,nc).then(function(r){if(!r.ok)throw 0;return r.text();}),
+    fetch('./sw.js'+q,nc).then(function(r){if(!r.ok)throw 0;return r.text();}),
+    window.caches?caches.keys():Promise.resolve([])
+  ]).then(function(res){
+    var mv=/APP_VERSION\s*=\s*['"]([^'"]+)['"]/.exec(res[0]);
+    var mc=/CACHE\s*=\s*['"]([^'"]+)['"]/.exec(res[1]);
+    var remoteV=mv?mv[1]:'?',remoteC=mc?mc[1]:null;
+    var localC=res[2].filter(function(k){return k.indexOf('yct-vocab')===0;});
+    var outdated=remoteV!==APP_VERSION||(remoteC&&localC.indexOf(remoteC)<0);
+    if(outdated||force){
+      _updMsg((outdated?'Nouvelle version trouvée (v'+remoteV+')':'Réinstallation')+', mise à jour…','var(--c1)');
+      _updApply();
+    }else{
+      _updMsg('✓ L\'app est à jour (v'+APP_VERSION+'). Appuie encore pour forcer la réinstallation.','var(--c1)');
+      btn.disabled=false;btn.dataset.force='1';
     }
-    // Nouvelle version déjà téléchargée et en attente
-    if(reg.waiting){reg.waiting.postMessage('skipWaiting');_updReload();return;}
-    reg.addEventListener('updatefound',function(){
-      var nw=reg.installing;if(!nw)return;
-      _updMsg('Nouvelle version trouvée, téléchargement…');
-      nw.addEventListener('statechange',function(){
-        if(nw.state==='installed'||nw.state==='activated'){
-          if(finished)return;finished=true;_updReload();
-        }
-      });
-    });
-    return reg.update().then(function(){
-      setTimeout(function(){
-        if(!finished&&!reg.installing&&!reg.waiting){
-          _updMsg('✓ L\'app est déjà à jour (v'+APP_VERSION+').','var(--c1)');end();
-        }
-      },1500);
-    });
   }).catch(function(){
-    _updMsg('Échec de la vérification. Réessaie plus tard.','var(--c5)');end();
+    _updMsg('Échec de la vérification (serveur injoignable). Réessaie plus tard.','var(--c5)');
+    btn.disabled=false;
   });
+}
+document.getElementById('settings-update').addEventListener('click',function(){
+  var force=this.dataset.force==='1';
+  this.dataset.force='';
+  _updCheck(force);
 });
 </script>
 </body>
